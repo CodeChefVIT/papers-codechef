@@ -20,7 +20,7 @@
     "@radix-ui/react-switch": "^1.1.1",
     "@t3-oss/env-nextjs": "^0.10.1",
     "@types/mongoose": "^5.11.97",
-    "axios": "^1.7.2",
+    "axios": "^1.7.4",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.0",
     "cloudinary": "^2.2.0",
