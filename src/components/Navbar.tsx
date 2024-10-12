@@ -28,7 +28,7 @@ function Navbar() {
           <ModeToggle />
         </div>
 
-        <Link href="/upload">
+        {/* <Link href="/upload">
           <Button
             variant="outline"
             className="rounded-full px-6 py-4 text-xs md:text-sm mt-2 md:mt-0"
@@ -36,7 +36,7 @@ function Navbar() {
             <ArrowUpToLine />
             <span>UPLOAD PAPERS</span>
           </Button>
-        </Link>
+        </Link> */}
       </div>
     </div>
   );

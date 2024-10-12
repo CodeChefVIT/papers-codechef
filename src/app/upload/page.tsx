@@ -44,71 +44,71 @@ const Page = () => {
   //   setOpenCamera((prev) => !prev);
   // };
 
-  const handlePrint = async () => {
-    // file validation
-    const maxFileSize = 5 * 1024 * 1024;
-    const files = fileInputRef.current?.files as FileList | null;
-    if (!files || files.length == 0) {
-      toast.error("No files selected");
-      return;
-    } else if (files.length > 5) {
-      toast.error("More than 5 files selected");
-      return;
-    }
-    for (const file of files) {
-      if (file.size > maxFileSize) {
-        toast.error(`File ${file.name} is more than 5MB`);
-        return;
-      }
-    }
-    const zip = new JSZip();
-    const formData = new FormData();
+  // const handlePrint = async () => {
+  //   // file validation
+  //   const maxFileSize = 5 * 1024 * 1024;
+  //   const files = fileInputRef.current?.files as FileList | null;
+  //   if (!files || files.length == 0) {
+  //     toast.error("No files selected");
+  //     return;
+  //   } else if (files.length > 5) {
+  //     toast.error("More than 5 files selected");
+  //     return;
+  //   }
+  //   for (const file of files) {
+  //     if (file.size > maxFileSize) {
+  //       toast.error(`File ${file.name} is more than 5MB`);
+  //       return;
+  //     }
+  //   }
+  //   const zip = new JSZip();
+  //   const formData = new FormData();
 
-    for (const file of files) {
-      zip.file(file.name, file);
-      const content = await zip.generateAsync({ type: "blob" });
+  //   for (const file of files) {
+  //     zip.file(file.name, file);
+  //     const content = await zip.generateAsync({ type: "blob" });
 
-      const arrayBuffer = await new Response(content).arrayBuffer();
-      const uint8Array = new Uint8Array(arrayBuffer);
+  //     const arrayBuffer = await new Response(content).arrayBuffer();
+  //     const uint8Array = new Uint8Array(arrayBuffer);
 
-      formData.append("zipFile", new Blob([uint8Array]), "files.zip");
-      formData.append("slot", slot);
-      formData.append("subject", subject);
-      formData.append("exam", exam);
-      formData.append("year", year);
-    }
-    try {
-      const result = await toast.promise(
-        (async () => {
-          try {
-            const response = await axios.post<{ message: string }>(
-              "/api/mail",
-              formData,
-              {
-                headers: {
-                  "Content-Type": "multipart/form-data",
-                },
-              },
-            );
-            return response.data;
-          } catch (error) {
-            handleAPIError(error);
-          }
-        })(),
-        {
-          loading: "Sending papers",
-          success: "Papers successfully sent",
-          error: (err: ApiError) => err.message,
-        },
-      );
-      if (result?.message === "Email sent successfully!") {
-        setTimeout(() => {
-          router.push("/");
-        }, 1500);
-      }
-    } catch (e) {
-    }
-  };
+  //     formData.append("zipFile", new Blob([uint8Array]), "files.zip");
+  //     formData.append("slot", slot);
+  //     formData.append("subject", subject);
+  //     formData.append("exam", exam);
+  //     formData.append("year", year);
+  //   }
+  //   try {
+  //     const result = await toast.promise(
+  //       (async () => {
+  //         try {
+  //           const response = await axios.post<{ message: string }>(
+  //             "/api/mail",
+  //             formData,
+  //             {
+  //               headers: {
+  //                 "Content-Type": "multipart/form-data",
+  //               },
+  //             },
+  //           );
+  //           return response.data;
+  //         } catch (error) {
+  //           handleAPIError(error);
+  //         }
+  //       })(),
+  //       {
+  //         loading: "Sending papers",
+  //         success: "Papers successfully sent",
+  //         error: (err: ApiError) => err.message,
+  //       },
+  //     );
+  //     if (result?.message === "Email sent successfully!") {
+  //       setTimeout(() => {
+  //         router.push("/");
+  //       }, 1500);
+  //     }
+  //   } catch (e) {
+  //   }
+  // };
 
   const handleSubjectSelect = (value: string) => {
     setSubject(value);
@@ -269,12 +269,12 @@ const Page = () => {
             </div>
           </div>
         </fieldset>
-        <Button
+        {/* <Button
           onClick={handlePrint}
           className="w-fit rounded-md px-4 py-3"
         >
           Upload Papers
-        </Button>
+        </Button> */}
       </div>
       <div className="">
         <Footer />
