@@ -5,7 +5,6 @@ import CatalogueContent from "@/components/CatalogueContent";
 import { Paper } from "@/interface";
 import getPapers from "@/actions/get-papers-by-sub";
 import { Metadata } from "next";
-import StoredPapers from "@/components/StoredPapers";
 
 interface PageProps {
   searchParams: {
@@ -17,14 +16,16 @@ interface PageProps {
 }
 
 export async function generateMetadata({ searchParams }: PageProps): Promise<Metadata> {
-  if (searchParams.subject) {
+  const subject = searchParams.subject;
+
+  if (subject) {
     return {
-      title: `Papers by CodeChef-VIT | ${Paper.subject}`,
+      title: `Papers by CodeChef-VIT | ${subject}`,
       openGraph: {
-        title: `Papers by CodeChef-VIT | ${Paper.subject}`,
+        title: `Papers by CodeChef-VIT | ${subject}`,
       },
       twitter: {
-        title: `Papers by CodeChef-VIT | ${Paper.subject}`,
+        title: `Papers by CodeChef-VIT | ${subject}`,
       }
     };
   }
