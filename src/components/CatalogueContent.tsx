@@ -1,7 +1,4 @@
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
-import axios, { type AxiosError } from "axios";
-import { Button } from "@/components/ui/button";
+"use client";
 import { type Paper, type Filters } from "@/interface";
 import { FilterDialog } from "@/components/FilterDialog";
 import Card from "./Card";
@@ -9,36 +6,34 @@ import { extractBracketContent } from "@/util/utils";
 import { useRouter } from "next/navigation";
 import SearchBar from "./searchbar";
 import Loader from "./ui/loader";
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
 
-const CatalogueContent = () => {
-  const searchParams = useSearchParams();
+interface CatalogueContentProps {
+  papers: Paper[];
+  filterOptions?: Filters;
+  exams?: string[];
+  slots?: string[];
+  years?: string[];
+  subject?: string;
+  error?: string | null;
+}
+
+export default function CatalogueContent({
+  papers,
+  filterOptions,
+  exams,
+  slots,
+  years,
+  subject,
+  error
+}: CatalogueContentProps) {
   const router = useRouter();
-  const subject = searchParams.get("subject");
-  const exams = searchParams.get("exams")?.split(",");
-  const slots = searchParams.get("slots")?.split(",");
-  const years = searchParams.get("years")?.split(",");
-  const [selectedExams, setSelectedExams] = useState<string[] | undefined>(
-    exams,
-  );
-  const [selectedSlots, setSelectedSlots] = useState<string[] | undefined>(
-    slots,
-  );
-  const [selectedYears, setSelectedYears] = useState<string[] | undefined>(
-    years,
-  );
+  const [selectedPapers, setSelectedPapers] = useState<Paper[]>([]);
 
   const handleResetFilters = () => {
-    setSelectedExams([]);
-    setSelectedSlots([]);
-    setSelectedYears([]);
     router.push(`/catalogue?subject=${encodeURIComponent(subject!)}`);
   };
-
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [selectedPapers, setSelectedPapers] = useState<Paper[]>([]);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [filterOptions, setFilterOptions] = useState<Filters>();
 
   const handleSelectAll = () => setSelectedPapers(papers);
   const handleDeselectAll = () => setSelectedPapers([]);
@@ -47,21 +42,19 @@ const CatalogueContent = () => {
     for (const paper of selectedPapers) {
       const extension = paper.finalUrl.split(".").pop();
       const fileName = `${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}.${extension}`;
-      await downloadFile(paper.finalUrl, fileName);
+      try {
+        const response = await fetch(paper.finalUrl);
+        const blob = await response.blob();
+        const link = document.createElement("a");
+        link.href = window.URL.createObjectURL(blob);
+        link.download = fileName;
+        link.click();
+        window.URL.revokeObjectURL(link.href);
+      } catch (error) {
+        console.error('Error downloading file:', error);
+      }
     }
   };
-
-  async function downloadFile(url: string, filename: string) {
-    try {
-      const response = await axios.get(url, { responseType: "blob" });
-      const blob = new Blob([response.data]);
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-      window.URL.revokeObjectURL(link.href);
-    } catch (error) {}
-  }
 
   const handleSelectPaper = (paper: Paper, isSelected: boolean) => {
     if (isSelected) {
@@ -70,96 +63,39 @@ const CatalogueContent = () => {
       setSelectedPapers((prev) => prev.filter((p) => p._id !== paper._id));
     }
   };
+
   const handleApplyFilters = (
-    exams: string[],
-    slots: string[],
-    years: string[],
+    newExams: string[],
+    newSlots: string[],
+    newYears: string[],
   ) => {
     if (subject) {
       let pushContent = "/catalogue";
-      if (subject) {
-        pushContent = pushContent.concat(
-          `?subject=${encodeURIComponent(subject)}`,
-        );
+      pushContent = pushContent.concat(`?subject=${encodeURIComponent(subject)}`);
+      
+      if (newExams?.length > 0) {
+        pushContent = pushContent.concat(`&exams=${encodeURIComponent(newExams.join(","))}`);
       }
-      if (exams !== undefined && exams.length > 0) {
-        pushContent = pushContent.concat(
-          `&exams=${encodeURIComponent(exams.join(","))}`,
-        );
+      if (newSlots?.length > 0) {
+        pushContent = pushContent.concat(`&slots=${encodeURIComponent(newSlots.join(","))}`);
       }
-      if (slots !== undefined && slots.length > 0) {
-        pushContent = pushContent.concat(
-          `&slots=${encodeURIComponent(slots.join(","))}`,
-        );
+      if (newYears?.length > 0) {
+        pushContent = pushContent.concat(`&years=${encodeURIComponent(newYears.join(","))}`);
       }
-      if (years !== undefined && years.length > 0) {
-        pushContent = pushContent.concat(
-          `&years=${encodeURIComponent(years.join(","))}`,
-        );
-      }
+      
       router.push(pushContent);
     }
-    setSelectedExams(exams);
-    setSelectedSlots(slots);
-    setSelectedYears(years);
     handleDeselectAll();
   };
 
-  useEffect(() => {
-    if (subject) {
-      const fetchPapers = async () => {
-        setLoading(true);
-
-        try {
-          const papersResponse = await axios.get<{ papers: Paper[], filters: Filters }>("/api/papers", {
-            params: { subject },
-          });
-          const papersData: Paper[] = papersResponse.data.papers;
-          const filters: Filters = papersResponse.data.filters;
-
-          setFilterOptions(filters);
-
-          const papersDataWithFilters = papersData.filter((paper) => {
-            const examCondition = exams?.length
-              ? exams.includes(paper.exam)
-              : true;
-            const slotCondition = slots?.length
-              ? slots.includes(paper.slot)
-              : true;
-            const yearCondition = years?.length
-              ? years.includes(paper.year)
-              : true;
-
-            return examCondition && slotCondition && yearCondition;
-          });
-
-          setPapers(
-            papersDataWithFilters.length >= 0
-              ? papersDataWithFilters
-              : papersData,
-          );
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            const axiosError = error as AxiosError<{ message?: string }>;
-            setError(
-              axiosError.response?.data?.message ?? "Error fetching papers",
-            );
-          } else {
-            setError("Error fetching papers");
-          }
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      void fetchPapers();
-    }
-  }, [subject, searchParams]);
+  if (!subject) {
+    return <div>Please select a subject</div>;
+  }
 
   return (
     <div className="min-h-screen px-2 md:p-8">
-      <div className="mb-10 flex w-full flex-row items-center md:justify-between  md:gap-10">
-        <div className=" w-[120%] md:w-[576px]">
+      <div className="mb-10 flex w-full flex-row items-center md:justify-between md:gap-10">
+        <div className="w-[120%] md:w-[576px]">
           <SearchBar />
         </div>
         <div className="flex gap-8">
@@ -173,8 +109,8 @@ const CatalogueContent = () => {
               onReset={handleResetFilters}
               onApplyFilters={handleApplyFilters}
             />
-          )}{" "}
-          <div className=" hidden items-center justify-center gap-2 md:flex md:justify-end 2xl:mr-4">
+          )}
+          <div className="hidden items-center justify-center gap-2 md:flex md:justify-end 2xl:mr-4">
             <Button variant="outline" onClick={handleSelectAll}>
               Select All
             </Button>
@@ -193,26 +129,20 @@ const CatalogueContent = () => {
       </div>
 
       {error && <p className="text-red-500">{error}</p>}
-      {loading ? (
+      {!papers.length ? (
         <Loader />
-      ) : papers.length > 0 ? (
-        <>
-          <div className="mx-auto flex flex-col flex-wrap items-center justify-center gap-10 md:flex-row md:justify-normal">
-            {papers.map((paper) => (
-              <Card
-                key={paper._id}
-                paper={paper}
-                onSelect={(p, isSelected) => handleSelectPaper(p, isSelected)}
-                isSelected={selectedPapers.some((p) => p._id === paper._id)}
-              />
-            ))}
-          </div>
-        </>
       ) : (
-        <p>No papers available for this subject.</p>
+        <div className="mx-auto flex flex-col flex-wrap items-center justify-center gap-10 md:flex-row md:justify-normal">
+          {papers.map((paper) => (
+            <Card
+              key={paper._id}
+              paper={paper}
+              onSelect={(p, isSelected) => handleSelectPaper(p, isSelected)}
+              isSelected={selectedPapers.some((p) => p._id === paper._id)}
+            />
+          ))}
+        </div>
       )}
     </div>
   );
-};
-
-export default CatalogueContent;
+}
