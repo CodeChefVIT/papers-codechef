@@ -1,12 +1,11 @@
 "use client";
+
 import React, { useRef, useState } from "react";
 import axios from "axios";
-import toast, { Toaster } from "react-hot-toast";
+import toast from "react-hot-toast";
 import { handleAPIError } from "../../util/error";
 import { useRouter } from "next/navigation";
-import { type ApiError } from "next/dist/server/api-utils";
 import { Button } from "@/components/ui/button";
-import { CldUploadWidget } from "next-cloudinary";
 import { Input } from "@/components/ui/input";
 import {
   Select,
@@ -17,19 +16,11 @@ import {
   SelectLabel,
   SelectItem,
 } from "@/components/ui/select";
-import {
-  Command,
-  CommandInput,
-  CommandList,
-  CommandItem,
-  CommandEmpty,
-  CommandGroup,
-} from "@/components/ui/command";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { PostPDFToCloudinary } from "@/interface";
 import { courses, slots, years } from "@/components/select_options";
 import SearchBar from "@/components/searchbarSubjectList";
+
 const Page = () => {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -39,9 +30,8 @@ const Page = () => {
   const [exam, setExam] = useState("");
   const [year, setYear] = useState("");
   const [files, setFiles] = useState<File[]>([]);
-  const [inputValue, setInputValue] = useState("");
-  const [isSubjectCommandOpen, setIsSubjectCommandOpen] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [resetSearch, setResetSearch] = useState(false);
 
   const handlePrint = async () => {
     const maxFileSize = 5 * 1024 * 1024;
@@ -53,38 +43,26 @@ const Page = () => {
     ];
     const files = fileInputRef.current?.files as FileList | null;
 
-    if (!slot) {
-      toast.error("Slot is required");
+    if (!slot || !subject || !exam || !year || !files || files.length === 0) {
+      toast.error("All fields are required.");
       return;
     }
-    if (!subject) {
-      toast.error("Subject is required");
-      return;
-    }
-    if (!exam) {
-      toast.error("Exam is required");
-      return;
-    }
-    if (!year) {
-      toast.error("Year is required");
-      return;
-    }
-    if (!files || files.length === 0) {
-      toast.error("No files selected");
-      return;
-    } else if (files.length > 5) {
+
+    if (files.length > 5) {
       toast.error("More than 5 files selected");
       return;
     }
-    //file have same extension
-    if (!Array.from(files).every((file) => file.type == files[0]?.type))
-      toast.error(`All files MUST be of same type`);
+
+    if (!Array.from(files).every((file) => file.type === files[0]?.type)) {
+      toast.error(`All files MUST be of the same type`);
+      return;
+    }
+
     for (const file of files) {
       if (file.size > maxFileSize) {
         toast.error(`File ${file.name} is more than 5MB`);
         return;
       }
-
       if (!allowedFileTypes.includes(file.type)) {
         toast.error(
           `File type of ${file.name} is not allowed. Only PDFs and images are accepted.`,
@@ -97,51 +75,47 @@ const Page = () => {
     if (files[0]?.type === "application/pdf") {
       isPdf = true;
       if (files.length > 1) {
-        toast.error(`PDFs should be uploaded seperately`);
+        toast.error(`PDFs should be uploaded separately`);
         return;
       }
     }
+
     const Arrfiles = Array.from(files);
     const formData = new FormData();
     Arrfiles.forEach((file) => {
       formData.append("files", file);
     });
-
-    // const body = {
-    //   subject: subject,
-    //   slot: slot,
-    //   year: year,
-    //   exam: exam,
-    //   isPdf: isPdf,
-    // };
     formData.append("subject", subject);
     formData.append("slot", slot);
     formData.append("year", year);
     formData.append("exam", exam);
     formData.append("isPdf", String(isPdf));
-    void toast.promise(
-      (async () => {
-        try {
-          const response = await axios.post<PostPDFToCloudinary>(
-            "/api/upload",
-            formData,
-          );
-        } catch (error: unknown) {
-          throw handleAPIError(error);
-        }
-      })(),
-      {
-        loading: "Uploading papers...",
-        success: "papers uploaded",
-        error: (err: ApiError) => err.message,
-      },
-    );
-  };
 
-  const handleSubjectSelect = (value: string) => {
-    setSubject(value);
-    setInputValue(value);
-    setIsSubjectCommandOpen(false);
+    setIsUploading(true);
+
+    try {
+      await toast.promise(axios.post("/api/upload", formData), {
+        loading: "Uploading papers...",
+        success: "Papers uploaded",
+        error: (err) => err.message,
+      });
+
+      setSlot("");
+      setSubject("");
+      setExam("");
+      setYear("");
+      setFiles([]); //gpt ko nahi ata hoga par merko ata hai.koi nahi
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
+
+      setResetSearch(true);
+      setTimeout(() => setResetSearch(false), 100);
+    } catch (error) {
+      handleAPIError(error);
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   return (
@@ -195,31 +169,7 @@ const Page = () => {
             {/* Subject Selection */}
             <div>
               <label>Subject:</label>
-              {/* setSubject */}
-              <SearchBar setSubject={setSubject}></SearchBar>
-              {/* <Command className="rounded-lg border shadow-md md:min-w-[450px]">
-                <CommandInput
-                  value={inputValue}
-                  onChangeCapture={(e) =>
-                    setInputValue((e.target as HTMLInputElement).value)
-                  }
-                  placeholder="Type a subject or search..."
-                /> */}
-              {/* <CommandList className="h-[100px]">
-                  <CommandEmpty>No results found.</CommandEmpty>
-
-                  <CommandGroup heading="Subjects">
-                    {courses.map((course) => (
-                      <CommandItem
-                        key={course}
-                        onSelect={() => handleSubjectSelect(course)}
-                      >
-                        <span>{course}</span>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
-                </CommandList>
-              </Command> */}
+              <SearchBar setSubject={setSubject} resetSearch={resetSearch} />
             </div>
 
             {/* Year Selection */}
@@ -232,14 +182,11 @@ const Page = () => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Years</SelectLabel>
-                    {years.map((year)=>
-                    {
-                      return (<SelectItem key={year} value={String(year)}>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={String(year)}>
                         {year}
-                      </SelectItem>)
-
-                    }
-                    )}
+                      </SelectItem>
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -283,7 +230,7 @@ const Page = () => {
           {isUploading ? "Uploading..." : "Upload Papers"}
         </Button>
       </div>
-      <div className="">
+      <div>
         <Footer />
       </div>
     </div>

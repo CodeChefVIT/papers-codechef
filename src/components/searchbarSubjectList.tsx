@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useCallback, useRef, useEffect } from "react";
 import { Search } from "lucide-react";
 import debounce from "debounce";
@@ -8,8 +6,10 @@ import { courses } from "./select_options";
 
 function SearchbarSubjectList({
   setSubject,
+  resetSearch,
 }: {
   setSubject: React.Dispatch<React.SetStateAction<string>>;
+  resetSearch: boolean;
 }) {
   const [searchText, setSearchText] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
@@ -30,11 +30,11 @@ function SearchbarSubjectList({
 
         if (filteredSubjects.length === 0) {
           setError("Subject not found");
+          setSuggestions([]);
           return;
         }
         setSuggestions(filteredSubjects);
         setError(null);
-
         setLoading(false);
       } else {
         setSuggestions([]);
@@ -52,11 +52,10 @@ function SearchbarSubjectList({
     void debouncedSearch(text);
   };
 
-  const handleSelectSuggestion = async (suggestion: string) => {
+  const handleSelectSuggestion = (suggestion: string) => {
     setSearchText(suggestion);
     setSuggestions([]);
     setSubject(suggestion);
-    // router.push(`/catalogue?subject=${encodeURIComponent(suggestion)}`);
   };
 
   const handleClickOutside = (event: MouseEvent) => {
@@ -75,6 +74,13 @@ function SearchbarSubjectList({
     };
   }, []);
 
+  useEffect(() => {
+    if (resetSearch) {
+      setSearchText("");
+      setSuggestions([]);
+    }
+  }, [resetSearch]);
+
   return (
     <div className="mx-4 md:mx-0">
       <form className=" my-2 ml-2 w-full max-w-xl">
@@ -84,14 +90,12 @@ function SearchbarSubjectList({
             value={searchText}
             onChange={handleSearchChange}
             placeholder="Search for subject..."
-            // className={`text-md w-fuyll rounded-full border bg-[#434dba] px-4 py-6 pr-10 font-sans tracking-wider text-white shadow-sm placeholder:text-white focus:outline-none focus:ring-2 ${loading ? "opacity-70" : ""}`}
           />
           <button
             type="submit"
             className="absolute inset-y-0 right-0 flex items-center pr-3"
             disabled
           >
-            {" "}
             <Search className="h-5 w-5 text-white " />
           </button>
           {loading && (
