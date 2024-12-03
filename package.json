@@ -44,7 +44,7 @@
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.395.0",
     "mongodb": "^6.7.0",
-    "mongoose": "^8.4.1",
+    "mongoose": "^8.8.3",
     "multer": "1.4.5-lts.1",
     "next": "^14.2.1",
     "next-cloudinary": "^6.6.2",
