@@ -40,6 +40,7 @@ export async function POST(req: Request) {
     const files: File[] = formData.getAll("files") as File[];
     const isPdf = formData.get("isPdf") === "true"; // Convert string to boolean
 
+
     let imageURL = "";
     if (isPdf) {
       imageURL = formData.get("image") as string;
@@ -58,53 +59,53 @@ export async function POST(req: Request) {
     const slot = finalTags.slot;
     const exam = finalTags["exam-type"];
     const year = finalTags.year;
-    const campus = formData.get("campus") as string
+    const campus = formData.get("campus") as string;
     const semester = finalTags.semester;
 
     if (!courses.includes(subject)) {
       return NextResponse.json(
         { message: "The course subject is invalid." },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     if (!slots.includes(slot)) {
       return NextResponse.json(
         { message: "The slot is invalid." },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     if (!exam.includes(exam)) {
       return NextResponse.json(
         { message: "The exam type is invalid." },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     if (!years.includes(year)) {
       return NextResponse.json(
         { message: "The year is invalid." },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     if (!campuses.includes(campus)) {
       return NextResponse.json(
-        { message:`The ${campus} is invalid.` },
-        { status: 400 }
+        { message: `The ${campus} is invalid.` },
+        { status: 400 },
       );
     }
-    
+
     if (!semesters.includes(semester)) {
       return NextResponse.json(
         { message: "The semester is invalid." },
-        { status: 400 }
+        { status: 400 },
       );
     }
-    
+
     // If all checks pass, continue with the rest of the logic
-    
+
     await connectToDatabase();
     let finalUrl: string | undefined = "";
     let public_id_cloudinary: string | undefined = "";
@@ -160,10 +161,7 @@ export async function POST(req: Request) {
       semester,
     });
     await paper.save();
-    return NextResponse.json(
-      { status: "success",  },
-      { status: 201 },
-    );
+    return NextResponse.json({ status: "success" }, { status: 201 });
   } catch (error) {
     console.error(error);
     return NextResponse.json(
@@ -201,12 +199,13 @@ async function uploadFile(
   }
 }
 
-async function CreatePDF(files: File[]) {
+async function CreatePDF(orderedFiles: File[]) {
   const pdfDoc = await PDFDocument.create();
   //sort files using name. Later remove to see if u can without names
-  const orderedFiles = Array.from(files).sort((a, b) => {
-    return a.name.localeCompare(b.name);
-  });
+  // moved to main function
+  // const orderedFiles = Array.from(files).sort((a, b) => {
+  //   return a.name.localeCompare(b.name);
+  // });
 
   for (const file of orderedFiles) {
     const fileBlob = new Blob([file]);
@@ -286,11 +285,6 @@ async function setTagsFromCurrentLists(
 }
 function findMatch<T>(arr: T[], value: string | undefined): T | undefined {
   if (!value) return undefined; // Handle undefined case
-  const pattern = new RegExp(
-    value
-      .split("")
-      .map((char) => `(?=.*${char})`)
-      .join(""),
-    "i"
-  );  return arr.find((item) => pattern.test(String(item)));
+  const pattern = new RegExp(value, "i");
+  return arr.find((item) => pattern.test(String(item)));
 }

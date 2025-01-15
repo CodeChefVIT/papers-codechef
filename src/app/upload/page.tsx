@@ -44,9 +44,10 @@ const Page = () => {
   const [campus, setCampus] = useState("Vellore");
 
   const [files, setFiles] = useState<File[]>([]);
+
   const [isUploading, setIsUploading] = useState(false);
   const [, setResetSearch] = useState(false);
-  function pdfCheckAndSelect<T extends File>(acceptedFiles: T[]) {
+  function fileCheckAndSelect<T extends File>(acceptedFiles: T[]) {
     const maxFileSize = 5 * 1024 * 1024;
     const allowedFileTypes = [
       "application/pdf",
@@ -96,8 +97,11 @@ const Page = () => {
       return;
     }
 
-    setFiles(acceptedFiles);
-    toast.success(`${acceptedFiles.length} files selected!`, {
+    const orderedFiles = files.sort((a, b) => {
+      return a.lastModified - b.lastModified;
+    });
+    setFiles(orderedFiles);
+    toast.success(`${orderedFiles.length} files selected!`, {
       id: toastId,
     });
   }
@@ -160,7 +164,7 @@ const Page = () => {
           <div className="flex w-full flex-col 2xl:gap-y-4">
             {/* File Dropzone */}
             <div>
-              <Dropzone onDrop={pdfCheckAndSelect}>
+              <Dropzone onDrop={fileCheckAndSelect}>
                 {({ getRootProps, getInputProps }) => (
                   <section className="my-2 -mr-2 cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center">
                     <div {...getRootProps()}>
