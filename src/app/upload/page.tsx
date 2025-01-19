@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
@@ -7,46 +8,26 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { type PostPDFToCloudinary } from "@/interface";
+import { slots, years, campuses, semesters, exams } from "@/components/select_options";
+import SearchBar from "@/components/searchbarSubjectList";
 import Dropzone from "react-dropzone";
-
-import { createCanvas } from "canvas";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
-import { PDFDocument } from "pdf-lib";
-async function pdfToImage(file: File) {
-  GlobalWorkerOptions.workerSrc =
-    "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
-
-  const pdfDoc = await PDFDocument.load(await file.arrayBuffer());
-
-  // Get the first page
-  const page = pdfDoc.getPages()[0];
-  if (!page) {
-    throw "First page not found";
-  }
-  // Create a canvas to render the image
-  const canvas = createCanvas(page.getWidth(), page.getHeight());
-  const context = canvas.getContext("2d");
-
-  // Use pdfjs-dist to render the page
-  const pdfjsDoc = await getDocument({ data: await file.arrayBuffer() })
-    .promise;
-  const pdfPage = await pdfjsDoc.getPage(1);
-
-  // Render page to canvas
-  const viewport = pdfPage.getViewport({ scale: 1 });
-  await pdfPage.render({ canvasContext: context, viewport }).promise;
-
-  // Convert the canvas to the desired output (Buffer, base64, etc.)
-  return canvas.toDataURL(); // Returns a Base64 string
-}
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const Page = () => {
+  const [slot, setSlot] = useState("");
+  const [subject, setSubject] = useState("");
+  const [exam, setExam] = useState("");
+  const [year, setYear] = useState("");
   const [campus, setCampus] = useState("Vellore");
-
-  const [files, setFiles] = useState<File[]>([]);
-
-  const [isUploading, setIsUploading] = useState(false);
-  const [, setResetSearch] = useState(false);
+  const [semester, setSemester] = useState("");
   function fileCheckAndSelect<T extends File>(acceptedFiles: T[]) {
     const maxFileSize = 5 * 1024 * 1024;
     const allowedFileTypes = [
@@ -105,23 +86,82 @@ const Page = () => {
       id: toastId,
     });
   }
+  const [files, setFiles] = useState<File[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [resetSearch, setResetSearch] = useState(false);
+
   const handlePrint = async () => {
+    const maxFileSize = 5 * 1024 * 1024;
+    const allowedFileTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+    ];
+
+    if (!slot) {
+      toast.error("Slot is required");
+      return;
+    }
+    if (!subject) {
+      toast.error("Subject is required");
+      return;
+    }
+    if (!exam) {
+      toast.error("Exam is required");
+      return;
+    }
+    if (!year) {
+      toast.error("Year is required");
+      return;
+    }
     if (!campus) {
       setCampus("Vellore");
     }
 
+    if (!semester) {
+      toast.error("Semester is required");
+      return;
+    }
+    if (!files || files.length === 0) {
+      toast.error("No files selected");
+      return;
+    }
+
+    if (files.length > 5) {
+      toast.error("More than 5 files selected");
+      return;
+    }
+
+    // File validations
+    const invalidFiles = files.filter(
+      (file) =>
+        file.size > maxFileSize || !allowedFileTypes.includes(file.type),
+    );
+
+    if (invalidFiles.length > 0) {
+      toast.error(
+        `Some files are invalid. Ensure each file is below 5MB and of an allowed type (PDF, JPEG, PNG, GIF).`,
+      );
+      return;
+    }
+
     const isPdf = files.length === 1 && files[0]?.type === "application/pdf";
+    if (isPdf && files.length > 1) {
+      toast.error("PDFs must be uploaded separately");
+      return;
+    }
 
     // Prepare FormData
     const formData = new FormData();
     files.forEach((file) => {
       formData.append("files", file);
     });
-
-    if (isPdf && files[0]) {
-      formData.append("image", await pdfToImage(files[0]));
-    }
-    // formData.append("exam", exam);
+    formData.append("subject", subject);
+    formData.append("slot", slot);
+    formData.append("year", year);
+    formData.append("exam", exam);
+    formData.append("semester", semester);
     formData.append("campus", campus);
 
     formData.append("isPdf", String(isPdf));
@@ -130,7 +170,7 @@ const Page = () => {
 
     try {
       await toast.promise(
-        axios.post<PostPDFToCloudinary>("/api/ai-upload", formData),
+        axios.post<PostPDFToCloudinary>("/api/upload", formData),
         {
           loading: "Uploading papers...",
           success: "Papers uploaded successfully!",
@@ -138,10 +178,10 @@ const Page = () => {
         },
       );
 
-      // setSlot("");
-      // setSubject("");
-      // setExam("");
-      // setYear("");
+      setSlot("");
+      setSubject("");
+      setExam("");
+      setYear("");
       setFiles([]);
       setResetSearch(true);
       setTimeout(() => setResetSearch(false), 100);
@@ -159,14 +199,104 @@ const Page = () => {
       </div>
       <div className="2xl:my-15 flex flex-col items-center">
         <fieldset className="mb-4 w-[350px] rounded-lg border-2 border-gray-300 p-4 pr-8">
-          {/* <legend className="text-lg font-bold">Upload papers</legend> */}
+          <legend className="text-lg font-bold">Select paper parameters</legend>
 
           <div className="flex w-full flex-col 2xl:gap-y-4">
+            {/* Slot Selection */}
+            <div>
+              <label>Slot:</label>
+              <Select value={slot} onValueChange={setSlot}>
+                <SelectTrigger className="m-2 rounded-md border p-2">
+                  <SelectValue placeholder="Select slot" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Slots</SelectLabel>
+                    {slots.map((slot) => (
+                      <SelectItem key={slot} value={slot}>
+                        {slot}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Exam Selection */}
+            <div>
+              <label>Exam:</label>
+              <Select value={exam} onValueChange={setExam}>
+                <SelectTrigger className="m-2 rounded-md border p-2">
+                  <SelectValue placeholder="Select exam" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Exams</SelectLabel>
+                    {exams.map((exam) => (
+                      <SelectItem key={exam} value={String(exam)}>
+                        {exam}
+                      </SelectItem>
+                    ))}{" "}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Subject Selection */}
+            <div>
+              <label>Subject:</label>
+              <SearchBar setSubject={setSubject} resetSearch={resetSearch} />
+            </div>
+
+            {/* Year Selection */}
+            <div>
+              <label>Year:</label>
+              <Select value={year} onValueChange={setYear}>
+                <SelectTrigger className="m-2 rounded-md border p-2">
+                  <SelectValue placeholder="Select year" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Years</SelectLabel>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={String(year)}>
+                        {year}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Year Selection */}
+
+            <div>
+              <label>Semester Selection:</label>
+              <Select value={semester} onValueChange={setSemester}>
+                <SelectTrigger className="m-2 rounded-md border p-2">
+                  <SelectValue placeholder="Select semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Semester</SelectLabel>
+                    {semesters.map((semester) => (
+                      <SelectItem key={semester} value={String(semester)}>
+                        {semester}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
             {/* File Dropzone */}
             <div>
-              <Dropzone onDrop={fileCheckAndSelect}>
+              <Dropzone
+                onDrop={(acceptedFiles) => setFiles(acceptedFiles)}
+                accept={{ "image/*": [], "application/pdf": [] }}
+              >
                 {({ getRootProps, getInputProps }) => (
-                  <section className="my-2 -mr-2 cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center">
+                  <section className="my-2 -mr-2 rounded-2xl border-2 border-dashed p-8 text-center">
                     <div {...getRootProps()}>
                       <input {...getInputProps()} />
                       <p>
