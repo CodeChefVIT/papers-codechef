@@ -56,7 +56,7 @@ const Card = ({
   return (
     <div
       key={paper._id}
-      className={`mb-2 flex w-[65%] flex-col justify-between space-y-1 rounded-xl border-2 border-black bg-white hover:border-[#434dba] dark:border-[#434dba] dark:bg-black dark:hover:border-white md:w-64  ${checked ? "bg-[#EEF2FF] dark:bg-[#050b1f]" : ""}  p-4 `}
+      className={`mb-2 flex w-[70%] flex-col justify-between space-y-1 rounded-xl border-2 border-black bg-white hover:border-[#434dba] dark:border-[#434dba] dark:bg-black dark:hover:border-white md:w-64  ${checked ? "bg-[#EEF2FF] dark:bg-[#050b1f]" : ""}  p-4 `}
     >
       <Link
         href={`/paper/${paper._id}`}
