@@ -11,7 +11,7 @@ const papers: IPaper[] = [
     slot: "A2",
     year: "2023",
     exam: "CAT-2",
-    semester: "Fall",
+    semester: "Fall Semester",
     campus: "Vellore",
   },
   {
@@ -24,7 +24,7 @@ const papers: IPaper[] = [
     slot: "A2",
     year: "2024",
     exam: "CAT-2",
-    semester: "Fall",
+    semester: "Fall Semester",
     campus: "Vellore",
   },
   {
@@ -38,7 +38,7 @@ const papers: IPaper[] = [
     slot: "A1",
     year: "2023",
     exam: "CAT-2",
-    semester: "Fall",
+    semester: "Fall Semester",
     campus: "Vellore",
   },
   {
@@ -51,7 +51,7 @@ const papers: IPaper[] = [
     slot: "C2",
     year: "2023",
     exam: "CAT-2",
-    semester: "Fall",
+    semester: "Fall Semester",
     campus: "Vellore",
   },
 ];
