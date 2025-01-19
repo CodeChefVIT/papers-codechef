@@ -1,5 +1,5 @@
 // "use server";
-import { ErrorResponse, type PaperResponse } from "@/interface";
+import {  type PaperResponse } from "@/interface";
 import axios, { type AxiosResponse } from "axios";
 
 export const fetchPaperID = async (id: string): Promise<PaperResponse> => {

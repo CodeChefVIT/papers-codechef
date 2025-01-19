@@ -14,7 +14,8 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     }
 
     const paper = await Paper.findById(id);
-
+    
+    
     if (!paper) {
       return NextResponse.json({ message: "Paper not found" }, { status: 404 });
     }

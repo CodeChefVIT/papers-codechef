@@ -1,6 +1,6 @@
-import { type Paper } from "@/interface";
+import { type IPaper } from "@/interface";
 
-const papers: Paper[] = [
+const papers: IPaper[] = [
   {
     _id: "6708fd8002a75017a4f08759",
     finalUrl:
@@ -11,6 +11,8 @@ const papers: Paper[] = [
     slot: "A2",
     year: "2023",
     exam: "CAT-2",
+    semester: "Fall",
+    campus: "Vellore",
   },
   {
     _id: "670980523ec3fdad83b2d211",
@@ -22,6 +24,8 @@ const papers: Paper[] = [
     slot: "A2",
     year: "2024",
     exam: "CAT-2",
+    semester: "Fall",
+    campus: "Vellore",
   },
   {
     _id: "670a105e6272bcf9da4e2362",
@@ -34,6 +38,8 @@ const papers: Paper[] = [
     slot: "A1",
     year: "2023",
     exam: "CAT-2",
+    semester: "Fall",
+    campus: "Vellore",
   },
   {
     _id: "67097e7b3ec3fdad83b2d205",
@@ -45,6 +51,8 @@ const papers: Paper[] = [
     slot: "C2",
     year: "2023",
     exam: "CAT-2",
+    semester: "Fall",
+    campus: "Vellore",
   },
 ];
 

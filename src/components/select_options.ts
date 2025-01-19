@@ -248,12 +248,12 @@ const slots: string[] = [
   "G2",
 ];
 function getYears(startYear: number) {
-  const currentYear = new Date().getFullYear();  // Get the current year
+  const currentYear = new Date().getFullYear(); // Get the current year
   const years = [];
 
   // Loop from startYear to currentYear and add each year to the array
   for (let year = startYear; year <= currentYear; year++) {
-      years.push(String(year));
+    years.push(String(year));
   }
 
   return years;
@@ -262,5 +262,14 @@ function getYears(startYear: number) {
 // Example usage:
 const startYear = 2011;
 const years = getYears(startYear);
-
-export { slots, courses, years };
+const campuses: string[] = [
+  "Vellore",
+  "Chennai",
+  "Andhra Pradesh",
+  "Bhopal",
+  "Bangalore",
+  "Mauritius",
+];
+const exams: string [] = ["CAT-1", "CAT-2", "FAT","Model CAT-1" , "Model CAT-2" , "Model FAT"]
+const semesters: string[] = ["Fall", "Winter", "Summer", "Weekend"];
+export { slots, courses, years, campuses, semesters, exams };

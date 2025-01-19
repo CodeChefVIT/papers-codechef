@@ -27,3 +27,8 @@ export function capsule(data: string) {
     <div className=" rounded-md bg-[#7480FF] p-1 px-3 text-sm">{data}</div>
   );
 }
+export function capsuleGreen(data: string) {
+  return (
+    <div className=" rounded-md bg-[#3cc923] p-1 px-3 text-sm">{data}</div>
+  );
+}

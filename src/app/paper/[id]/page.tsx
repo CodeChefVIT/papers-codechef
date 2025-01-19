@@ -4,120 +4,128 @@ import Navbar from "@/components/Navbar";
 import PdfViewer from "@/components/pdfViewer";
 import Loader from "@/components/ui/loader";
 import { type ErrorResponse, type PaperResponse } from "@/interface";
+import { extractBracketContent } from "@/util/utils";
 import axios, { type AxiosResponse } from "axios";
 import { type Metadata } from "next";
 import { redirect } from "next/navigation"; // Import redirect
+import QR from "@/components/qr";
 
 export async function generateMetadata({
   params,
 }: {
   params: { id: string };
 }): Promise<Metadata> {
-  const paper: PaperResponse | null = await fetchPaperID(params.id);
+  try {
+    const paper: PaperResponse | null = await fetchPaperID(params.id);
 
-  if (paper) {
+    if (paper) {
+      return {
+        metadataBase: new URL("https://papers.codechefvit.com/"),
+        title: `Papers | ${paper.subject} | ${paper.exam} | ${paper.slot}`,
+        description: `Discover ${paper.subject}'s question paper created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.`,
+        icons: [{ rel: "icon", url: "/codechef_logo.svg" }],
+        openGraph: {
+          title: `Papers | ${paper.subject} | ${paper.exam} | ${paper.slot}`,
+          images: [{ url: "/papers.png" }],
+          url: "https://papers.codechefvit.com/",
+          type: "website",
+          description: `Discover ${paper.subject}'s question paper created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.`,
+          siteName: "Papers by CodeChef-VIT",
+        },
+        twitter: {
+          card: "summary_large_image",
+          title: `Papers | ${paper.subject} | ${paper.exam} | ${paper.slot}`,
+          description: `Discover ${paper.subject}'s question paper created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.`,
+          images: [{ url: "/papers.png" }],
+        },
+        applicationName: "Papers by CodeChef-VIT",
+        keywords: [
+          "CodeChef",
+          "VIT",
+          "Vellore Institute of Technology",
+          "CodeChef-VIT",
+          "Papers",
+          "Exam solutions",
+          "Student resources",
+          "VIT exam papers",
+          "Exam preparation",
+          "Previous year papers VIT",
+          "VITCAT1",
+          "VITCAT2",
+          "VITFAT",
+          "VIT CAT1 papers",
+          "VIT CAT2 papers",
+          "VIT FAT papers",
+          "VIT exam question papers",
+          "VIT question bank",
+          "VIT previous year question papers",
+          "VIT academic resources",
+          "VIT exam pattern",
+          "VIT preparation tips",
+          "VIT question solutions",
+          "VIT model papers",
+          "VIT solved papers",
+          "VIT test papers",
+          "VIT sample papers",
+          "VIT question papers with solutions",
+          "VIT exam guide",
+          "VIT CAT1 preparation",
+          "VIT CAT2 preparation",
+          "VIT FAT preparation",
+          "VIT previous year CAT1 papers",
+          "VIT previous year CAT2 papers",
+          "VIT previous year FAT papers",
+          "VIT exam resources",
+          "VIT academic help",
+          "VIT syllabus",
+          "VIT question paper pattern",
+          "VIT 2023 papers",
+          "VIT 2024 papers",
+          "VIT exam practice",
+          "VIT question paper archives",
+          "VIT study materials",
+          "VIT engineering papers",
+          "VIT exam strategy",
+          "VIT online exam resources",
+          "VIT question paper download",
+          "VIT important questions",
+          "VIT question paper solutions",
+          `${paper.subject} question paper`,
+          `${paper.exam} question paper`,
+          `${paper.slot} question paper`,
+          `${paper.year} question paper`,
+          `${paper.subject} question paper`,
+          `${paper.exam} question paper`,
+          `${paper.slot} question paper`,
+          `${paper.year} question paper`,
+          `${paper.subject} ${paper.exam} question paper`,
+          `${paper.subject} ${paper.slot} question paper`,
+          `${paper.subject} ${paper.year} question paper`,
+          `${paper.exam} ${paper.slot} question paper`,
+          `${paper.exam} ${paper.year} question paper`,
+          `${paper.subject} ${paper.exam} ${paper.year} question paper`,
+          `${paper.subject} ${paper.exam} ${paper.slot} question paper`,
+          `${paper.subject} ${paper.year} ${paper.slot} question paper`,
+          `${paper.exam} ${paper.year} ${paper.slot} question paper`,
+          `${paper.subject} ${paper.exam} ${paper.year} ${paper.slot} question paper`,
+          `${paper.year} ${paper.subject} ${paper.slot} question paper`,
+          `${paper.year} ${paper.exam} ${paper.subject} question paper`,
+          `${paper.exam} ${paper.subject} ${paper.year} question paper`,
+          `${paper.slot} ${paper.subject} ${paper.year} question paper`,
+          `${paper.slot} ${paper.exam} ${paper.year} question paper`,
+        ],
+        robots: "index, follow",
+      };
+    }
+
     return {
-      metadataBase: new URL("https://papers.codechefvit.com/"),
-      title: `Papers | ${paper.subject} | ${paper.exam} | ${paper.slot}`,
-      description: `Discover ${paper.subject}'s question paper created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.`,
-      icons: [{ rel: "icon", url: "/codechef_logo.svg" }],
-      openGraph: {
-        title: `Papers | ${paper.subject} | ${paper.exam} | ${paper.slot}`,
-        images: [{ url: "/papers.png" }],
-        url: "https://papers.codechefvit.com/",
-        type: "website",
-        description: `Discover ${paper.subject}'s question paper created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.`,
-        siteName: "Papers by CodeChef-VIT",
-      },
-      twitter: {
-        card: "summary_large_image",
-        title: `Papers | ${paper.subject} | ${paper.exam} | ${paper.slot}`,
-        description: `Discover ${paper.subject}'s question paper created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.`,
-        images: [{ url: "/papers.png" }],
-      },
-      applicationName: "Papers by CodeChef-VIT",
-      keywords: [
-        "CodeChef",
-        "VIT",
-        "Vellore Institute of Technology",
-        "CodeChef-VIT",
-        "Papers",
-        "Exam solutions",
-        "Student resources",
-        "VIT exam papers",
-        "Exam preparation",
-        "Previous year papers VIT",
-        "VITCAT1",
-        "VITCAT2",
-        "VITFAT",
-        "VIT CAT1 papers",
-        "VIT CAT2 papers",
-        "VIT FAT papers",
-        "VIT exam question papers",
-        "VIT question bank",
-        "VIT previous year question papers",
-        "VIT academic resources",
-        "VIT exam pattern",
-        "VIT preparation tips",
-        "VIT question solutions",
-        "VIT model papers",
-        "VIT solved papers",
-        "VIT test papers",
-        "VIT sample papers",
-        "VIT question papers with solutions",
-        "VIT exam guide",
-        "VIT CAT1 preparation",
-        "VIT CAT2 preparation",
-        "VIT FAT preparation",
-        "VIT previous year CAT1 papers",
-        "VIT previous year CAT2 papers",
-        "VIT previous year FAT papers",
-        "VIT exam resources",
-        "VIT academic help",
-        "VIT syllabus",
-        "VIT question paper pattern",
-        "VIT 2023 papers",
-        "VIT 2024 papers",
-        "VIT exam practice",
-        "VIT question paper archives",
-        "VIT study materials",
-        "VIT engineering papers",
-        "VIT exam strategy",
-        "VIT online exam resources",
-        "VIT question paper download",
-        "VIT important questions",
-        "VIT question paper solutions",
-        `${paper.subject} question paper`,
-        `${paper.exam} question paper`,
-        `${paper.slot} question paper`,
-        `${paper.year} question paper`,
-        `${paper.subject} question paper`,
-        `${paper.exam} question paper`,
-        `${paper.slot} question paper`,
-        `${paper.year} question paper`,
-        `${paper.subject} ${paper.exam} question paper`,
-        `${paper.subject} ${paper.slot} question paper`,
-        `${paper.subject} ${paper.year} question paper`,
-        `${paper.exam} ${paper.slot} question paper`,
-        `${paper.exam} ${paper.year} question paper`,
-        `${paper.subject} ${paper.exam} ${paper.year} question paper`,
-        `${paper.subject} ${paper.exam} ${paper.slot} question paper`,
-        `${paper.subject} ${paper.year} ${paper.slot} question paper`,
-        `${paper.exam} ${paper.year} ${paper.slot} question paper`,
-        `${paper.subject} ${paper.exam} ${paper.year} ${paper.slot} question paper`,
-        `${paper.year} ${paper.subject} ${paper.slot} question paper`,
-        `${paper.year} ${paper.exam} ${paper.subject} question paper`,
-        `${paper.exam} ${paper.subject} ${paper.year} question paper`,
-        `${paper.slot} ${paper.subject} ${paper.year} question paper`,
-        `${paper.slot} ${paper.exam} ${paper.year} question paper`,
-      ],
-      robots: "index, follow",
+      title: "Paper not found",
+    };
+  } catch {
+    return {
+      title: "Paper not found",
     };
   }
-
-  return {
-    title: "Paper not found",
-  };
 }
 const PaperPage = async ({ params }: { params: { id: string } }) => {
   async function getPaper() {
@@ -132,9 +140,12 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
         } else {
           return errorResponse?.data?.message ?? "Failed to fetch paper";
         }
+      } else if (err instanceof Error) {
+        return err.message;
       } else {
-        return "An unknown error occurred";
+        return String(err);
       }
+      
     }
   }
   const paper = await getPaper();
@@ -155,7 +166,7 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
             {paper.subject} {paper.exam} {paper.slot} {paper.year}
           </h1>
           <center>
-            <PdfViewer url={paper.finalUrl}></PdfViewer>
+            <PdfViewer url={paper.finalUrl} name={`${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}></PdfViewer>
           </center>
         </>
       )}

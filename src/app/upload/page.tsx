@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { type PostPDFToCloudinary } from "@/interface";
-import { slots, years } from "@/components/select_options";
+import { slots, years, campuses, semesters, exams } from "@/components/select_options";
 import SearchBar from "@/components/searchbarSubjectList";
 import Dropzone from "react-dropzone";
 import {
@@ -26,6 +26,66 @@ const Page = () => {
   const [subject, setSubject] = useState("");
   const [exam, setExam] = useState("");
   const [year, setYear] = useState("");
+  const [campus, setCampus] = useState("Vellore");
+  const [semester, setSemester] = useState("");
+  function fileCheckAndSelect<T extends File>(acceptedFiles: T[]) {
+    const maxFileSize = 5 * 1024 * 1024;
+    const allowedFileTypes = [
+      "application/pdf",
+      "image/jpeg",
+      "image/png",
+      "image/gif",
+    ];
+
+    const toastId = toast.loading("uploading your files");
+    if (!acceptedFiles || acceptedFiles.length === 0) {
+      toast.error("No files selected", {
+        id: toastId,
+      });
+      return;
+    }
+
+    if (acceptedFiles.length > 5) {
+      toast.error("More than 5 files selected", {
+        id: toastId,
+      });
+      return;
+    }
+
+    // File validations
+    const invalidFiles = acceptedFiles.filter(
+      (file) =>
+        file.size > maxFileSize || !allowedFileTypes.includes(file.type),
+    );
+
+    if (invalidFiles.length > 0) {
+      toast.error(
+        `Some files are invalid. Ensure each file is below 5MB and of an allowed type (PDF, JPEG, PNG, GIF).`,
+        {
+          id: toastId,
+        },
+      );
+      return;
+    }
+
+    const isPdf =
+      acceptedFiles.length === 1 &&
+      acceptedFiles[0]?.type === "application/pdf";
+    if (isPdf && acceptedFiles.length > 1) {
+      toast.error("PDFs must be uploaded separately", {
+        id: toastId,
+      });
+      return;
+    }
+
+    const orderedFiles = files.sort((a, b) => {
+      return a.lastModified - b.lastModified;
+    });
+    setFiles(orderedFiles);
+    toast.success(`${orderedFiles.length} files selected!`, {
+      id: toastId,
+    });
+  }
   const [files, setFiles] = useState<File[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [resetSearch, setResetSearch] = useState(false);
@@ -55,7 +115,14 @@ const Page = () => {
       toast.error("Year is required");
       return;
     }
+    if (!campus) {
+      setCampus("Vellore");
+    }
 
+    if (!semester) {
+      toast.error("Semester is required");
+      return;
+    }
     if (!files || files.length === 0) {
       toast.error("No files selected");
       return;
@@ -94,6 +161,9 @@ const Page = () => {
     formData.append("slot", slot);
     formData.append("year", year);
     formData.append("exam", exam);
+    formData.append("semester", semester);
+    formData.append("campus", campus);
+
     formData.append("isPdf", String(isPdf));
 
     setIsUploading(true);
@@ -162,9 +232,11 @@ const Page = () => {
                 <SelectContent>
                   <SelectGroup>
                     <SelectLabel>Exams</SelectLabel>
-                    <SelectItem value="CAT-1">CAT-1</SelectItem>
-                    <SelectItem value="CAT-2">CAT-2</SelectItem>
-                    <SelectItem value="FAT">FAT</SelectItem>
+                    {exams.map((exam) => (
+                      <SelectItem key={exam} value={String(exam)}>
+                        {exam}
+                      </SelectItem>
+                    ))}{" "}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -189,6 +261,27 @@ const Page = () => {
                     {years.map((year) => (
                       <SelectItem key={year} value={String(year)}>
                         {year}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Year Selection */}
+
+            <div>
+              <label>Semester Selection:</label>
+              <Select value={semester} onValueChange={setSemester}>
+                <SelectTrigger className="m-2 rounded-md border p-2">
+                  <SelectValue placeholder="Select semester" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    <SelectLabel>Semester</SelectLabel>
+                    {semesters.map((semester) => (
+                      <SelectItem key={semester} value={String(semester)}>
+                        {semester}
                       </SelectItem>
                     ))}
                   </SelectGroup>

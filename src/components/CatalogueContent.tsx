@@ -2,13 +2,14 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios, { type AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
-import { type Paper, type Filters } from "@/interface";
+import { type IPaper, type Filters } from "@/interface";
 import { FilterDialog } from "@/components/FilterDialog";
 import Card from "./Card";
 import { extractBracketContent } from "@/util/utils";
 import { useRouter } from "next/navigation";
 import SearchBar from "./searchbar";
 import Loader from "./ui/loader";
+import { campuses, semesters } from "./select_options";
 
 const CatalogueContent = () => {
   const searchParams = useSearchParams();
@@ -17,6 +18,9 @@ const CatalogueContent = () => {
   const exams = searchParams.get("exams")?.split(",");
   const slots = searchParams.get("slots")?.split(",");
   const years = searchParams.get("years")?.split(",");
+  const semesters = searchParams.get("semesters")?.split(",");
+  const campuses = searchParams.get("campuses")?.split(",");
+
   const [selectedExams, setSelectedExams] = useState<string[] | undefined>(
     exams,
   );
@@ -34,8 +38,8 @@ const CatalogueContent = () => {
     router.push(`/catalogue?subject=${encodeURIComponent(subject!)}`);
   };
 
-  const [papers, setPapers] = useState<Paper[]>([]);
-  const [selectedPapers, setSelectedPapers] = useState<Paper[]>([]);
+  const [papers, setPapers] = useState<IPaper[]>([]);
+  const [selectedPapers, setSelectedPapers] = useState<IPaper[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [filterOptions, setFilterOptions] = useState<Filters>();
@@ -63,7 +67,7 @@ const CatalogueContent = () => {
     } catch (error) {}
   }
 
-  const handleSelectPaper = (paper: Paper, isSelected: boolean) => {
+  const handleSelectPaper = (paper: IPaper, isSelected: boolean) => {
     if (isSelected) {
       setSelectedPapers((prev) => [...prev, paper]);
     } else {
@@ -171,6 +175,8 @@ const CatalogueContent = () => {
               initialExams={exams}
               initialSlots={slots}
               initialYears={years}
+              initialCampuses={campuses}
+              initialSemesters={semesters}
               onReset={handleResetFilters}
               onApplyFilters={handleApplyFilters}
             />

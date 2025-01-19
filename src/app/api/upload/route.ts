@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { PDFDocument } from "pdf-lib";
-import { slots, years } from "@/components/select_options";
+import { campuses, exams, semesters, slots, years } from "@/components/select_options";
 import { connectToDatabase } from "@/lib/mongoose";
 import cloudinary from "cloudinary";
 import { type ICourses, type CloudinaryUploadResult } from "@/interface";
@@ -26,6 +26,9 @@ export async function POST(req: Request) {
     const slot = formData.get("slot") as string;
     const year = formData.get("year") as string;
     const exam = formData.get("exam") as string;
+    const campus = formData.get("campus") as string;
+    const semester = formData.get("semester") as string;
+
     const isPdf = formData.get("isPdf") === "true"; // Convert string to boolean
 
     const { data } = await axios.get<ICourses[]>(`${process.env.SERVER_URL}/api/course-list`);
@@ -34,7 +37,10 @@ export async function POST(req: Request) {
       !(
         courses.includes(subject) &&
         slots.includes(slot) &&
-        years.includes(year)
+        years.includes(year) &&
+        exams.includes(exam) &&
+        campuses.includes(campus) &&
+        semesters.includes(semester) 
       )
     ) {
       return NextResponse.json({ message: "Bad Request" }, { status: 400 });
@@ -90,6 +96,8 @@ export async function POST(req: Request) {
       slot,
       year,
       exam,
+      campus,
+      semester
     });
     await paper.save();
     return NextResponse.json(
@@ -136,9 +144,7 @@ async function uploadFile(
 async function CreatePDF(files: File[]) {
   const pdfDoc = await PDFDocument.create();
 
-  const orderedFiles = Array.from(files).sort((a, b) => {
-    return a.name.localeCompare(b.name);
-  });
+  const orderedFiles = files;
 
   for (const file of orderedFiles) {
     const fileBlob = new Blob([file]);

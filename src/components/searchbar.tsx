@@ -20,7 +20,9 @@ function SearchBar() {
       if (text.length > 1) {
         setLoading(true);
         try {
-          const searchResponse = await axios.get<{ subjects: { subject: string }[] }>("/api/search", {
+          const searchResponse = await axios.get<{
+            subjects: { subject: string }[];
+          }>("/api/search", {
             params: { text },
           });
 
@@ -47,10 +49,10 @@ function SearchBar() {
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
-    setSearchText(text);
     if (text.length <= 1) {
       setSuggestions([]);
     }
+    setSearchText(text);
     void debouncedSearch(text);
   };
 
@@ -85,7 +87,7 @@ function SearchBar() {
             value={searchText}
             onChange={handleSearchChange}
             placeholder="Search by subject..."
-            className={`w-full font-sans text-md tracking-wider rounded-full border bg-[#434dba] px-4 py-6 pr-10 text-white shadow-sm placeholder:text-white focus:outline-none focus:ring-2 ${loading ? "opacity-70" : ""}`}
+            className={`text-md w-full rounded-full border bg-[#434dba] px-4 py-6 pr-10 font-sans tracking-wider text-white shadow-sm placeholder:text-white focus:outline-none focus:ring-2 ${loading ? "opacity-70" : ""}`}
           />
           <button
             type="submit"
@@ -96,7 +98,7 @@ function SearchBar() {
             <Search className="h-5 w-5 text-white " />
           </button>
           {loading && (
-            <div className="font-sans text-md font-semibold tracking-wider absolute z-20 mt-2 w-full max-w-xl rounded-md border border-[#434dba] bg-white p-2 text-center dark:bg-[#030712]">
+            <div className="text-md absolute z-20 mt-2 w-full max-w-xl rounded-md border border-[#434dba] bg-white p-2 text-center font-sans font-semibold tracking-wider dark:bg-[#030712]">
               Loading suggestions...
             </div>
           )}
