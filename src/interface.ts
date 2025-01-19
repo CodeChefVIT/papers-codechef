@@ -70,7 +70,7 @@ export interface IAdminPaper {
   slot: string;
   year: string;
   exam: "CAT-1" | "CAT-2" | "FAT" | "Model";
-  semester: "Fall" | "Winter" | "Summer" | "Weekend";
+  semester: "Fall" | "Win" | "Summer" | "Weekend";
   campus:
     | "Vellore"
     | "Chennai"
@@ -132,7 +132,7 @@ export interface IPaper {
   exam: "CAT-1" | "CAT-2" | "FAT" | "Model CAT-1" | "Model CAT-2" | "Model FAT";
   finalUrl: string;
   thumbnailUrl: string;
-  semester: "Fall" | "Winter" | "Summer" | "Weekend";
+  semester: "Fall" | "Win" | "Summer" | "Weekend";
   campus:
     | "Vellore"
     | "Chennai"
@@ -150,7 +150,7 @@ export type ExamDetail = {
   slot: string;
   "course-code": string;
   "exam-type": string;
-  semester: "Fall" | "Winter" | "Summer" | "Weekend";
+  semester: "Fall" | "Win" | "Summer" | "Weekend";
   year: string;
 };
 export interface Filters {

@@ -271,5 +271,5 @@ const campuses: string[] = [
   "Mauritius",
 ];
 const exams: string [] = ["CAT-1", "CAT-2", "FAT","Model CAT-1" , "Model CAT-2" , "Model FAT"]
-const semesters: string[] = ["Fall", "Winter", "Summer", "Weekend"];
+const semesters: string[] = ["Fall", "Win", "Summer", "Weekend"];
 export { slots, courses, years, campuses, semesters, exams };
