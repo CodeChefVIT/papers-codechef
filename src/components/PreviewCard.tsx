@@ -29,17 +29,19 @@ const PreviewCard = ({ paper }: { paper: IPaper }) => {
           className="mb-2 h-[156px] w-full object-cover md:h-[170px]"
         />
 
-        <div className="flex h-28 flex-col justify-center space-y-2">
+        <div className="flex h-25 flex-col justify-center space-y-2">
           <div className="font-sans text-sm font-medium">
             {extractBracketContent(paper.subject)}
           </div>
           <div className="cursor-pointer font-sans text-base font-semibold">
             {extractWithoutBracketContent(paper.subject)}
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             {capsule(paper.exam)}
             {capsule(paper.slot)}
             {capsule(paper.year)}
+            {capsule(paper.semester)}
+
           </div>
         </div>
       </Link>

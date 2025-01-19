@@ -76,7 +76,7 @@ function parseExamDetail(analysis: string): ExamDetail {
     if (jsonMatch) {
       const examDetail: ExamDetail = JSON.parse(jsonMatch[0]) as ExamDetail;
       if (examDetail.semester) {
-        const validSemesters = ["Fall", "Winter", "Summer", "Weekend"];
+        const validSemesters = ["Fall", "Win", "Summer", "Weekend"];
         if (!validSemesters.includes(examDetail.semester)) {
           examDetail.semester = "Fall"; // Default to Fall if invalid
         }
@@ -123,7 +123,7 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
     - slot: One of A1|A2|B1|B2|C1|C2|D1|D2|E1|E2|F1|F2|G1|G2
     - course-code: The course code (format: department letters + numbers)
     - exam-type: One of "Final Assessment Test|Continuous Assessment Test - 1|Continuous Assessment Test - 2"
-    - semester: Must be exactly one of "Fall", "Winter", "Summer", or "Weekend"
+    - semester: Must be exactly one of "Fall", "Win", "Summer", or "Weekend"
     - year: The year in YYYY format (e.g., "2023")
     
     Provide the response in this exact format:
