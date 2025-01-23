@@ -4,6 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { GeistSans } from "geist/font/sans";
 import Script from "next/script";
 import type { Metadata } from "next";
+import Banner from "@/components/Banner";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://papers.codechefvit.com/"),
@@ -115,6 +116,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position="top-right" reverseOrder={false} />
+          <Banner />
           {children}
         </ThemeProvider>
       </body>
