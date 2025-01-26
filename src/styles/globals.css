@@ -134,3 +134,10 @@
 .rpv-full-screen__overlay {
   display: none !important;
 }
+
+@font-face {
+  font-family: "Yerk";
+  src: url("/fonts/yerk.woff") format("woff");
+  font-weight: 400;
+  font-style: normal;
+}
