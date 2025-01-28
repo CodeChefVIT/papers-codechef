@@ -16,8 +16,7 @@ export default function Banner() {
             className="md:hidden"
           />
           <span className="hidden md:block">
-            Master Exams with Papers and gear up to Build Beyond Limits at
-            DevSOC&apos;25
+            Master Exams with Papers and gear up for DevSOC&apos;25
           </span>
           <Link
             href="https://devsoc.codechefvit.com/"
