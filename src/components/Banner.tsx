@@ -16,7 +16,7 @@ export default function Banner() {
             className="md:hidden"
           />
           <span className="hidden md:block">
-            Master Exams with Papers and gear up for DevSOC&apos;25
+            Register for DevSOC&apos;25 and enjoy a 3 day full OD to unwind after CATs!
           </span>
           <Link
             href="https://devsoc.codechefvit.com/"
