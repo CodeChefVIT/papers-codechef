@@ -21,6 +21,7 @@ interface CardProps {
 
 const Card = ({ paper, onSelect, isSelected }: CardProps) => {
   const [checked, setChecked] = useState<boolean>(isSelected);
+  const [fileName, setFileName] = useState("");
 
   useEffect(() => {
     setChecked(isSelected);
@@ -59,19 +60,28 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
       return newChecked;
     });
   };
-
+  const url = paper.thumbnailUrl;
+  const urlArr = url.split("/")
   const paperLink = `/paper/${paper._id}`;
-
+  useEffect(()=>{
+    if(url.includes("/papers")){
+      setFileName(`/1/${urlArr[urlArr.length-3] + "/" +urlArr[urlArr.length-2] +"/"+urlArr[urlArr.length-1]}`)
+      
+      return 
+    }
+    setFileName(`/2/${urlArr[urlArr.length-2] +"/"+urlArr[urlArr.length-1]}`)
+    
+  }, [])
   return (
     <div
       className={cn(
-        "font-play overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
+        "overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
         checked && "bg-white",
       )}
     >
       <Link href={paperLink} target="_blank" rel="noopener noreferrer">
         <Image
-          src={paper.thumbnailUrl}
+          src={fileName}
           alt={paper.subject}
           width={320}
           height={180}
@@ -80,7 +90,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
 
         <div className="justify-center">
           <div className="flex flex-row items-center justify-between px-4 pb-2">
-            <div className="font-play text-md font-medium">
+            <div className="text-md font-play font-medium">
               {extractBracketContent(paper.subject)}
             </div>
             <div className="flex gap-2">
@@ -115,7 +125,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
         </div>
       </Link>
 
-      <div className="font-play hidden items-center justify-between gap-2 px-4 pb-4 md:flex">
+      <div className="hidden items-center justify-between gap-2 px-4 pb-4 font-play md:flex">
         <div className="flex items-center gap-2">
           <input
             checked={checked}

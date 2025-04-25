@@ -19,6 +19,23 @@ const config = {
     });
     return config;
   },
+  async rewrites() {
+    return [
+
+      {
+        source: "/1/:path*",   
+        destination:
+          `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_1}/image/upload/w_400,h_400,c_fill/:path*`, 
+      },
+      {
+        source: "/2/:path*",   
+        destination:
+          `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_2}/image/upload/w_400,h_400,c_fill/:path*`, 
+      },
+      
+    ];
+  },
+
 };
 
 export default config;
