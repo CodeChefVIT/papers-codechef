@@ -149,7 +149,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
     <div className="flex flex-col items-center">
       <div
         ref={containerRef}
-        className="max-h-[70vh] max-w-[100vh]   overflow-auto bg-[#F3F5FF] shadow-lg dark:bg-[#070114]"
+        className="max-h-[70vh] max-w-[100vw]   overflow-auto bg-[#F3F5FF] shadow-lg dark:bg-[#070114]"
       >
         <Document
           file={url}
