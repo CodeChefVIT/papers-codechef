@@ -2,22 +2,9 @@ import mongoose, { Schema, type Model } from "mongoose";
 import { type IPaper, type IAdminPaper, type ICourses } from "@/interface";
 
 const adminSchema = new Schema<IAdminPaper>({
-  public_id_cloudinary: { type: String, required: true },
-  cloudinary_index: { type: Number, required: true },
-  finalUrl: { type: String, required: true },
-  thumbnailUrl: { type: String, required: true },
-  subject: { type: String, required: true, index: true },
-  slot: { type: String, required: true },
-  year: { type: String, required: true },
-  exam: { type: String, enum: ["CAT-1", "CAT-2", "FAT", "Model CAT-1", "Model CAT-2", "Model FAT"], required: true },
-  semester: { type: String, enum: ["Fall Semester", "Winter Semester", "Summer Semester", "Weekend Semester"], required: true },
-  campus: { type: String, enum: ["Vellore", "Chennai", "Andhra Pradesh", "Bhopal", "Bangalore", "Mauritius"], required: true },
-  answerKeyIncluded: { type: Boolean, default: false },
-  isSelected: { type: Boolean, default: false },
 });
 const paperSchema = new Schema<IPaper>({
   finalUrl: { type: String, required: true },
-  thumbnailUrl: { type: String, required: true },
   subject: { type: String, required: true, index: true },
   slot: { type: String, required: true },
   year: { type: String, required: true },
