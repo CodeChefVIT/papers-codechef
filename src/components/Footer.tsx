@@ -4,7 +4,6 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
-import { Input } from "@/components/ui/input";
 import {
   FaFacebook,
   FaGithub,
@@ -14,40 +13,16 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { Mail } from "lucide-react";
-import toast from "react-hot-toast";
+
 export default function Footer() {
   const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
-  const [email, setEmail] = useState("");
+
   useEffect(() => {
     if (theme) {
       setIsDarkMode(theme === "dark");
     }
   }, [theme]);
-  const handleSubscribe = async () => {
-    if (!email || !email.includes("@")) {
-      toast.error("Please Enter A Valid Email.");
-      return;
-    }
-
-    await toast.promise(
-      fetch("/api/subscribe", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email }),
-      }).then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok.");
-        return res.json();
-      }),
-      {
-        loading: "Subscribing...",
-        success: "You've Successfully Subscribed!",
-        error: "Something went wrong. Try again later.",
-      }
-    );
-
-    setEmail("");
-  };
 
   return (
     <footer className="w-full overflow-hidden bg-gradient-to-b from-[#F3F5FF] to-[#A599CE] px-12 py-12 font-sans text-white dark:from-[#070114] dark:to-[#1F0234]">
@@ -120,31 +95,9 @@ export default function Footer() {
           >
             <Mail /> codechefvit@gmail.com
           </Link>
-
-          <div className="mt-4 flex flex-col gap-2 w-full max-w-xs">
-            <h3 htmlFor="email" className="font-jost text-2xl font-semibold">
-              Subscribe For Updates:
-            </h3>
-            <div className="relative w-full">
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter Your Email"
-                className="pr-24"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-              />
-              <Button
-                onClick={handleSubscribe}
-                className="absolute right-0 top-0 h-full rounded-l-none rounded-r-md bg-[#562EE7] px-4 text-white hover:bg-[#4531b3]"
-              >
-                Subscribe!
-              </Button>
-            </div>
-          </div>
         </div>
       </div>
-      <p className="font-play mt-8 border-t border-[#130E1F] pt-12 text-center text-lg text-black dark:border-white/10 dark:text-white">
+      <p className="font-play mt-4 border-t border-[#130E1F] pt-12 text-center text-lg text-black dark:border-white/10 dark:text-white">
         Made with ❤️ by Codechef-VIT
       </p>
     </footer>
