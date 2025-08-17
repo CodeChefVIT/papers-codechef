@@ -115,12 +115,12 @@ function PinnedPapersCarousel({
           plugins={plugins}
           className="w-full"
         >
-          <div
+          {/* <div
             className={`relative mt-4 flex justify-end gap-4 ${displayPapers.length > 0 ? "block" : "hidden"}`}
           >
             <CarouselPrevious className="relative" />
             <CarouselNext className="relative" />
-          </div>
+          </div> */}
           <CarouselContent>
             {isLoading ? (
               <CarouselItem
