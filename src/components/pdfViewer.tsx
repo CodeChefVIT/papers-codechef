@@ -11,7 +11,7 @@ import ShareButton from "./ShareButton";
 import Loader from "./ui/loader";
 import { FaGreaterThan, FaLessThan } from "react-icons/fa6";
 
-pdfjs.GlobalWorkerOptions.workerSrc =
+pdfjs.GlobalWorkerOptions.workerSrc = 
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs";
 
 interface PdfViewerProps {
@@ -159,14 +159,26 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
   }, []);
 
   useEffect(() => {
-    const calculateInitialScale = () => {
+    if (containerRef.current) {
+      const containerWidth = containerRef.current.offsetWidth;
+
+      const initialScale = containerWidth / 800;
+      setScale(initialScale > 1 ? 1 : initialScale);
+    }
+  }, []);
+
+  useEffect(() => {
+    const calculateScale = () => {
       if (containerRef.current) {
         const containerWidth = containerRef.current.offsetWidth;
         const initialScale = containerWidth / 800;
         setScale(initialScale > 1 ? 1 : initialScale);
       }
     };
-    calculateInitialScale();
+
+    calculateScale();
+    window.addEventListener("resize", calculateScale);
+    return () => window.removeEventListener("resize", calculateScale);
   }, []);
 
   useEffect(() => {
