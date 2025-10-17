@@ -421,7 +421,7 @@ const CatalogueContent = () => {
 
           
       {/* Select/Deselect/Download All Buttons */}
-      
+      {papers.length > 0 && (
       <div className="mb-8 flex w-full items-center justify-end gap-4">
         <SidebarButton onClick={handleSelectAll}>
           Select All
@@ -429,10 +429,11 @@ const CatalogueContent = () => {
         <SidebarButton onClick={handleDeselectAll}>
           Deselect All
         </SidebarButton>
+
         <SidebarButton onClick={handleDownloadSelected}>
           Download Selected
         </SidebarButton>
-      </div>
+      </div>)}
 
           {relatedSubjects.length > 0 && (
             <div className="mt-3 flex flex-wrap items-center gap-2">
