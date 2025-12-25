@@ -70,7 +70,7 @@ Before getting started, please ensure that the .env file is properly configured.
 Dev names and stats be seen in [github stats](https://github.com/CodeChefVIT/papers-codechef/graphs/contributors) page
 
 ## Maintainers
-Our top maintainers, making sure the Database of papers is maintainered and upto-date.
+Our top maintainers, making sure the database of papers is maintained and upto-date.
 <table>
   <tr>
     <td align="center">
