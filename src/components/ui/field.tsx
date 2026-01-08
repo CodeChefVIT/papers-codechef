@@ -1,12 +1,16 @@
 import { Label } from "@/components/ui/label";
 
-export function Field({ label, children, className }: {
+export function Field({
+  label,
+  children,
+  className,
+}: {
   label: string;
   children: React.ReactNode;
   className?: string;
 }) {
   return (
-    <div className={`space-y-1 w-full ${className || ""}`}>
+    <div className={`w-full space-y-1 ${className ?? ""}`}>
       <Label>{label}</Label>
       {children}
     </div>

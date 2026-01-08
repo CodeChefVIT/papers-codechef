@@ -159,7 +159,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     const url = URL.createObjectURL(zipBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = searchParams.get("subject")?.split(" [")[0];
+    a.download = searchParams.get("subject")?.split(" [")[0] ?? "papers";
     document.body.appendChild(a);
     a.click();
     a.remove();

@@ -15,6 +15,12 @@ import {
 } from "react-icons/fa6";
 import { Bold, Mail } from "lucide-react";
 import toast from "react-hot-toast";
+
+type SubscribeResponse = {
+  message?: string;
+  error?: string;
+};
+
 export default function Footer() {
   const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
@@ -35,16 +41,22 @@ export default function Footer() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
-      })
-      .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) return Promise.reject(data.error || "Something went wrong.");
+      }).then(async (res) => {
+        const data = (await res.json()) as SubscribeResponse;
+
+        if (!res.ok) {
+          return Promise.reject(
+            new Error(data.error ?? "Something went wrong."),
+          );
+        }
+
         return data;
       }),
       {
         loading: "Subscribing...",
         success: "You've Successfully Subscribed!",
-        error: (err: any) => err,
+        error: (err: unknown) =>
+          err instanceof Error ? err.message : String(err),
       },
     );
 
@@ -52,8 +64,8 @@ export default function Footer() {
   };
 
   return (
-    <footer className="w-full overflow-hidden bg-gradient-to-b from-[#F3F5FF] to-[#A599CE] px-6 py-10 pt-16 md:pt-20 lg:pt-36 text-white dark:from-[#070114] dark:to-[#1F0234]">
-      <div className="mx-auto flex max-w-7xl flex-col lg:flex-row justify-between gap-y-10 text-center lg:text-left mb-16">
+    <footer className="w-full overflow-hidden bg-gradient-to-b from-[#F3F5FF] to-[#A599CE] px-6 py-10 pt-16 text-white dark:from-[#070114] dark:to-[#1F0234] md:pt-20 lg:pt-36">
+      <div className="mx-auto mb-16 flex max-w-7xl flex-col justify-between gap-y-10 text-center lg:flex-row lg:text-left">
         {/* Branding & Socials */}
         <div className="flex w-full flex-col gap-4 lg:w-[30%]">
           <h1 className="bg-gradient-to-r from-[#562EE7] to-[rgba(116,128,255,0.8)] bg-clip-text font-jost text-5xl font-bold text-transparent dark:to-[#FFC6E8]">
@@ -96,32 +108,41 @@ export default function Footer() {
         </div>
 
         {/* Events */}
-        <div className="flex w-full flex-col gap-2 text-black dark:text-white  lg:w-[15%]">
+        <div className="flex w-full flex-col gap-2 text-black dark:text-white lg:w-[15%]">
           <h3 className="font-jost text-xl font-semibold">Events</h3>
-          <Link href="https://devsoc25.codechefvit.com" target="_blank">DevSoc</Link>
-          <Link href="https://gravitas.codechefvit.com" target="_blank">CookOff</Link>
-          <Link href="https://gravitas.codechefvit.com" target="_blank">Clueminati</Link>
+          <Link href="https://devsoc25.codechefvit.com" target="_blank">
+            DevSoc
+          </Link>
+          <Link href="https://gravitas.codechefvit.com" target="_blank">
+            CookOff
+          </Link>
+          <Link href="https://gravitas.codechefvit.com" target="_blank">
+            Clueminati
+          </Link>
         </div>
         {/* Projects */}
-        <div className="flex w-full flex-col gap-2 text-black dark:text-white  lg:w-[20%]">
+        <div className="flex w-full flex-col gap-2 text-black dark:text-white lg:w-[20%]">
           <h3 className="font-jost text-xl font-semibold">Our Projects</h3>
-          <Link href="https://papers.codechefvit.com" target="_blank">Papers</Link>
-          <Link href="https://contactify.codechefvit.com" target="_blank">Contactify</Link>
-          <Link href="https://ffcs.codechefvit.com" target="_blank">FFCS-inator</Link>
+          <Link href="https://papers.codechefvit.com" target="_blank">
+            Papers
+          </Link>
+          <Link href="https://contactify.codechefvit.com" target="_blank">
+            Contactify
+          </Link>
+          <Link href="https://ffcs.codechefvit.com" target="_blank">
+            FFCS-inator
+          </Link>
         </div>
 
         {/* Suggestions */}
-        <div className="flex w-full flex-col gap-1 text-black dark:text-white lg:w-[25%] items-center lg:items-start">
+        <div className="flex w-full flex-col items-center gap-1 text-black dark:text-white lg:w-[25%] lg:items-start">
           <Link
             href={`mailto:codechefvit@gmail.com`}
-            className="flex items-center gap-2 font-jost text-xl font-semibold mb-2"
+            className="mb-2 flex items-center gap-2 font-jost text-xl font-semibold"
           >
-            <Mail size={20} 
-              fontWeight="Bold"
-            />
+            <Mail size={20} fontWeight="Bold" />
             <span>codechefvit@gmail.com</span>
           </Link>
-
 
           <h3 className="my-2 font-jost text-xl font-semibold">
             Subscribe For Updates:

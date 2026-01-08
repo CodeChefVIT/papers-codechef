@@ -2,7 +2,13 @@
 
 import React from "react";
 import { Field } from "@/components/ui/field";
-import { Select, SelectTrigger, SelectContent, SelectValue, SelectItem } from "@/components/ui/select";
+import {
+  Select,
+  SelectTrigger,
+  SelectContent,
+  SelectValue,
+  SelectItem,
+} from "@/components/ui/select";
 
 interface LabeledSelectProps {
   label: string;
@@ -12,12 +18,18 @@ interface LabeledSelectProps {
   placeholder?: string;
 }
 
-const LabeledSelect = ({ label, value, onChange, options, placeholder }: LabeledSelectProps) => {
+const LabeledSelect = ({
+  label,
+  value,
+  onChange,
+  options,
+  placeholder,
+}: LabeledSelectProps) => {
   return (
     <Field label={label}>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="w-full">
-          <SelectValue placeholder={placeholder || "Select"} />
+          <SelectValue placeholder={placeholder ?? "Select"} />
         </SelectTrigger>
         <SelectContent>
           {options.map((opt) => (
