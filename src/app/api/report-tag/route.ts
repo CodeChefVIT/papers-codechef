@@ -3,7 +3,8 @@ import { connectToDatabase } from "@/lib/database/mongoose";
 import TagReport from "@/db/tagReport";
 import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "@/lib/utils/redis";
-import { exams } from "@/components/select_options";
+
+const exams: string[] = ["CAT-1", "CAT-2", "FAT", "Model CAT-1", "Model CAT-2", "Model FAT"]
 
 interface ReportedFieldInput {
   field: string;
@@ -27,7 +28,15 @@ function getRateLimit(){
 });
 }
 function getClientIp(req: Request & { ip?: string}): string {
-  return req.ip ?? "127.0.0.1";
+  const xff = req.headers.get("x-forwarded-for");
+  if (typeof xff === "string" && xff.length > 0) {
+    return xff.split(",")[0]?.trim()??"";
+  }
+  const xri = req.headers.get("x-real-ip");
+  if (typeof xri === "string" && xri.length > 0) {
+    return xri;
+  }
+  return "0.0.0.0";
 }
 
 export async function POST(req: Request & { ip?: string }) {
