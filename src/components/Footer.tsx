@@ -15,6 +15,12 @@ import {
 } from "react-icons/fa6";
 import { Bold, Mail } from "lucide-react";
 import toast from "react-hot-toast";
+
+type SubscribeResponse = {
+  success?: boolean;
+  error?: string;
+};
+
 export default function Footer() {
   const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
@@ -37,14 +43,14 @@ export default function Footer() {
         body: JSON.stringify({ email }),
       })
       .then(async (res) => {
-        const data = await res.json();
-        if (!res.ok) return Promise.reject(data.error || "Something went wrong.");
+        const data = (await res.json()) as SubscribeResponse;
+        if (!res.ok) throw new Error(data.error ?? "Something went wrong.");
         return data;
       }),
       {
         loading: "Subscribing...",
         success: "You've Successfully Subscribed!",
-        error: (err: any) => err,
+        error: (err: Error) => err.message,
       },
     );
 
