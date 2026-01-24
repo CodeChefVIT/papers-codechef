@@ -19,12 +19,13 @@ interface ReportTagBody {
 
 const ALLOWED_FIELDS = ["subject", "courseCode", "exam", "slot", "year"];
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.slidingWindow(3, "1 h"),//per id - 3 request - per hour
-  analytics: true,
+function getRateLimit(){
+  return new Ratelimit({
+    redis,
+    limiter: Ratelimit.slidingWindow(3, "1 h"),//per id - 3 request - per hour
+    analytics: true,
 });
-
+}
 function getClientIp(req: Request & { ip?: string}): string {
   return req.ip ?? "127.0.0.1";
 }
@@ -32,7 +33,7 @@ function getClientIp(req: Request & { ip?: string}): string {
 export async function POST(req: Request & { ip?: string }) {
   try {
     await connectToDatabase();
-
+    const ratelimit = getRateLimit();
     const body = (await req.json()) as ReportTagBody;
     const paperId = typeof body.paperId === "string" ? body.paperId : undefined;
 
