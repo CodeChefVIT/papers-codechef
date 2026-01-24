@@ -9,6 +9,14 @@ interface ReportedFieldInput {
   field: string;
   value?: string;
 }
+interface ReportTagBody {
+  paperId?: string;
+  reportedFields?: unknown;
+  comment?: unknown;
+  reporterEmail?: unknown;
+  reporterId?: unknown;
+}
+
 const ALLOWED_FIELDS = ["subject", "courseCode", "exam", "slot", "year"];
 
 const ratelimit = new Ratelimit({
@@ -18,15 +26,15 @@ const ratelimit = new Ratelimit({
 });
 
 function getClientIp(req: Request & { ip?: string}): string {
-  return req.ip || "127.0.0.1";
+  return req.ip ?? "127.0.0.1";
 }
 
 export async function POST(req: Request & { ip?: string }) {
   try {
     await connectToDatabase();
 
-    const body = await req.json();
-    const { paperId } = body;
+    const body = (await req.json()) as ReportTagBody;
+    const paperId = typeof body.paperId === "string" ? body.paperId : undefined;
 
     if (!paperId) {
       return NextResponse.json(
@@ -55,12 +63,14 @@ export async function POST(req: Request & { ip?: string }) {
     }
       const reportedFields: ReportedFieldInput[] = Array.isArray(body.reportedFields)
         ? body.reportedFields
-            .map((r:Partial<ReportedFieldInput>) => ({
-              field: typeof r.field === "string" ? r.field.trim() : "",
-              value: typeof r.value === "string" ? r.value.trim() : undefined,
-            }))
-            .filter((r:Partial<ReportedFieldInput>) => r.field)
-        : [];
+            .map((r): ReportedFieldInput | null => {
+               if (!r || typeof r !== "object") return null;
+
+              const field = typeof (r as { field?: unknown }).field === "string" ? (r as { field: string }).field.trim() : "";
+              const value = typeof (r as { value?: unknown }).value === "string" ? (r as { value: string }).value.trim() : undefined;
+             return field ? { field, value } : null;
+            })
+             .filter((r): r is ReportedFieldInput => r !== null):[];
 
     for (const rf of reportedFields) {
       if (!ALLOWED_FIELDS.includes(rf.field)) {
@@ -82,9 +92,10 @@ export async function POST(req: Request & { ip?: string }) {
     const newReport = await TagReport.create({
       paperId,
       reportedFields,
-      comment: body.comment,
-      reporterEmail: body.reporterEmail,
-      reporterId: body.reporterId,
+      comment: typeof body.comment === "string" ? body.comment : undefined,
+      reporterEmail: typeof body.reporterEmail === "string" ? body.reporterEmail : undefined,
+      reporterId: typeof body.reporterId === "string" ? body.reporterId : undefined,
+
     });
 
     return NextResponse.json(

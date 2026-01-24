@@ -14,8 +14,10 @@ import { Button } from "@/components/ui/button";
 import { MultiSelect } from "@/components/multi-select";
 import LabeledInput from "@/components/ui/LabeledInput";
 import LabeledSelect from "@/components/ui/LabeledSelect";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";  
+
+type ReportResponse = { error?: string; message?: string };
 
 interface ReportTagModalProps {
   paperId: string;
@@ -40,8 +42,8 @@ const ReportTagModal = ({
   const [internalOpen, setInternalOpen] = useState(false);
   const isControlled = open !== undefined && setOpen !== undefined;
 
-  const modalOpen = isControlled ? open! : internalOpen;
-  const modalSetOpen = isControlled ? setOpen! : setInternalOpen;
+  const modalOpen = isControlled ? open : internalOpen;
+  const modalSetOpen = isControlled ? setOpen : setInternalOpen;
   const [comment, setComment] = useState("");
   const [email, setEmail] = useState("");
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -64,14 +66,14 @@ const ReportTagModal = ({
   const isDirty = useMemo(() => {
     if (selectedCategories.length === 0) return false;
     for (const c of selectedCategories) {
-      const curr = (categoryValues[c] || "").trim();
-      const orig = (originalCategoryValues[c] || "").trim();
+      const curr = (categoryValues[c] ?? "").trim();
+      const orig = (originalCategoryValues[c] ?? "").trim();
       if (curr !== orig) return true;
     }
 
     if (selectedCategories.includes("subject")) {
-      const currCode = (categoryValues["courseCode"] || "").trim();
-      const origCode = (originalCategoryValues["courseCode"] || "").trim();
+      const currCode = (categoryValues.courseCode ?? "").trim();
+      const origCode = (originalCategoryValues.courseCode ?? "").trim();
       if (currCode !== origCode) return true;
     }
 
@@ -83,7 +85,8 @@ const ReportTagModal = ({
     for (const c of selectedCategories) {
       if (categoryValues[c]) continue;
       if (c === "subject" && subject) {
-        const m = subject.match(/^(.*)\s*\[([^\]]+)\]\s*$/);
+        const subjectRegex = /^(.*)\s*\[([^\]]+)\]\s*$/;
+        const m = subjectRegex.exec(subject);
         if (m?.[1] && m?.[2]) {
           const name = m[1].trim();
           const code = m[2].trim();
@@ -104,17 +107,18 @@ const ReportTagModal = ({
     if (open) {
       const base: Record<string, string> = {};
       if (subject) {
-        const m = subject.match(/^(.*)\s*\[([^\]]+)\]\s*$/);
+        const subjectRegex = /^(.*)\s*\[([^\]]+)\]\s*$/;
+        const m = subjectRegex.exec(subject);
         if (m?.[1] && m?.[2]) {
-          base["subject"] = m[1].trim();
-          base["courseCode"] = m[2].trim();
+          base.subject = m[1].trim();
+          base.courseCode = m[2].trim();
         } else {
-          base["subject"] = subject;
+          base.subject = subject;
         }
       }
-      if (exam) base["exam"] = exam;
-      if (slot) base["slot"] = slot;
-      if (year) base["year"] = year;
+      if (exam) base.exam = exam;
+      if (slot) base.slot = slot;
+      if (year) base.year = year;
       setOriginalCategoryValues(base);
       setOriginalEmail("");
     } else {
@@ -134,7 +138,7 @@ const ReportTagModal = ({
   }
 
   if (selectedCategories.includes("subject")) {
-  const sub = (categoryValues.subject || "").trim();
+  const sub = (categoryValues.subject ?? "").trim();
   if (!sub) {
     toast.error("Subject name cannot be empty.");
     return;
@@ -142,7 +146,7 @@ const ReportTagModal = ({
 }
 
   if (selectedCategories.includes("slot")) {
-    const v = (categoryValues.slot || "").trim();
+    const v = (categoryValues.slot ?? "").trim();
     const slotRegex = /^[A-G][1-2]$/;
     if (!slotRegex.test(v)) {
       toast.error("Slot must be from A1 to G2 (e.g., D1, B2).");
@@ -150,7 +154,7 @@ const ReportTagModal = ({
     }
   }
   if (selectedCategories.includes("year")) {
-    const y = (categoryValues.year || "").trim();
+    const y = (categoryValues.year ?? "").trim();
     const yearRegex = /^\d{4}(-\d{4})?$/;
     if (!yearRegex.test(y)) {
       toast.error("Year must be a valid format (e.g., 2024 or 2024-2025).");
@@ -180,15 +184,15 @@ const ReportTagModal = ({
 
   for (const c of selectedCategories) {
     if (c === "subject") {
-      const newSub = (categoryValues.subject || "").trim();
-      const oldSub = (originalCategoryValues.subject || "").trim();
+      const newSub = (categoryValues.subject ?? "").trim();
+      const oldSub = (originalCategoryValues.subject ?? "").trim();
 
       if (newSub !== oldSub) {
         reportedFields.push({ field: "subject", value: newSub });
       }
 
-      const newCode = (categoryValues.courseCode || "").trim();
-      const oldCode = (originalCategoryValues.courseCode || "").trim();
+      const newCode = (categoryValues.courseCode ?? "").trim();
+      const oldCode = (originalCategoryValues.courseCode ?? "").trim();
 
       if (newCode !== oldCode) {
         reportedFields.push({ field: "courseCode", value: newCode });
@@ -197,8 +201,8 @@ const ReportTagModal = ({
       continue;
     }
 
-    const newVal = (categoryValues[c] || "").trim();
-    const oldVal = (originalCategoryValues[c] || "").trim();
+    const newVal = (categoryValues[c] ?? "").trim();
+    const oldVal = (originalCategoryValues[c] ?? "").trim();
 
     if (newVal !== oldVal) {
       reportedFields.push({ field: c, value: newVal });
@@ -213,20 +217,23 @@ if (reportedFields.length === 0 && comment.trim().length === 0) {
     paperId,
     reportedFields,
     comment,
-    reporterEmail: email || undefined,
+    reporterEmail: email ?? undefined,
   };
   setLoading(true);
   await toast.promise(
-    axios.post("/api/report-tag", payload),
+    axios.post<ReportResponse>("/api/report-tag", payload),
     {
       loading: "Submitting your report...",
       success: "Reported successfully. Thank you, We will work on that",
-      error: (err)=>{
-        return (
-        err?.response?.data?.error ||
-        err?.message ||
-        "Failed to submit report."
-        )
+      error: (err: unknown)=>{
+          if (axios.isAxiosError<ReportResponse>(err)) {
+            return ( 
+              err.response?.data?.error ??
+              err.message ??
+              "Failed to submit report."
+            );
+        }
+        return err instanceof Error ? err.message : "Failed to submit report.";
       },
     }
   )

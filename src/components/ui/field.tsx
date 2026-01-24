@@ -6,7 +6,7 @@ export function Field({ label, children, className }: {
   className?: string;
 }) {
   return (
-    <div className={`space-y-1 w-full ${className || ""}`}>
+    <div className={`space-y-1 w-full ${className ?? ""}`}>
       <Label>{label}</Label>
       {children}
     </div>
