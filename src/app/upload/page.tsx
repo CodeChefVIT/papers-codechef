@@ -114,7 +114,7 @@ export default function Page() {
       }
 
       if (isNewPdf && hasExistingPdf) {
-        toast.error("Only one PDF is allowed. You’ve already uploaded a PDF.", {
+        toast.error("Only one PDF is allowed. You've already uploaded a PDF.", {
           id: toastId,
         });
         return;
@@ -136,11 +136,8 @@ export default function Page() {
         return;
       }
 
-      const totalSize = allFiles.reduce(
-        (sum, f) => sum + f.size,
-        0,
-      );
-      if (totalSize > maxFileSize){
+      const totalSize = allFiles.reduce((sum, f) => sum + f.size, 0);
+      if (totalSize > maxFileSize) {
         toast.error("The total upload size exceeds 5MB.", { id: toastId });
         return;
       }
@@ -440,8 +437,8 @@ export default function Page() {
                       strategy={horizontalListSortingStrategy}
                     >
                       <div className="flex w-full snap-x snap-mandatory gap-3 sm:gap-4 md:gap-5">
-                        {previews.map((item, index) => (
-                          <SortablePreview key={item.id} id={item.id}>
+                        {previews.map((item, index) => {
+                          const previewContent = (
                             <div className="group relative w-full flex-shrink-0 snap-start sm:w-1/2 md:w-1/3 lg:w-1/4">
                               <div className="relative h-64 w-48 overflow-hidden rounded-xl outline outline-2 outline-white sm:h-60">
                                 {/* Index badge */}
@@ -486,8 +483,17 @@ export default function Page() {
                                 </div>
                               </div>
                             </div>
-                          </SortablePreview>
-                        ))}
+                          );
+
+                          // Only wrap in SortablePreview if there are multiple files
+                          return previews.length > 1 ? (
+                            <SortablePreview key={item.id} id={item.id}>
+                              {previewContent}
+                            </SortablePreview>
+                          ) : (
+                            <div key={item.id}>{previewContent}</div>
+                          );
+                        })}
                       </div>
 
                       {previews.length > 2 && (
