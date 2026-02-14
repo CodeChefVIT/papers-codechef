@@ -5,25 +5,29 @@ export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-
     const url = req.nextUrl.searchParams;
     const sub = url.get("subject");
+    if (!sub) {
+      return NextResponse.json(
+        { message: "Subject query parameter is required" },
+        { status: 400 },
+      );
+    }
+    const paper = await getPapersBySubject(sub);
 
-    const paper = await getPapersBySubject(sub as string);
-
-    return NextResponse.json(
-      paper,
-      { status: 200 },
-    );
+    return NextResponse.json(paper, { status: 200 });
   } catch (error) {
     if (error instanceof Error) {
       return NextResponse.json(
         { message: "Failed to fetch papers", error: error.message },
-        { status: error.message === "Subject query parameter is required" ? 400 : 500 },
+        {
+          status:
+            error.message === "Subject query parameter is required" ? 400 : 500,
+        },
       );
     }
     return NextResponse.json(
-      { message: "Failed to fetch papers", error},
+      { message: "Failed to fetch papers", error },
       { status: 500 },
     );
   }
