@@ -18,6 +18,7 @@ import { useCourses } from "@/context/courseContext";
 import { FilterProvider, useFilters } from "@/context/filterContext";
 import EmptyState from "./ui/EmptyState";
 import SidebarButton from "./SidebarButton";
+import SortComponent from "./ui/sorting";
 
 const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -27,6 +28,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   const [pinned, setPinned] = useState<boolean>(false);
   const [relatedSubjects, setRelatedSubjects] = useState<string[]>([]);
   const { courses } = useCourses();
+  const [sortOption, setSortOption] = useState<"asc" | "desc" | "none">("none");
 
   // Use filter context
   const {
@@ -178,6 +180,31 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   useEffect(() => {
     if (!papers.length) return;
 
+    const filtered = [...papers];
+
+    if (sortOption === "asc") {
+      filtered.sort((a, b) => a.year.localeCompare(b.year));
+    } else if (sortOption === "desc") {
+      filtered.sort((a, b) => b.year.localeCompare(a.year));
+    }
+
+    setFilteredPapers(filtered);
+  }, [
+    papers,
+    selectedExams,
+    selectedSlots,
+    selectedYears,
+    selectedSemesters,
+    selectedCampuses,
+    selectedAnswerKeyIncluded,
+    sortOption,
+    setFilteredPapers,
+    setAppliedFilters,
+  ]);
+
+  useEffect(() => {
+    if (!papers.length) return;
+
     const filtered = papers.filter((paper) => {
       const examCondition = selectedExams.length
         ? selectedExams.includes(paper.exam)
@@ -206,6 +233,11 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
         answerkeyCondition
       );
     });
+    if (sortOption === "asc") {
+      filtered.sort((a, b) => a.year.localeCompare(b.year));
+    } else if (sortOption === "desc") {
+      filtered.sort((a, b) => b.year.localeCompare(a.year));
+    }
     setFilteredPapers(filtered);
     setAppliedFilters(
       selectedExams.length > 0 ||
@@ -284,12 +316,21 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
           </div>
 
           {/* Select/Deselect/Download All Buttons */}
-          <div className="mb-8 flex w-full items-center justify-end gap-4">
-            <SidebarButton onClick={handleSelectAll}>Select All</SidebarButton>
-            <SidebarButton onClick={handleDeselectAll}>
+          <div className="mb-6 mt-5 flex w-full flex-wrap items-center justify-start gap-3 sm:gap-4 md:mt-4 md:justify-end">
+            <SortComponent
+              onSortChange={setSortOption}
+              currentSort={sortOption}
+            />
+
+            <SidebarButton onClick={handleSelectAll} className="order-2">
+              Select All
+            </SidebarButton>
+
+            <SidebarButton onClick={handleDeselectAll} className="order-2">
               Deselect All
             </SidebarButton>
-            <SidebarButton onClick={handleDownloadSelected}>
+
+            <SidebarButton onClick={handleDownloadSelected} className="order-2">
               Download Selected
             </SidebarButton>
           </div>

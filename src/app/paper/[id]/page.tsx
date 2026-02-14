@@ -7,6 +7,7 @@ import { extractBracketContent } from "@/lib/utils/string";
 import axios, { type AxiosResponse } from "axios";
 import { type Metadata } from "next";
 import { redirect } from "next/navigation";
+import { PaperProvider } from "@/context/PaperContext";
 
 export async function generateMetadata({
   params,
@@ -164,10 +165,20 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
             </div>
           </h1>
           <center>
+              <PaperProvider
+                value={{
+                  paperId: params.id,
+                  subject: paper.subject,
+                  exam: paper.exam,
+                  slot: paper.slot,
+                  year: paper.year,
+                }}
+              >
             <PdfViewer
               url={paper.file_url}
               name={`${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}
             ></PdfViewer>
+            </PaperProvider>
           </center>
           <RelatedPapers />
         </>

@@ -30,6 +30,7 @@
     "@types/node": "^24.6.1",
     "@ungap/with-resolvers": "^0.1.0",
     "@upstash/ratelimit": "^2.0.5",
+    "@upstash/redis": "^1.33.0",
     "@vercel/kv": "^3.0.0",
     "axios": "^1.8.4",
     "canvas": "^3.2.0",

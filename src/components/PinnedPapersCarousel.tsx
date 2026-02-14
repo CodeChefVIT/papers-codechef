@@ -84,6 +84,16 @@ function PinnedPapersCarousel() {
 
       const allDisplayPapers = [...fetchedPapers, ...missingSubjects];
 
+      allDisplayPapers.sort((a, b) => {
+        const aIndex = storedSubjects.indexOf(a.subject);
+        const bIndex = storedSubjects.indexOf(b.subject);
+
+        return (
+          (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) -
+          (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex)
+        );
+      });
+
       setDisplayPapers(allDisplayPapers);
     } catch (error) {
       console.error("Failed to fetch papers:", error);
@@ -125,6 +135,16 @@ function PinnedPapersCarousel() {
             })) as { subject: string; slots: string[] }[];
 
           const allDisplayPapers = [...fetchedPapers, ...missingSubjects];
+
+          allDisplayPapers.sort((a, b) => {
+            const aIndex = storedSubjects.indexOf(a.subject);
+            const bIndex = storedSubjects.indexOf(b.subject);
+
+            return (
+              (aIndex === -1 ? Number.MAX_SAFE_INTEGER : aIndex) -
+              (bIndex === -1 ? Number.MAX_SAFE_INTEGER : bIndex)
+            );
+          });
 
           setDisplayPapers(allDisplayPapers);
         } catch (error) {

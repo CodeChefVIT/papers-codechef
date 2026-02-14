@@ -108,20 +108,25 @@ function Navbar() {
                 </DropdownMenuTrigger>
 
                 <DropdownMenuContent
-                  className="w-56 rounded-2xl border border-[#3A3745] border-[rgba(255,255,255,0.1)] bg-[#e8e9ff] text-gray-700 shadow-2xl backdrop-blur-sm hover:bg-slate-50 dark:bg-black dark:text-white dark:hover:bg-[#1A1823]"
+                  className="mt-2 w-56 space-y-1 rounded-3xl border border-[#3A3745] bg-[#e8e9ff] py-2 text-gray-700 shadow-lg backdrop-blur-sm dark:border-[#3A3745] dark:bg-black dark:text-white"
                   align="start"
                 >
                   <DropdownMenuItem
                     asChild
                     onSelect={(e) => e.preventDefault()}
                   >
-                    <PinnedModal />
+                    <div className="flex w-full items-center gap-3 rounded-lg px-3 py-1 transition hover:bg-[#1A1823] hover:text-white">
+                      <PinnedModal />
+                    </div>
                   </DropdownMenuItem>
+
                   <DropdownMenuItem
                     asChild
                     onSelect={(e) => e.preventDefault()}
                   >
-                    <RequestModal />
+                    <div className="flex w-full items-center gap-3 rounded-lg px-3 py-1 transition hover:bg-[#1A1823] hover:text-white">
+                      <RequestModal />
+                    </div>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
