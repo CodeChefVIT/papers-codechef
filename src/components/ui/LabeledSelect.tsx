@@ -17,7 +17,7 @@ const LabeledSelect = ({ label, value, onChange, options, placeholder }: Labeled
     <Field label={label}>
       <Select value={value} onValueChange={onChange}>
         <SelectTrigger className="w-full">
-          <SelectValue placeholder={placeholder || "Select"} />
+          <SelectValue placeholder={placeholder ?? "Select"} />
         </SelectTrigger>
         <SelectContent>
           {options.map((opt) => (

@@ -15,6 +15,12 @@ import {
 } from "react-icons/fa6";
 import { Bold, Mail } from "lucide-react";
 import toast from "react-hot-toast";
+
+type SubscribeResponse = {
+  success?: boolean;
+  error?: string;
+};
+
 export default function Footer() {
   const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
@@ -37,8 +43,9 @@ export default function Footer() {
         body: JSON.stringify({ email }),
       })     
       .then(async (res) => {
-        if (!res.ok) throw new Error("Network response was not ok.");
-        return res.json();
+        const data = (await res.json()) as SubscribeResponse;
+        if (!res.ok) throw new Error(data.error ?? "Something went wrong.");
+        return data;
       }),
       {
         loading: "Subscribing...",
@@ -97,7 +104,7 @@ export default function Footer() {
         {/* Events */}
         <div className="flex w-full flex-col gap-2 text-black dark:text-white  lg:w-[15%]">
           <h3 className="font-jost text-xl font-semibold">Events</h3>
-          <Link href="https://devsoc25.codechefvit.com" target="_blank">DevSoc</Link>
+          <Link href="https://devsoc25.codechefvit.com" target="_blank">DevSOC</Link>
           <Link href="https://gravitas.codechefvit.com" target="_blank">CookOff</Link>
           <Link href="https://gravitas.codechefvit.com" target="_blank">Clueminati</Link>
         </div>

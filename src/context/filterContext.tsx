@@ -7,7 +7,11 @@ import React, {
   useCallback,
   type ReactNode,
 } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  ReadonlyURLSearchParams,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 import { type IPaper, type Filters } from "@/interface";
 import JSZip from "jszip";
 import { toast } from "react-hot-toast";
@@ -154,12 +158,22 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
         console.error(`Failed to fetch ${paper.file_url}`, err);
       }
     }
-
+    function getDownloadName(
+      params: ReadonlyURLSearchParams,
+      key: string,
+      fallback = "download",
+    ): string {
+      const value = params.get(key);
+      if (!value) return fallback;
+      return value.split(" [")[0]?.trim() ?? fallback;
+    }
     const zipBlob = await zip.generateAsync({ type: "blob" });
     const url = URL.createObjectURL(zipBlob);
     const a = document.createElement("a");
     a.href = url;
-    a.download = subject ?? searchParams.get("subject")?.split(" [")[0] ?? "paper";
+
+    a.download = getDownloadName(searchParams, "subject");
+
     document.body.appendChild(a);
     a.click();
     a.remove();
