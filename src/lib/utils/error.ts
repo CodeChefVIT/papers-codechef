@@ -18,7 +18,7 @@ export function customErrorHandler(error: unknown, defaultMessage: string) {
         );
     } else {
         return NextResponse.json(
-            {message: defaultMessage, error},
+            {message: defaultMessage},
             {status: 500}
         );
     }

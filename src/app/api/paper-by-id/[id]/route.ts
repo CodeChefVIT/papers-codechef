@@ -1,30 +1,15 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/database/mongoose";
-import Paper from "@/db/papers";
-import { Types } from "mongoose";
+import { customErrorHandler } from "@/lib/utils/error";
+import { getPapersById } from "@/lib/services/paper";
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
-    await connectToDatabase();
-
     const { id } = params;
+    const paper = await getPapersById(id);
 
-    if (!Types.ObjectId.isValid(id)) {
-      return NextResponse.json({ message: "Invalid paper ID" }, { status: 400 });
-    }
-
-    const paper = await Paper.findById(id);
-
-    if (!paper) {
-      return NextResponse.json({ message: "Paper not found" }, { status: 404 });
-    }
-
-    return NextResponse.json(paper, { status: 200 });
+    return NextResponse.json(paper, { status: 200 })
   } catch (error) {
-    console.error(error);
-    return NextResponse.json(
-      { message: "Failed to fetch paper", error },
-      { status: 500 },
-    );
+      console.error(error);
+      return customErrorHandler(error, "Failed to fetch paper");
   }
 }

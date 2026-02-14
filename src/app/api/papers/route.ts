@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { getPapersBySubject } from "@/lib/services/paper";
+import { customErrorHandler } from "@/lib/utils/error";
 
 export const dynamic = "force-dynamic";
 
@@ -16,15 +17,6 @@ export async function GET(req: NextRequest) {
       { status: 200 },
     );
   } catch (error) {
-    if (error instanceof Error) {
-      return NextResponse.json(
-        { message: "Failed to fetch papers", error: error.message },
-        { status: error.message === "Subject query parameter is required" ? 400 : 500 },
-      );
-    }
-    return NextResponse.json(
-      { message: "Failed to fetch papers", error},
-      { status: 500 },
-    );
+    return customErrorHandler(error, "Failed to fetch papers");
   }
 }
