@@ -8,7 +8,6 @@ export async function getPapersBySubject(subject: string) {
     if (!subject){
         throw new Error("Subject query parameter is required");
     }
-
     await connectToDatabase();
     
     const escapedSubject = escapeRegExp(subject);
@@ -23,4 +22,15 @@ export async function getPapersBySubject(subject: string) {
         ...uniqueValues,
     }
 
+}
+
+export async function getPaperById(id: string) {
+    await connectToDatabase();
+    const paper = await Paper.findById(id);
+
+    if (!paper) {
+        throw new Error("Paper not found"); // 404
+    }
+
+    return paper;
 }
