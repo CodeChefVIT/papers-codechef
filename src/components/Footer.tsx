@@ -104,7 +104,7 @@ export default function Footer() {
         {/* Events */}
         <div className="flex w-full flex-col gap-2 text-black dark:text-white  lg:w-[15%]">
           <h3 className="font-jost text-xl font-semibold">Events</h3>
-          <Link href="https://devsoc25.codechefvit.com" target="_blank">DevSoc</Link>
+          <Link href="https://devsoc25.codechefvit.com" target="_blank">DevSOC</Link>
           <Link href="https://gravitas.codechefvit.com" target="_blank">CookOff</Link>
           <Link href="https://gravitas.codechefvit.com" target="_blank">Clueminati</Link>
         </div>
