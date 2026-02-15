@@ -133,7 +133,7 @@ export default function RootLayout({
           <Toaster position="top-right" reverseOrder={false} />
           <div className="bg-[#F3F5FF] dark:bg-[#070114]">
             <CoursesProvider>
-     \         <Navbar />
+              <Navbar />
               <ChildrenWrapper>{children}</ChildrenWrapper>
               <Footer />
             </CoursesProvider>
