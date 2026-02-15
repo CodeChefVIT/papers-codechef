@@ -41,7 +41,7 @@ export default function Footer() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
-      })
+      })     
       .then(async (res) => {
         const data = (await res.json()) as SubscribeResponse;
         if (!res.ok) throw new Error(data.error ?? "Something went wrong.");
@@ -50,7 +50,7 @@ export default function Footer() {
       {
         loading: "Subscribing...",
         success: "You've Successfully Subscribed!",
-        error: (err: Error) => err.message,
+        error: (err: Error) => err.message || "Subscription Failed.",
       },
     );
 
