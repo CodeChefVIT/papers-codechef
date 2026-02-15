@@ -228,7 +228,7 @@ if (reportedFields.length === 0 && comment.trim().length === 0) {
       error: (err: unknown)=>{
           if (axios.isAxiosError<ReportResponse>(err)) {
             return ( 
-              err.response?.data?.error ??
+              err.response?.data?.message ??
               err.message ??
               "Failed to submit report."
             );
