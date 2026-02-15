@@ -16,5 +16,5 @@ export async function getRelatedSubjects(subject: string) {
 		subject: { $regex: new RegExp(`${escapedSubject}`, "i") },
 	});
 
-	return subjects[0]?.related_subjects || [];
+	return subjects[0]?.related_subjects ?? [];
 }
