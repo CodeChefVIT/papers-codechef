@@ -5,27 +5,34 @@ frontend:
       commands:
         - corepack enable
         - pnpm install --frozen-lockfile
+
     build:
       commands:
+        # Inject env vars BEFORE build
+        - 'echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env.production'
+        - 'echo "GOOGLE_CLIENT_EMAIL=$GOOGLE_CLIENT_EMAIL" >> .env.production'
+        - 'echo "GOOGLE_PRIVATE_KEY=$GOOGLE_PRIVATE_KEY" >> .env.production'
+        - 'echo "KV_REST_API_READ_ONLY_TOKEN=$KV_REST_API_READ_ONLY_TOKEN" >> .env.production'
+        - 'echo "KV_REST_API_TOKEN=$KV_REST_API_TOKEN" >> .env.production'
+        - 'echo "KV_REST_API_URL=$KV_REST_API_URL" >> .env.production'
+        - 'echo "KV_URL=$KV_URL" >> .env.production'
+        - 'echo "MONGODB_URI=$MONGODB_URI" >> .env.production'
+        - 'echo "SERVER_URL=$SERVER_URL" >> .env.production'
+        - 'echo "SHEET_ID=$SHEET_ID" >> .env.production'
+        - 'echo "GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT" >> .env.production'
+        - 'echo "GOOGLE_CLOUD_BUCKET=$GOOGLE_CLOUD_BUCKET" >> .env.production'
+        - 'echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=$GOOGLE_APPLICATION_CREDENTIALS_JSON" >> .env.production'
+        - 'echo "UPSTASH_REDIS_REST_URL=$UPSTASH_REDIS_REST_URL" >> .env.production'
+        - 'echo "UPSTASH_REDIS_REST_TOKEN=$UPSTASH_REDIS_REST_TOKEN" >> .env.production'
+
+        # Now run build
         - pnpm run build
-        - 'echo "GEMINI_APLKEY=$GEMINI_APLKEY" >>.env.production'
-        - 'echo "GOOGLE_CLIENT_EMAIL=$GOOGLE_CLIENT_EMAIL" >>.env.production'
-        - 'echo "GOOGLE_PRIVATE_KEY=$GOOGLE_PRIVATE_KEY" >>.env.production'
-        - 'echo "KV_REST_APL_READ_ONLY_TOKEN=$KV_REST_APL_READ_ONLY_TOKEN" >>.env.production'
-        - 'echo "KV_REST_APL_TOKEN=$KV_REST_APL_TOKEN" >>.env.production'
-        - 'echo "KV_REST_APLURL=$KV_REST_APLURL" >>.env.production'
-        - 'echo "KV_URL=$KV_URL" >>.env.production'
-        - 'echo "MONGODB_URI=$MONGODB_URI" >>.env.production'
-        - 'echo "SERVER_URL=$SERVER_URL" >>.env.production'
-        - 'echo "SHEET_ID=$SHEET_ID" >>.env.production'
-        - 'echo "GOOGLE_CLOUD_PROJECT=$GOOGLE_CLOUD_PROJECT" >>.env.production'
-        - 'echo "GOOGLE_CLOUD_BUCKET=$GOOGLE_CLOUD_BUCKET" >>.env.production'
-        - 'echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=$GOOGLE_APPLICATION_CREDENTIALS_JSON" >>.env.production'
-      
+
   artifacts:
     baseDirectory: .next
     files:
       - "**/*"
+
   cache:
     paths:
       - .next/cache/**/*
