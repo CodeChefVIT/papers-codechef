@@ -8,7 +8,6 @@ frontend:
 
     build:
       commands:
-        - pnpm run build
         - 'echo "GEMINI_API_KEY=$GEMINI_API_KEY" >> .env.production'
         - 'echo "GOOGLE_CLIENT_EMAIL=$GOOGLE_CLIENT_EMAIL" >> .env.production'
         - 'echo "GOOGLE_PRIVATE_KEY=$GOOGLE_PRIVATE_KEY" >> .env.production'
@@ -24,6 +23,7 @@ frontend:
         - 'echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=$GOOGLE_APPLICATION_CREDENTIALS_JSON" >> .env.production'
         - 'echo "UPSTASH_REDIS_REST_URL=$UPSTASH_REDIS_REST_URL" >> .env.production'
         - 'echo "UPSTASH_REDIS_REST_TOKEN=$UPSTASH_REDIS_REST_TOKEN" >> .env.production'
+        - pnpm run build
 
 
 
