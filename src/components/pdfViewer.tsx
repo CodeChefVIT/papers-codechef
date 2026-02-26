@@ -213,18 +213,6 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
 
           <div className="flex items-center gap-2">
             <Button
-              onClick={zoomOut}
-              disabled={scale <= 0.25}
-              className="h-9 w-9 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
-            >
-              <ZoomOut />
-            </Button>
-
-            <span className="w-10 text-center text-sm font-medium">
-              {(scale * 100).toFixed(0)}%
-            </span>
-
-            <Button
               onClick={zoomIn}
               disabled={scale >= 3}
               className="h-9 w-9 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
@@ -232,6 +220,18 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
               <ZoomIn />
             </Button>
 
+            <span className="w-10 text-center text-sm font-medium">
+              {(scale * 100).toFixed(0)}%
+            </span>
+
+
+            <Button
+              onClick={zoomOut}
+              disabled={scale <= 0.25}
+              className="h-9 w-9 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
+            >
+              <ZoomOut />
+            </Button>
             <ShareButton />
 
             <Button onClick={downloadPDF} className="h-9 w-9 rounded p-0">
