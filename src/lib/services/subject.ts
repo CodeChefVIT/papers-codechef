@@ -7,7 +7,7 @@ import RelatedSubject from "@/db/relatedSubjects";
 export async function getCourseList(){
 	await connectToDatabase();
 	return await Course.find().lean();
-
+}
 export async function getRelatedSubjects(subject: string) {
 	await connectToDatabase();
 	const escapedSubject = escapeRegExp(subject);
