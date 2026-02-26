@@ -1,0 +1,47 @@
+name: Amplify-Equivalent PR Checks
+
+on:
+  pull_request:
+    branches: [ "staging", "prod" ]
+  push:
+    branches: [ "staging", "prod"]
+
+jobs:
+  pr-checks:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Enable corepack
+        run: corepack enable
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
+
+      - name: Install deps (pnpm)
+        run: pnpm install --frozen-lockfile
+
+      - name: Create env file
+        run: |
+          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env.production
+          echo "GOOGLE_CLIENT_EMAIL=${{ secrets.GOOGLE_CLIENT_EMAIL }}" >> .env.production
+          echo "GOOGLE_PRIVATE_KEY=${{ secrets.GOOGLE_PRIVATE_KEY }}" >> .env.production
+          echo "KV_REST_API_READ_ONLY_TOKEN=${{ secrets.KV_REST_API_READ_ONLY_TOKEN }}" >> .env.production
+          echo "KV_REST_API_TOKEN=${{ secrets.KV_REST_API_TOKEN }}" >> .env.production
+          echo "KV_REST_API_URL=${{ secrets.KV_REST_API_URL }}" >> .env.production
+          echo "KV_URL=${{ secrets.KV_URL }}" >> .env.production
+          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env.production
+          echo "SERVER_URL=${{ secrets.SERVER_URL }}" >> .env.production
+          echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> .env.production
+          echo "GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }}" >> .env.production
+          echo "GOOGLE_CLOUD_BUCKET=${{ secrets.GOOGLE_CLOUD_BUCKET }}" >> .env.production
+          echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" >> .env.production
+          echo "UPSTASH_REDIS_REST_URL=${{ secrets.UPSTASH_REDIS_REST_URL }}" >> .env.production
+          echo "UPSTASH_REDIS_REST_TOKEN=${{ secrets.UPSTASH_REDIS_REST_TOKEN }}" >> .env.production
+
+      - name: Build (same as Amplify)
+        run: pnpm run build
