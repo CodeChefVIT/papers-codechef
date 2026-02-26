@@ -4,7 +4,7 @@ on:
   pull_request:
     branches: [ "staging", "prod" ]
   push:
-    branches: [ "staging", "prod"]
+    branches: [ "staging", "prod" ]
 
 jobs:
   pr-checks:
@@ -25,23 +25,21 @@ jobs:
       - name: Install deps (pnpm)
         run: pnpm install --frozen-lockfile
 
-      - name: Create env file
-        run: |
-          echo "GEMINI_API_KEY=${{ secrets.GEMINI_API_KEY }}" >> .env.production
-          echo "GOOGLE_CLIENT_EMAIL=${{ secrets.GOOGLE_CLIENT_EMAIL }}" >> .env.production
-          echo "GOOGLE_PRIVATE_KEY=${{ secrets.GOOGLE_PRIVATE_KEY }}" >> .env.production
-          echo "KV_REST_API_READ_ONLY_TOKEN=${{ secrets.KV_REST_API_READ_ONLY_TOKEN }}" >> .env.production
-          echo "KV_REST_API_TOKEN=${{ secrets.KV_REST_API_TOKEN }}" >> .env.production
-          echo "KV_REST_API_URL=${{ secrets.KV_REST_API_URL }}" >> .env.production
-          echo "KV_URL=${{ secrets.KV_URL }}" >> .env.production
-          echo "MONGODB_URI=${{ secrets.MONGODB_URI }}" >> .env.production
-          echo "SERVER_URL=${{ secrets.SERVER_URL }}" >> .env.production
-          echo "SHEET_ID=${{ secrets.SHEET_ID }}" >> .env.production
-          echo "GOOGLE_CLOUD_PROJECT=${{ secrets.GOOGLE_CLOUD_PROJECT }}" >> .env.production
-          echo "GOOGLE_CLOUD_BUCKET=${{ secrets.GOOGLE_CLOUD_BUCKET }}" >> .env.production
-          echo "GOOGLE_APPLICATION_CREDENTIALS_JSON=${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}" >> .env.production
-          echo "UPSTASH_REDIS_REST_URL=${{ secrets.UPSTASH_REDIS_REST_URL }}" >> .env.production
-          echo "UPSTASH_REDIS_REST_TOKEN=${{ secrets.UPSTASH_REDIS_REST_TOKEN }}" >> .env.production
-
       - name: Build (same as Amplify)
         run: pnpm run build
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GOOGLE_CLIENT_EMAIL: ${{ secrets.GOOGLE_CLIENT_EMAIL }}
+          GOOGLE_PRIVATE_KEY: ${{ secrets.GOOGLE_PRIVATE_KEY }}
+          KV_REST_API_READ_ONLY_TOKEN: ${{ secrets.KV_REST_API_READ_ONLY_TOKEN }}
+          KV_REST_API_TOKEN: ${{ secrets.KV_REST_API_TOKEN }}
+          KV_REST_API_URL: ${{ secrets.KV_REST_API_URL }}
+          KV_URL: ${{ secrets.KV_URL }}
+          MONGODB_URI: ${{ secrets.MONGODB_URI }}
+          SERVER_URL: ${{ secrets.SERVER_URL }}
+          SHEET_ID: ${{ secrets.SHEET_ID }}
+          GOOGLE_CLOUD_PROJECT: ${{ secrets.GOOGLE_CLOUD_PROJECT }}
+          GOOGLE_CLOUD_BUCKET: ${{ secrets.GOOGLE_CLOUD_BUCKET }}
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS_JSON }}
+          UPSTASH_REDIS_REST_URL: ${{ secrets.UPSTASH_REDIS_REST_URL }}
+          UPSTASH_REDIS_REST_TOKEN: ${{ secrets.UPSTASH_REDIS_REST_TOKEN }}
