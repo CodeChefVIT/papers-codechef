@@ -4,7 +4,7 @@ import { CustomError } from "@/lib/utils/error";
 
 const exams: string[] = ["CAT-1", "CAT-2", "FAT", "Model CAT-1", "Model CAT-2", "Model FAT"]
 const ALLOWED_FIELDS = ["subject", "courseCode", "exam", "slot", "year"];
-const MAX_REPORTS_PER_PAPER = 5; 
+
 
 export interface ReportTagBody {
   paperId?: string;
@@ -21,10 +21,10 @@ interface ReportedFieldInput {
 
 export async function reportTag(paperId: string, body: ReportTagBody) {
   await connectToDatabase();
-  const MAX_REPORTS_PER_PAPER = 5; 
+ 
   const count = await TagReport.countDocuments({ paperId });
 
-  if (count >= MAX_REPORTS_PER_PAPER) {
+  if (count >= 5){
     throw new CustomError("Received many reports; we are currently working on it.", 429)
   }
     const reportedFields: ReportedFieldInput[] = Array.isArray(body.reportedFields)
