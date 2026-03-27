@@ -51,17 +51,6 @@ export interface ICourses {
   name: string;
 }
 
-export interface IAdminUpload {
-  form_data: FormData;
-  files: File[];
-  public_ids: Array<string>;
-  subject: string;
-  slot: string;
-  year: string;
-  exam: "CAT-1" | "CAT-2" | "FAT";
-  is_pdf: boolean;
-}
-
 export interface APIResponse {
   message: string;
   status: number;
