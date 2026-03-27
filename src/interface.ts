@@ -60,10 +60,6 @@ export interface ConverttoPDFResponse {
   version: number;
 }
 
-export interface LoginResponse {
-  token: string;
-}
-
 export interface ErrorResponse {
   message: string;
 }
