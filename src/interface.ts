@@ -83,11 +83,6 @@ export interface ErrorResponse {
   message: string;
 }
 
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
 export interface DecryptedLoginResponse {
   token: string;
   user: {
