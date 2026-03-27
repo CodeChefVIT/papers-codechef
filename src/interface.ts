@@ -9,10 +9,6 @@ export interface IUpcomingSubject {
   slots: string[];
 }
 
-export interface PostRequestBody {
-  tags: string;
-}
-
 export interface PaperResponse {
   file_url: string;
   subject: string;
