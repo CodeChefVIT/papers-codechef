@@ -96,20 +96,6 @@ export interface IPaper {
   answer_key_included?: boolean;
 }
 
-export type ExamDetail = {
-  subject: string;
-  slot: string;
-  "course-code": string;
-  exam: string;
-  semester:
-    | "Fall Semester"
-    | "Winter Semester"
-    | "Summer Semester"
-    | "Weekend Semester";
-  year: string;
-  answer_key_included: boolean | undefined;
-};
-
 export interface Filters {
   papers: IPaper[];
   unique_exams: string[];
