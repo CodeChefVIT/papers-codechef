@@ -83,14 +83,6 @@ export interface ErrorResponse {
   message: string;
 }
 
-export interface DecryptedLoginResponse {
-  token: string;
-  user: {
-    email: string;
-    id: string;
-  };
-}
-
 export interface IUpcomingPaper extends mongo.Document {
   subject: string;
   slots: string[];
