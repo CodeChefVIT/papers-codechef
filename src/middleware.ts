@@ -8,7 +8,7 @@ const ratelimit = new Ratelimit({
 });
 
 export const config = {
-  matcher: "/api/up",
+  matcher: "/api/upload",
 };
 
 export default async function middleware(request: NextRequest) {
