@@ -71,9 +71,6 @@ importers:
       '@upstash/redis':
         specifier: ^1.33.0
         version: 1.33.0
-      '@vercel/kv':
-        specifier: ^3.0.0
-        version: 3.0.0
       axios:
         specifier: ^1.8.4
         version: 1.12.2
@@ -1257,10 +1254,6 @@ packages:
 
   '@upstash/redis@1.35.7':
     resolution: {integrity: sha512-bdCdKhke+kYUjcLLuGWSeQw7OLuWIx3eyKksyToLBAlGIMX9qiII0ptp8E0y7VFE1yuBxBd/3kSzJ8774Q4g+A==}
-
-  '@vercel/kv@3.0.0':
-    resolution: {integrity: sha512-pKT8fRnfyYk2MgvyB6fn6ipJPCdfZwiKDdw7vB+HL50rjboEBHDVBEcnwfkEpVSp2AjNtoaOUH7zG+bVC/rvSg==}
-    engines: {node: '>=14.6'}
 
   '@webassemblyjs/ast@1.14.1':
     resolution: {integrity: sha512-nuBEDgQfm1ccRp/8bCQrx1frohyufl4JlbMMZ4P1wpeOfDhF6FQkxZJ1b/e+PLwr6X1Nhw6OLme5usuBWYBvuQ==}
@@ -4815,10 +4808,6 @@ snapshots:
   '@upstash/redis@1.35.7':
     dependencies:
       uncrypto: 0.1.3
-
-  '@vercel/kv@3.0.0':
-    dependencies:
-      '@upstash/redis': 1.35.7
 
   '@webassemblyjs/ast@1.14.1':
     dependencies:
