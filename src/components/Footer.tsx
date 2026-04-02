@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 
 type SubscribeResponse = {
   success?: boolean;
-  error?: string;
+  message?: string;
 };
 
 export default function Footer() {
@@ -44,7 +44,7 @@ export default function Footer() {
       })     
       .then(async (res) => {
         const data = (await res.json()) as SubscribeResponse;
-        if (!res.ok) throw new Error(data.error ?? "Something went wrong.");
+        if (!res.ok) throw new Error(data.message ?? "Something went wrong.");
         return data;
       }),
       {
