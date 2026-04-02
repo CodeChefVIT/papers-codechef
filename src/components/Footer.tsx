@@ -80,7 +80,7 @@ export default function Footer() {
                 <FaYoutube size={18} key="youtube" />,
               ],
               [
-                "https://github.com/CodeChefVIT",
+                "https://github.com/CodeChefVIT/papers-codechef",
                 <FaGithub size={18} key="github" />,
               ],
               [
@@ -151,7 +151,16 @@ export default function Footer() {
         </div>
       </div>
       <p className="mt-8 border-t border-[#130E1F] pt-12 text-center font-play text-lg text-black dark:border-white/10 dark:text-white">
-        Made with 💜 by Codechef-VIT
+        Made with 💜 by Codechef-VIT <br />
+        <span className="text-sm opacity-80">
+          This project is open source on{" "}
+          <a
+            href="https://github.com/CodeChefVIT/papers-codechef"
+            className="underline hover:text-purple-500"
+          >
+            Github
+          </a>
+        </span>
       </p>
     </footer>
   );
