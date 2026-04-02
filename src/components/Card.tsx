@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { type IPaper } from "@/interface";
 import Image from "next/image";
 import { Eye, Download, Check } from "lucide-react";
@@ -24,22 +23,12 @@ interface CardProps {
 }
 
 const Card = ({ paper, onSelect, isSelected }: CardProps) => {
-  const [checked, setChecked] = useState<boolean>(isSelected);
-
-  useEffect(() => {
-    setChecked(isSelected);
-  }, [isSelected]);
-
   const handleDownload = async (paper: IPaper) => {
     await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
   };
 
   const handleCheckboxChange = () => {
-    setChecked((prev) => {
-      const newChecked = !prev;
-      onSelect(paper, newChecked);
-      return newChecked;
-    });
+    onSelect(paper, !isSelected);
   };
 
   const paperLink = `/paper/${paper._id}`;
@@ -48,7 +37,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
     <div
       className={cn(
         "overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
-        checked && "bg-white",
+        isSelected && "bg-white",
       )}
     >
       <Link href={paperLink} target="_blank" rel="noopener noreferrer">
@@ -100,7 +89,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
       <div className="flex items-center justify-between gap-2 px-4 pb-4 font-play">
         <div className="flex items-center gap-2">
           <input
-            checked={checked}
+            checked={isSelected}
             onChange={handleCheckboxChange}
             className="h-5 w-5 accent-[#7480FF]"
             type="checkbox"
