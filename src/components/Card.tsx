@@ -55,9 +55,9 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
               {extractBracketContent(paper.subject)}
             </div>
             <div className="flex gap-2">
-              <Link href={paperLink} target="_blank" rel="noopener noreferrer">
+              <span aria-hidden="true">
                 <Eye size={22} />
-              </Link>
+              </span>
               <Download
                 size={20}
                 onClick={(e) => {
