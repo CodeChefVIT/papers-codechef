@@ -1,5 +1,4 @@
 import { fetchPaperID } from "@/app/actions/get-papers-by-id";
-import PdfViewer from "@/components/pdfViewer";
 import RelatedPapers from "@/components/RelatedPaper";
 import Loader from "@/components/ui/loader";
 import { type ErrorResponse, type PaperResponse } from "@/interface";
