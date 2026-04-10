@@ -72,22 +72,6 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
     }
   }, [handleScroll]);
 
-  const goToPreviousPage = () => {
-    setPageNumber((prev) => {
-      const newPage = Math.max(1, prev - 1);
-      scrollToPage(newPage);
-      return newPage;
-    });
-  };
-
-  const goToNextPage = () => {
-    setPageNumber((prev) => {
-      const newPage = Math.min(numPages ?? 1, prev + 1);
-      scrollToPage(newPage);
-      return newPage;
-    });
-  };
-
   const handlePageChange = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") {
       const target = e.target as HTMLInputElement;
@@ -107,7 +91,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
   };
 
   const zoomIn = () => {
-    setScale((prev) => Math.min(prev + 0.1, 3));
+    setScale((prev) => Math.min(prev*1.1, 3));
   };
 
   const zoomOut = () => {
@@ -219,12 +203,9 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
             >
               <ZoomIn />
             </Button>
-
             <span className="w-10 text-center text-sm font-medium">
               {(scale * 100).toFixed(0)}%
             </span>
-
-
             <Button
               onClick={zoomOut}
               disabled={scale <= 0.25}

@@ -13,7 +13,7 @@ export default function ReportButton(){
     <>
       <Button
         onClick={() => setOpen(true)}
-        className="h-10 w-10 rounded p-0 text-white transition hover:bg-red-600 bg-red-500"
+        className="h-12 w-12 rounded p-0 text-white transition hover:bg-red-600 bg-red-500"
       >
         <FaFlag className="text-sm" />
       </Button>
