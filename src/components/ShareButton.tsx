@@ -30,7 +30,7 @@ export default function ShareButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className="aspect-square h-12 w-12 p-0 rounded text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]">
+        <Button className="aspect-square h-10 w-10 p-0 rounded text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]">
           <FaShare />
         </Button>
       </DialogTrigger>

@@ -19,6 +19,8 @@ interface PdfViewerProps {
   name: string;
 }
 
+
+
 export default function PdfViewer({ url, name }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
