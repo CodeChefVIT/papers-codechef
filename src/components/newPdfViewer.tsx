@@ -31,6 +31,11 @@ interface PdfViewerProps {
   name: string;
 }
 
+interface WheelZoomProps {
+  documentId: string;
+  viewerRef: React.RefObject<HTMLDivElement>;
+}
+
 function useBreakpoint() {
   const [width, setWidth] = useState(() => window.innerWidth);
 
@@ -243,6 +248,30 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
   )
 });
 
+function WheelZoom({documentId, viewerRef}: WheelZoomProps){
+  const { provides: zoomProv } = useZoom(documentId);
+
+  const handleWheel = useCallback((e: WheelEvent) => {
+    if (e.ctrlKey && zoomProv) {
+      e.preventDefault();
+      if (e.deltaY < 0) {
+        zoomProv.zoomIn();
+      } else {
+        zoomProv.zoomOut();
+      }
+    }
+  }, [zoomProv]);
+
+  useEffect(() => {
+    const viewer = viewerRef.current;
+    if (!viewer) return;
+    viewer.addEventListener("wheel", handleWheel, { passive: false });
+    return () => viewer.removeEventListener("wheel", handleWheel);
+  }, [handleWheel]);
+
+  return null;
+}
+
 export default function PDFViewer({ url, name }: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
   const {isMobile, isSmall} = useBreakpoint();
@@ -301,6 +330,7 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
         {({ activeDocumentId }) =>
           activeDocumentId && (
             <>
+              <WheelZoom documentId={activeDocumentId} viewerRef={viewerRef} />
               {(isMobile && !isFullscreen) && 
               <Controls
                 documentId={activeDocumentId}
