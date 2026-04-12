@@ -123,7 +123,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
         <ZoomOut size={24} />
       </Button>
 
-      <span className="text-xs text-[16px] py-2 text-white font-medium bg-[#000000]">
+      <span className="text-xs text-[16.5px] py-2 text-white font-small bg-[#262635] rounded px-1">
         {typeof zoomLevel === "number" && `${Math.round(zoomLevel * 100)}%`}
       </span>
 
