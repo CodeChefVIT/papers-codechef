@@ -37,7 +37,7 @@ interface WheelZoomProps {
 }
 
 function useBreakpoint() {
-  const [width, setWidth] = useState(() => window.innerWidth);
+  const [width, setWidth] = useState<number | null>(null);
 
   useEffect(() => {
     setWidth(window.innerWidth);
@@ -45,8 +45,8 @@ function useBreakpoint() {
     window.addEventListener("resize", handler);
     return () => window.removeEventListener("resize", handler);
   }, []);
-
-  return {isMobile: width < 768, isSmall: width < 640};
+  
+  return {isMobile: width !== null && width < 768, isSmall: width !== null && width < 640};
 }
 
 const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, onDownload,
