@@ -248,25 +248,43 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
   )
 });
 
-function WheelZoom({documentId, viewerRef}: WheelZoomProps){
+function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
   const { provides: zoomProv } = useZoom(documentId);
+  const accumulatedDelta = useRef(0);
+  const rafId = useRef<number | null>(null);
 
-  const handleWheel = useCallback((e: WheelEvent) => {
-    if (e.ctrlKey && zoomProv) {
+  const handleWheel = useCallback(
+    (e: WheelEvent) => {
+      if (!e.ctrlKey || !zoomProv) return;
       e.preventDefault();
-      if (e.deltaY < 0) {
-        zoomProv.zoomIn();
-      } else {
-        zoomProv.zoomOut();
-      }
-    }
-  }, [zoomProv]);
+
+      // Trackpad pinch sends fractional deltaY (often < 1),
+      // mouse wheel sends large discrete steps (typically 100–120).
+      const isTrackpad = Math.abs(e.deltaY) < 50;
+      const scaleFactor = isTrackpad ? 0.007 : 0.08;
+
+      accumulatedDelta.current += -e.deltaY * scaleFactor;
+
+      // Flush on the next animation frame to batch rapid events
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+      rafId.current = requestAnimationFrame(() => {
+        const clamped = Math.max(-0.15, Math.min(accumulatedDelta.current, 0.15));
+        zoomProv.requestZoomBy(clamped);
+        accumulatedDelta.current = 0;
+        rafId.current = null;
+      });
+    },
+    [zoomProv]
+  );
 
   useEffect(() => {
     const viewer = viewerRef.current;
     if (!viewer) return;
     viewer.addEventListener("wheel", handleWheel, { passive: false });
-    return () => viewer.removeEventListener("wheel", handleWheel);
+    return () => {
+      viewer.removeEventListener("wheel", handleWheel);
+      if (rafId.current !== null) cancelAnimationFrame(rafId.current);
+    };
   }, [handleWheel]);
 
   return null;
