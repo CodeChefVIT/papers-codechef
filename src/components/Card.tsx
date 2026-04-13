@@ -52,6 +52,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
             height={180}
             className="w-full object-cover p-4 pb-3 md:h-[250px]"
           />
+          </Link>
 
           <div className="justify-center">
             <div className="flex flex-row items-center justify-between px-4 pb-2">
@@ -74,7 +75,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
               </div>
             </div>
           </div>
-        </Link>
+        
 
         <div className="flex justify-end gap-2 px-4 pb-2">
           <Eye
