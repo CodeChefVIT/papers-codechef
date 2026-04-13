@@ -81,6 +81,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
             size={22}
             className="cursor-pointer"
             onClick={(e) => {
+              e.preventDefault();
               e.stopPropagation();
               setPreviewOpen(true);
             }}
@@ -132,7 +133,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
               ✕
             </button>
             <iframe
-              src={paper.file_url}
+              src={getSecureUrl(paper.file_url)}
               className="w-full h-full rounded-md"
             />
           </div>
