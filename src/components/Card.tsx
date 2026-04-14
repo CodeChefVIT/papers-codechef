@@ -44,7 +44,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
           isSelected && "bg-white",
         )}
       >
-        <Link href={paperLink} target="_blank" rel="noopener noreferrer">
+         
           <Image
             src={paper.thumbnail_url}
             alt={paper.subject}
@@ -52,7 +52,6 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
             height={180}
             className="w-full object-cover p-4 pb-3 md:h-[250px]"
           />
-          </Link>
 
           <div className="justify-center">
             <div className="flex flex-row items-center justify-between px-4 pb-2">
@@ -134,7 +133,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
               ✕
             </button>
             <iframe
-              src={getSecureUrl(paper.file_url)}
+              src={`${getSecureUrl(paper.file_url)}#toolbar=0`}
               className="w-full h-full rounded-md"
             />
           </div>

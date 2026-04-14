@@ -7,7 +7,7 @@ import SidebarSection from "./SidebarSection";
 import { useFilters } from "@/context/filterContext";
 
 function SideBar() {
-  // Get everything from context - no more prop drilling!
+  const [openItem, setOpenItem] = React.useState<string | undefined>(undefined);
   const {
     selectedExams,
     selectedSlots,
@@ -138,6 +138,8 @@ function SideBar() {
           data={section.data}
           selected={section.selected}
           updater={section.updater}
+          openItem={openItem}
+          setOpenItem={setOpenItem}
         />
       ))}
     </div>
