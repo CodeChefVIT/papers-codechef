@@ -15,6 +15,7 @@ import { downloadFile } from "../lib/utils/download";
 import { Button } from "./ui/button";
 import ShareButton from "./ShareButton";
 import ReportButton from "./ReportButton";
+import path from 'path/win32';
 
 interface ControlProps {
   documentId: string;
@@ -252,24 +253,39 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
   const { provides: zoomProv } = useZoom(documentId);
   const accumulatedDelta = useRef(0);
   const rafId = useRef<number | null>(null);
+  const curZoom = useRef(1);
+
+  // Stay in sync with zoom from anywhere (buttons, keyboard, etc.)
+  useEffect(() => {
+    if (!zoomProv) return;
+    curZoom.current = zoomProv.getState().currentZoomLevel;
+    const unsub = zoomProv.onZoomChange((e) => {
+      curZoom.current = e.newZoom;
+    });
+    return unsub;
+  }, [zoomProv]);
 
   const handleWheel = useCallback(
     (e: WheelEvent) => {
       if (!e.ctrlKey || !zoomProv) return;
       e.preventDefault();
 
-      // Trackpad pinch sends fractional deltaY (often < 1),
-      // mouse wheel sends large discrete steps (typically 100–120).
       const isTrackpad = Math.abs(e.deltaY) < 50;
-      const scaleFactor = isTrackpad ? 0.007 : 0.08;
-
+      const scaleFactor = isTrackpad ? 0.008 : 0.08;
       accumulatedDelta.current += -e.deltaY * scaleFactor;
 
-      // Flush on the next animation frame to batch rapid events
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);
       rafId.current = requestAnimationFrame(() => {
         const clamped = Math.max(-0.15, Math.min(accumulatedDelta.current, 0.15));
-        zoomProv.requestZoomBy(clamped);
+
+        if (isTrackpad) {
+          const target = Math.max(0.25, Math.min(curZoom.current + clamped, 4));
+          zoomProv.requestZoom(target)
+          curZoom.current = target;
+        } else {
+          zoomProv.requestZoomBy(clamped); // mouse wheel, relative is fine
+        }
+
         accumulatedDelta.current = 0;
         rafId.current = null;
       });
