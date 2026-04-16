@@ -9,10 +9,6 @@ export interface IUpcomingSubject {
   slots: string[];
 }
 
-export interface PostRequestBody {
-  tags: string;
-}
-
 export interface PaperResponse {
   file_url: string;
   subject: string;
@@ -51,17 +47,6 @@ export interface ICourses {
   name: string;
 }
 
-export interface IAdminUpload {
-  form_data: FormData;
-  files: File[];
-  public_ids: Array<string>;
-  subject: string;
-  slot: string;
-  year: string;
-  exam: "CAT-1" | "CAT-2" | "FAT";
-  is_pdf: boolean;
-}
-
 export interface APIResponse {
   message: string;
   status: number;
@@ -75,25 +60,8 @@ export interface ConverttoPDFResponse {
   version: number;
 }
 
-export interface LoginResponse {
-  token: string;
-}
-
 export interface ErrorResponse {
   message: string;
-}
-
-export interface LoginRequest {
-  email: string;
-  password: string;
-}
-
-export interface DecryptedLoginResponse {
-  token: string;
-  user: {
-    email: string;
-    id: string;
-  };
 }
 
 export interface IUpcomingPaper extends mongo.Document {
@@ -123,20 +91,6 @@ export interface IPaper {
   year: string;
   answer_key_included?: boolean;
 }
-
-export type ExamDetail = {
-  subject: string;
-  slot: string;
-  "course-code": string;
-  exam: string;
-  semester:
-    | "Fall Semester"
-    | "Winter Semester"
-    | "Summer Semester"
-    | "Weekend Semester";
-  year: string;
-  answer_key_included: boolean | undefined;
-};
 
 export interface Filters {
   papers: IPaper[];

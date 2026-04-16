@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 
 type SubscribeResponse = {
   success?: boolean;
-  error?: string;
+  message?: string;
 };
 
 export default function Footer() {
@@ -44,7 +44,7 @@ export default function Footer() {
       })     
       .then(async (res) => {
         const data = (await res.json()) as SubscribeResponse;
-        if (!res.ok) throw new Error(data.error ?? "Something went wrong.");
+        if (!res.ok) throw new Error(data.message ?? "Something went wrong.");
         return data;
       }),
       {
@@ -80,7 +80,7 @@ export default function Footer() {
                 <FaYoutube size={18} key="youtube" />,
               ],
               [
-                "https://github.com/CodeChefVIT",
+                "https://github.com/CodeChefVIT/papers-codechef",
                 <FaGithub size={18} key="github" />,
               ],
               [
@@ -151,7 +151,16 @@ export default function Footer() {
         </div>
       </div>
       <p className="mt-8 border-t border-[#130E1F] pt-12 text-center font-play text-lg text-black dark:border-white/10 dark:text-white">
-        Made with 💜 by Codechef-VIT
+        Made with 💜 by Codechef-VIT <br />
+        <span className="text-sm opacity-80">
+          This project is open source on{" "}
+          <a
+            href="https://github.com/CodeChefVIT/papers-codechef"
+            className="underline hover:text-purple-500"
+          >
+            Github
+          </a>
+        </span>
       </p>
     </footer>
   );

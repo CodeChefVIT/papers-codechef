@@ -1,23 +1,16 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/database/mongoose";
-import Paper from "@/db/papers";
 import { Types } from "mongoose";
+import { getPaperById } from "@/lib/services/paper";
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
-    await connectToDatabase();
-
     const { id } = params;
-
+    
     if (!Types.ObjectId.isValid(id)) {
       return NextResponse.json({ message: "Invalid paper ID" }, { status: 400 });
     }
 
-    const paper = await Paper.findById(id);
-
-    if (!paper) {
-      return NextResponse.json({ message: "Paper not found" }, { status: 404 });
-    }
+    const paper = await getPaperById(id);
 
     return NextResponse.json(paper, { status: 200 });
   } catch (error) {
