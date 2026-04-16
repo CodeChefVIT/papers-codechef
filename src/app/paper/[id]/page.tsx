@@ -1,5 +1,4 @@
 import { fetchPaperID } from "@/app/actions/get-papers-by-id";
-import PdfViewer from "@/components/pdfViewer";
 import RelatedPapers from "@/components/RelatedPaper";
 import Loader from "@/components/ui/loader";
 import { type ErrorResponse, type PaperResponse } from "@/interface";
@@ -8,6 +7,7 @@ import axios, { type AxiosResponse } from "axios";
 import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PaperProvider } from "@/context/PaperContext";
+import PDFViewer from "@/components/newPdfViewer";
 
 export async function generateMetadata({
   params,
@@ -174,10 +174,16 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
                   year: paper.year,
                 }}
               >
-            <PdfViewer
+
+            <PDFViewer
+              url={paper.file_url}
+              name={`${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}/>
+            
+            {/* <PdfViewer
               url={paper.file_url}
               name={`${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}
-            ></PdfViewer>
+            ></PdfViewer> */}
+            
             </PaperProvider>
           </center>
           <RelatedPapers />
