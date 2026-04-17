@@ -21,9 +21,10 @@ interface CardProps {
   paper: IPaper;
   onSelect: (paper: IPaper, isSelected: boolean) => void;
   isSelected: boolean;
+  isShow: boolean;
 }
 
-const Card = ({ paper, onSelect, isSelected }: CardProps) => {
+const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
 
   const handleDownload = async (paper: IPaper) => {
@@ -39,12 +40,19 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
   return (
     <>
       <div
+        onClick={(e) => {
+  const target = e.target as HTMLElement;
+
+  // ignore clicks on interactive elements
+  if (target.closest("button, input, svg")) return;
+
+  window.open(paperLink, "_blank");
+}}
         className={cn(
-          "overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
-          isSelected && "bg-white",
+          "cursor-pointer overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
+          isSelected && "ring-2 ring-[#7480FF] bg-[#EFEAFF]"
         )}
       >
-         
           <Image
             src={paper.thumbnail_url}
             alt={paper.subject}
@@ -52,7 +60,6 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
             height={180}
             className="w-full object-cover p-4 pb-3 md:h-[250px]"
           />
-
           <div className="justify-center">
             <div className="flex flex-row items-center justify-between px-4 pb-2">
               <div className="text-md font-play font-medium">
@@ -74,14 +81,12 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
               </div>
             </div>
           </div>
-        
 
         <div className="flex justify-end gap-2 px-4 pb-2">
           <Eye
             size={22}
-            className="cursor-pointer"
+            className="cursor-pointer hover:scale-105 transition"
             onClick={(e) => {
-              e.preventDefault();
               e.stopPropagation();
               setPreviewOpen(true);
             }}
@@ -96,17 +101,21 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
             className="cursor-pointer"
           />
         </div>
-
+         
         <div className="flex items-center justify-between gap-2 px-4 pb-4 font-play">
-          <div className="flex items-center gap-2">
+          {isShow && <div className="flex items-center gap-2">
             <input
               checked={isSelected}
-              onChange={handleCheckboxChange}
+              onChange={(e) => {
+                e.stopPropagation();
+                handleCheckboxChange();
+              }}
+              onClick={(e) => e.stopPropagation()}
               className="h-5 w-5 accent-[#7480FF]"
               type="checkbox"
             />
             <p>Select</p>
-          </div>
+          </div>}
 
           {paper.answer_key_included && (
             <div className="flex items-center gap-2 font-normal text-[#7480FF]">
