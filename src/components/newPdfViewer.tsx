@@ -29,6 +29,10 @@ interface ControlProps {
 interface PdfViewerProps {
   url: string;
   name: string;
+  className?: string;
+  height?: string;
+  hideControls?: boolean;
+  backgroundColor?: string;
 }
 
 interface WheelZoomProps {
@@ -342,7 +346,14 @@ export function Loader() {
     </div>
   );
 }
-export default function PDFViewer({ url, name }: PdfViewerProps) {
+export default function PDFViewer({
+  url,
+  name,
+  className,
+  height = "100dvh",
+  hideControls = false,
+  backgroundColor = "#070114",
+}: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
   const {isMobile, isSmall} = useBreakpoint();
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -396,14 +407,15 @@ if (isLoading || !engine) {
   return (
     <div
       ref={viewerRef}
-      style={{ height: "100dvh", width: "100%", position: "relative", backgroundColor: "#070114", display: "flex", flexDirection: "column" }}
+      className={className}
+      style={{ height, width: "100%", position: "relative", backgroundColor, display: "flex", flexDirection: "column" }}
     >
       <EmbedPDF engine={engine} plugins={plugins}>
         {({ activeDocumentId }) =>
           activeDocumentId && (
             <>
               <WheelZoom documentId={activeDocumentId} viewerRef={viewerRef} />
-              {(isMobile && !isFullscreen) && 
+              {!hideControls && (isMobile && !isFullscreen) && 
               <Controls
                 documentId={activeDocumentId}
                 toggleFullscreen={toggleFullscreen}
@@ -421,14 +433,15 @@ if (isLoading || !engine) {
             style={{
             opacity: isLoaded ? 0 : 1,
             pointerEvents: isLoaded ? "none" : "auto",
-            transition: "opacity 0.3s"
+            transition: "opacity 0.3s",
+            backgroundColor,
           }}
           >
             <Loader />
           </div>
       <Viewport
         documentId={activeDocumentId}
-        style={{ backgroundColor: "#070114", visibility: isLoaded ? "visible" : "hidden" }}
+        style={{ backgroundColor, visibility: isLoaded ? "visible" : "hidden" }}
       >
         <Scroller
           documentId={activeDocumentId}
@@ -443,7 +456,7 @@ if (isLoading || !engine) {
   )}
 </DocumentContent>
               
-              {(!isMobile || isFullscreen) && (
+              {!hideControls && (!isMobile || isFullscreen) && (
                 <Controls
                   documentId={activeDocumentId}
                   toggleFullscreen={toggleFullscreen}

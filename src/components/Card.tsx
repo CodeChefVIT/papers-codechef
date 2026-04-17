@@ -16,6 +16,8 @@ import {
 } from "@/lib/utils/download";
 import { Capsule } from "@/components/ui/capsule";
 import { cn } from "@/lib/utils";
+import PDFViewer from "@/components/newPdfViewer";
+import { PaperProvider } from "@/context/PaperContext";
 
 interface CardProps {
   paper: IPaper;
@@ -26,7 +28,6 @@ interface CardProps {
 
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
-  const [iframeLoading, setIframeLoading] = React.useState(true);
   const handleDownload = async (paper: IPaper) => {
     await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
   };
@@ -86,7 +87,6 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
            className="cursor-pointer transition-all duration-200 ease-out hover:scale-110"
               onClick={(e) => {
                 e.stopPropagation();
-                setIframeLoading(true); 
                 setPreviewOpen(true);
               }}
             />
@@ -131,27 +131,33 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
           onClick={() => setPreviewOpen(false)}
         >
           <div
-            className="relative w-[95%] max-w-5xl h-[90vh] rounded-lg bg-white p-2 dark:bg-[#171720]"
+            className="relative h-[90vh] w-[95%] max-w-5xl"
             onClick={(e) => e.stopPropagation()}
           >
-            <div
-              className={`absolute inset-0 z-50 flex items-center justify-center bg-[#070114] transition-opacity duration-300 ${
-                iframeLoading ? "opacity-100" : "opacity-0 pointer-events-none"
-              }`}
-            >
-      <div className="w-7 h-7 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-    </div>
           <button
-            className="absolute top-3 left-6 z-50 p-2 rounded-full bg-black/60 text-white hover:bg-black transition"
+            className="absolute left-4 top-4 z-[60] rounded-full bg-black/60 p-2 text-white transition hover:bg-black"
             onClick={() => setPreviewOpen(false)}
           >
             <X size={18} />
           </button>
-            <iframe
-              src={`${getSecureUrl(paper.file_url)}#toolbar=0`}
-              className="w-full h-full rounded-md"
-              onLoad={() => setIframeLoading(false)}
+          <PaperProvider
+            value={{
+              paperId: paper._id,
+              subject: paper.subject,
+              exam: paper.exam,
+              slot: paper.slot,
+              year: paper.year,
+            }}
+          >
+            <PDFViewer
+              url={getSecureUrl(paper.file_url)}
+              name={generateFileName(paper).replace(/\.[^.]+$/, "")}
+              className="h-full overflow-hidden"
+              height="100%"
+              hideControls={true}
+              backgroundColor="transparent"
             />
+          </PaperProvider>
           </div>
         </div>
       )}
