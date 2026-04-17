@@ -21,7 +21,7 @@ interface CardProps {
   paper: IPaper;
   onSelect: (paper: IPaper, isSelected: boolean) => void;
   isSelected: boolean;
-  isShow: boolean;
+  isShow?: boolean;
 }
 
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
@@ -84,6 +84,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
 
         <div className="flex justify-end gap-2 px-4 pb-2">
           <Eye
+           className="cursor-pointer transition-all duration-200 ease-out hover:scale-110"
               onClick={(e) => {
                 e.stopPropagation();
                 setIframeLoading(true); 
