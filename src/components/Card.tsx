@@ -43,7 +43,6 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
         onClick={(e) => {
   const target = e.target as HTMLElement;
 
-  // ignore clicks on interactive elements
   if (target.closest("button, input, svg")) return;
 
   window.open(paperLink, "_blank");
@@ -134,13 +133,14 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
           <div
             className="relative w-[95%] max-w-5xl h-[90vh] rounded-lg bg-white p-2 dark:bg-[#171720]"
             onClick={(e) => e.stopPropagation()}
-          ><div
-  className={`absolute inset-0 z-50 flex items-center justify-center bg-[#070114] transition-opacity duration-300 ${
-    iframeLoading ? "opacity-100" : "opacity-0 pointer-events-none"
-  }`}
->
-  <div className="w-7 h-7 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-</div>
+          >
+            <div
+              className={`absolute inset-0 z-50 flex items-center justify-center bg-[#070114] transition-opacity duration-300 ${
+                iframeLoading ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
+            >
+      <div className="w-7 h-7 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+    </div>
           <button
             className="absolute top-3 left-6 z-50 p-2 rounded-full bg-black/60 text-white hover:bg-black transition"
             onClick={() => setPreviewOpen(false)}
