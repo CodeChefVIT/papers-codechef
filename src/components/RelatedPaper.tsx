@@ -90,7 +90,7 @@ const RelatedPapers = () => {
       {relatedPapers.length === 0 ? (
         <p className="font-play">No related papers found.</p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <div className=" cursor-pointer grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {relatedPapers.map((paper) => (
             <Card
               key={paper._id}
@@ -99,6 +99,7 @@ const RelatedPapers = () => {
                 ("");
               }}
               isSelected={false}
+              isShow={false}
             />
           ))}
         </div>
