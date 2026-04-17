@@ -29,7 +29,7 @@ export default function ShareButton() {
   const paperPath = origin + pathname;
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button className="aspect-square h-10 w-10 p-0">
           <FaShare />
         </Button>
