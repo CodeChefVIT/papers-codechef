@@ -3,6 +3,7 @@
 import React from "react";
 import { type IPaper } from "@/interface";
 import Image from "next/image";
+import { X } from "lucide-react";
 import { Eye, Download, Check } from "lucide-react";
 import {
   extractBracketContent,
@@ -135,12 +136,12 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
             className="relative w-[95%] max-w-5xl h-[90vh] rounded-lg bg-white p-2 dark:bg-[#171720]"
             onClick={(e) => e.stopPropagation()}
           >
-            <button
-              className="absolute right-3 top-3 z-10 text-xl"
-              onClick={() => setPreviewOpen(false)}
-            >
-              ✕
-            </button>
+          <button
+            className="absolute top-3 left-6 z-50 p-2 rounded-full bg-black/60 text-white hover:bg-black transition"
+            onClick={() => setPreviewOpen(false)}
+          >
+            <X size={18} />
+          </button>
             <iframe
               src={`${getSecureUrl(paper.file_url)}#toolbar=0`}
               className="w-full h-full rounded-md"
