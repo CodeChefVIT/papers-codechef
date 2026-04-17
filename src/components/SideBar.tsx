@@ -17,7 +17,6 @@ function SideBar() {
     selectedAnswerKeyIncluded,
     filterOptions,
     handleApplyFilters,
-    setCurrentPage,
   } = useFilters();
   const exams =
     filterOptions?.unique_exams.map((exam) => ({ label: exam, value: exam })) ??
