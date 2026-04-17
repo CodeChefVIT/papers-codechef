@@ -15,7 +15,6 @@ import { downloadFile } from "../lib/utils/download";
 import { Button } from "./ui/button";
 import ShareButton from "./ShareButton";
 import ReportButton from "./ReportButton";
-import path from 'path/win32';
 
 interface ControlProps {
   documentId: string;
@@ -255,7 +254,6 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
   const rafId = useRef<number | null>(null);
   const curZoom = useRef(1);
 
-  // Stay in sync with zoom from anywhere (buttons, keyboard, etc.)
   useEffect(() => {
     if (!zoomProv) return;
     curZoom.current = zoomProv.getState().currentZoomLevel;
@@ -283,7 +281,7 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
           zoomProv.requestZoom(target)
           curZoom.current = target;
         } else {
-          zoomProv.requestZoomBy(clamped); // mouse wheel, relative is fine
+          zoomProv.requestZoomBy(clamped);
         }
 
         accumulatedDelta.current = 0;
@@ -351,9 +349,13 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
     }),
   ], [url, name]);
 
-  if (isLoading || !engine) {
-    return <div>Loading PDF Engine...</div>;
-  }
+if (isLoading || !engine) {
+  return (
+    <div style={{ height: "100dvh", width: "100%", backgroundColor: "#070114", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <span style={{ color: "#fff", fontSize: 16 }}>Loading PDF…</span>
+    </div>
+  );
+}
 
   return (
     <div
@@ -371,32 +373,34 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
                 toggleFullscreen={toggleFullscreen}
                 isFullscreen={isFullscreen}
                 onDownload={handleDownload}
-                forceMobile={true} // pass the isMobile flag to Controls`
+                forceMobile={true}
                 isMobile={isMobile}
                 isSmall={isSmall}
               />}
               <DocumentContent documentId={activeDocumentId}>
-                {({ isLoaded }) =>
-                  isLoaded && (
-                    <Viewport
-                      documentId={activeDocumentId}
-                      style={{ backgroundColor: "#070114" }}
-                    >
-                      <Scroller
-                        documentId={activeDocumentId}
-                        renderPage={({ width, height, pageIndex }) => (
-                          <div style={{ width, height }}>
-                            <RenderLayer
-                              documentId={activeDocumentId}
-                              pageIndex={pageIndex}
-                            />
-                          </div>
-                        )}
-                      />
-                    </Viewport>
-                  )
-                }
-              </DocumentContent>
+  {({ isLoaded }) => (
+    <>
+      {!isLoaded && (
+        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#070114", zIndex: 10 }}>
+          <span style={{ color: "#fff", fontSize: 16 }}>Loading PDF…</span>
+        </div>
+      )}
+      <Viewport
+        documentId={activeDocumentId}
+        style={{ backgroundColor: "#070114", visibility: isLoaded ? "visible" : "hidden" }}
+      >
+        <Scroller
+          documentId={activeDocumentId}
+          renderPage={({ width, height, pageIndex }) => (
+            <div style={{ width, height }}>
+              <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
+            </div>
+          )}
+        />
+      </Viewport>
+    </>
+  )}
+</DocumentContent>
               
               {(!isMobile || isFullscreen) && (
                 <Controls
@@ -409,7 +413,6 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
                   isSmall={isSmall}
                 />
               )}
-              
             </>
           )
         }
