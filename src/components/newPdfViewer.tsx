@@ -15,7 +15,6 @@ import { downloadFile } from "../lib/utils/download";
 import { Button } from "./ui/button";
 import ShareButton from "./ShareButton";
 import ReportButton from "./ReportButton";
-import path from 'path/win32';
 
 interface ControlProps {
   documentId: string;
@@ -255,7 +254,6 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
   const rafId = useRef<number | null>(null);
   const curZoom = useRef(1);
 
-  // Stay in sync with zoom from anywhere (buttons, keyboard, etc.)
   useEffect(() => {
     if (!zoomProv) return;
     curZoom.current = zoomProv.getState().currentZoomLevel;
@@ -283,7 +281,7 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
           zoomProv.requestZoom(target)
           curZoom.current = target;
         } else {
-          zoomProv.requestZoomBy(clamped); // mouse wheel, relative is fine
+          zoomProv.requestZoomBy(clamped);
         }
 
         accumulatedDelta.current = 0;
@@ -306,6 +304,44 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
   return null;
 }
 
+function useLoadingMessage(messages: string[], interval = 2200) {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex(i => (i + 1) % messages.length);
+        setVisible(true);
+      }, 400);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [messages, interval]);
+
+  return { message: messages[index], visible };
+}
+
+const LOADING_MESSAGES = [
+  "Loading document",
+  "Preparing pages",
+  "Almost there",
+];
+
+export function Loader() {
+  const { message, visible } = useLoadingMessage(LOADING_MESSAGES);
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 h-dvh w-full bg-[#070114]">
+      <div className="w-7 h-7 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+      <span
+        className="text-white/50 text-sm tracking-wide transition-opacity duration-400"
+        style={{ opacity: visible ? 1 : 0 }}
+      >
+        {message}
+      </span>
+    </div>
+  );
+}
 export default function PDFViewer({ url, name }: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
   const {isMobile, isSmall} = useBreakpoint();
@@ -351,9 +387,11 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
     }),
   ], [url, name]);
 
-  if (isLoading || !engine) {
-    return <div>Loading PDF Engine...</div>;
-  }
+if (isLoading || !engine) {
+  return (
+<Loader />
+  );
+}
 
   return (
     <div
@@ -371,32 +409,39 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
                 toggleFullscreen={toggleFullscreen}
                 isFullscreen={isFullscreen}
                 onDownload={handleDownload}
-                forceMobile={true} // pass the isMobile flag to Controls`
+                forceMobile={true}
                 isMobile={isMobile}
                 isSmall={isSmall}
               />}
               <DocumentContent documentId={activeDocumentId}>
-                {({ isLoaded }) =>
-                  isLoaded && (
-                    <Viewport
-                      documentId={activeDocumentId}
-                      style={{ backgroundColor: "#070114" }}
-                    >
-                      <Scroller
-                        documentId={activeDocumentId}
-                        renderPage={({ width, height, pageIndex }) => (
-                          <div style={{ width, height }}>
-                            <RenderLayer
-                              documentId={activeDocumentId}
-                              pageIndex={pageIndex}
-                            />
-                          </div>
-                        )}
-                      />
-                    </Viewport>
-                  )
-                }
-              </DocumentContent>
+            {({ isLoaded }) => (
+              <>
+                <div
+            className="absolute inset-0 z-50 flex items-center justify-center bg-[#070114]"
+            style={{
+            opacity: isLoaded ? 0 : 1,
+            pointerEvents: isLoaded ? "none" : "auto",
+            transition: "opacity 0.3s"
+          }}
+          >
+            <Loader />
+          </div>
+      <Viewport
+        documentId={activeDocumentId}
+        style={{ backgroundColor: "#070114", visibility: isLoaded ? "visible" : "hidden" }}
+      >
+        <Scroller
+          documentId={activeDocumentId}
+          renderPage={({ width, height, pageIndex }) => (
+            <div style={{ width, height }}>
+              <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
+            </div>
+          )}
+        />
+      </Viewport>
+    </>
+  )}
+</DocumentContent>
               
               {(!isMobile || isFullscreen) && (
                 <Controls
@@ -409,7 +454,6 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
                   isSmall={isSmall}
                 />
               )}
-              
             </>
           )
         }
