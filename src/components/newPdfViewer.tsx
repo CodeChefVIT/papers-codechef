@@ -304,6 +304,44 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
   return null;
 }
 
+function useLoadingMessage(messages: string[], interval = 2200) {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex(i => (i + 1) % messages.length);
+        setVisible(true);
+      }, 400);
+    }, interval);
+    return () => clearInterval(timer);
+  }, [messages, interval]);
+
+  return { message: messages[index], visible };
+}
+
+const LOADING_MESSAGES = [
+  "Loading document",
+  "Preparing pages",
+  "Almost there",
+];
+
+export function Loader() {
+  const { message, visible } = useLoadingMessage(LOADING_MESSAGES);
+  return (
+    <div className="flex flex-col items-center justify-center gap-3 h-dvh w-full bg-[#070114]">
+      <div className="w-7 h-7 rounded-full border-2 border-white/10 border-t-white animate-spin" />
+      <span
+        className="text-white/50 text-sm tracking-wide transition-opacity duration-400"
+        style={{ opacity: visible ? 1 : 0 }}
+      >
+        {message}
+      </span>
+    </div>
+  );
+}
 export default function PDFViewer({ url, name }: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
   const {isMobile, isSmall} = useBreakpoint();
@@ -351,9 +389,7 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
 
 if (isLoading || !engine) {
   return (
-    <div style={{ height: "100dvh", width: "100%", backgroundColor: "#070114", display: "flex", alignItems: "center", justifyContent: "center" }}>
-      <span style={{ color: "#fff", fontSize: 16 }}>Loading PDF…</span>
-    </div>
+<Loader />
   );
 }
 
@@ -378,13 +414,18 @@ if (isLoading || !engine) {
                 isSmall={isSmall}
               />}
               <DocumentContent documentId={activeDocumentId}>
-  {({ isLoaded }) => (
-    <>
-      {!isLoaded && (
-        <div style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", backgroundColor: "#070114", zIndex: 10 }}>
-          <span style={{ color: "#fff", fontSize: 16 }}>Loading PDF…</span>
-        </div>
-      )}
+            {({ isLoaded }) => (
+              <>
+                <div
+            className="absolute inset-0 z-50 flex items-center justify-center bg-[#070114]"
+            style={{
+            opacity: isLoaded ? 0 : 1,
+            pointerEvents: isLoaded ? "none" : "auto",
+            transition: "opacity 0.3s"
+          }}
+          >
+            <Loader />
+          </div>
       <Viewport
         documentId={activeDocumentId}
         style={{ backgroundColor: "#070114", visibility: isLoaded ? "visible" : "hidden" }}
