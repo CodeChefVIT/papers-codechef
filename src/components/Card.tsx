@@ -15,7 +15,6 @@ import {
   downloadFile,
 } from "@/lib/utils/download";
 import { Capsule } from "@/components/ui/capsule";
-import Link from "next/link";
 import { cn } from "@/lib/utils";
 
 interface CardProps {
@@ -27,7 +26,7 @@ interface CardProps {
 
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
-
+  const [iframeLoading, setIframeLoading] = React.useState(true);
   const handleDownload = async (paper: IPaper) => {
     await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
   };
@@ -85,13 +84,12 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
 
         <div className="flex justify-end gap-2 px-4 pb-2">
           <Eye
-            size={22}
-            className="cursor-pointer hover:scale-105 transition"
-            onClick={(e) => {
-              e.stopPropagation();
-              setPreviewOpen(true);
-            }}
-          />
+              onClick={(e) => {
+                e.stopPropagation();
+                setIframeLoading(true); 
+                setPreviewOpen(true);
+              }}
+            />
 
           <Download
             size={20}
@@ -135,7 +133,13 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
           <div
             className="relative w-[95%] max-w-5xl h-[90vh] rounded-lg bg-white p-2 dark:bg-[#171720]"
             onClick={(e) => e.stopPropagation()}
-          >
+          ><div
+  className={`absolute inset-0 z-50 flex items-center justify-center bg-[#070114] transition-opacity duration-300 ${
+    iframeLoading ? "opacity-100" : "opacity-0 pointer-events-none"
+  }`}
+>
+  <div className="w-7 h-7 rounded-full border-2 border-white/20 border-t-white animate-spin" />
+</div>
           <button
             className="absolute top-3 left-6 z-50 p-2 rounded-full bg-black/60 text-white hover:bg-black transition"
             onClick={() => setPreviewOpen(false)}
@@ -145,6 +149,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
             <iframe
               src={`${getSecureUrl(paper.file_url)}#toolbar=0`}
               className="w-full h-full rounded-md"
+              onLoad={() => setIframeLoading(false)}
             />
           </div>
         </div>
