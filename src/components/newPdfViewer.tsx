@@ -33,6 +33,7 @@ interface PdfViewerProps {
   height?: string;
   hideControls?: boolean;
   backgroundColor?: string;
+  hideScrollbar?: boolean;
 }
 
 interface WheelZoomProps {
@@ -353,6 +354,7 @@ export default function PDFViewer({
   height = "100dvh",
   hideControls = false,
   backgroundColor = "#070114",
+  hideScrollbar = false,
 }: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
   const {isMobile, isSmall} = useBreakpoint();
@@ -405,12 +407,29 @@ if (isLoading || !engine) {
 }
 
   return (
-    <div
-      ref={viewerRef}
-      className={className}
-      style={{ height, width: "100%", position: "relative", backgroundColor, display: "flex", flexDirection: "column" }}
-    >
-      <EmbedPDF engine={engine} plugins={plugins}>
+    <>
+      {hideScrollbar && (
+        <style jsx global>{`
+          [data-pdf-viewer-scrollbars="hidden"] *,
+          [data-pdf-viewer-scrollbars="hidden"] {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+
+          [data-pdf-viewer-scrollbars="hidden"] ::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+          }
+        `}</style>
+      )}
+      <div
+        ref={viewerRef}
+        data-pdf-viewer-scrollbars={hideScrollbar ? "hidden" : "visible"}
+        className={className}
+        style={{ height, width: "100%", position: "relative", backgroundColor, display: "flex", flexDirection: "column" }}
+      >
+        <EmbedPDF engine={engine} plugins={plugins}>
         {({ activeDocumentId }) =>
           activeDocumentId && (
             <>
@@ -446,7 +465,10 @@ if (isLoading || !engine) {
         <Scroller
           documentId={activeDocumentId}
           renderPage={({ width, height, pageIndex }) => (
-            <div style={{ width, height }}>
+            <div
+              style={{ width, height }}
+              onClick={(e) => e.stopPropagation()}
+            >
               <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
             </div>
           )}
@@ -470,7 +492,8 @@ if (isLoading || !engine) {
             </>
           )
         }
-      </EmbedPDF>
-    </div>
+        </EmbedPDF>
+      </div>
+    </>
   );
 }

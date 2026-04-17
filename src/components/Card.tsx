@@ -3,8 +3,7 @@
 import React from "react";
 import { type IPaper } from "@/interface";
 import Image from "next/image";
-import { X } from "lucide-react";
-import { Eye, Download, Check } from "lucide-react";
+import { X, Eye, Download, Check } from "lucide-react";
 import {
   extractBracketContent,
   extractWithoutBracketContent,
@@ -28,6 +27,18 @@ interface CardProps {
 
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    if (!previewOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [previewOpen]);
+
   const handleDownload = async (paper: IPaper) => {
     await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
   };
@@ -127,37 +138,42 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
 
       {previewOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 py-8"
           onClick={() => setPreviewOpen(false)}
         >
           <div
-            className="relative h-[90vh] w-[95%] max-w-5xl"
-            onClick={(e) => e.stopPropagation()}
+            className="relative h-full w-full max-w-5xl"
           >
-          <button
-            className="absolute left-4 top-4 z-[60] rounded-full bg-black/60 p-2 text-white transition hover:bg-black"
-            onClick={() => setPreviewOpen(false)}
-          >
-            <X size={18} />
-          </button>
-          <PaperProvider
-            value={{
-              paperId: paper._id,
-              subject: paper.subject,
-              exam: paper.exam,
-              slot: paper.slot,
-              year: paper.year,
-            }}
-          >
-            <PDFViewer
-              url={getSecureUrl(paper.file_url)}
-              name={generateFileName(paper).replace(/\.[^.]+$/, "")}
-              className="h-full overflow-hidden"
-              height="100%"
-              hideControls={true}
-              backgroundColor="transparent"
-            />
-          </PaperProvider>
+            <div
+              className="relative mx-auto h-full max-w-[760px]"
+            >
+              <PaperProvider
+                value={{
+                  paperId: paper._id,
+                  subject: paper.subject,
+                  exam: paper.exam,
+                  slot: paper.slot,
+                  year: paper.year,
+                }}
+              >
+              <button
+                className="fixed right-4 top-4 z-[60] rounded-full border border-black/10 bg-white/95 p-2 text-black shadow-md transition hover:bg-white"
+                onClick={() => setPreviewOpen(false)}
+                aria-label="Close preview"
+              >
+                <X size={18} />
+              </button>
+                <PDFViewer
+                  url={getSecureUrl(paper.file_url)}
+                  name={generateFileName(paper).replace(/\.[^.]+$/, "")}
+                  className="h-full overflow-hidden"
+                  height="100%"
+                  hideControls={true}
+                  backgroundColor="transparent"
+                  hideScrollbar={true}
+                />
+              </PaperProvider>
+            </div>
           </div>
         </div>
       )}
