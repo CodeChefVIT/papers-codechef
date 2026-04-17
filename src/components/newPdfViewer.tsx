@@ -15,6 +15,7 @@ import { downloadFile } from "../lib/utils/download";
 import { Button } from "./ui/button";
 import ShareButton from "./ShareButton";
 import ReportButton from "./ReportButton";
+import { useTheme } from "next-themes";
 
 interface ControlProps {
   documentId: string;
@@ -29,6 +30,12 @@ interface ControlProps {
 interface PdfViewerProps {
   url: string;
   name: string;
+  className?: string;
+  height?: string;
+  hideControls?: boolean;
+  backgroundColor?: string;
+  hideScrollbar?: boolean;
+  isolateFromTheme?: boolean;
 }
 
 interface WheelZoomProps {
@@ -328,25 +335,48 @@ const LOADING_MESSAGES = [
   "Almost there",
 ];
 
-export function Loader() {
+export function Loader({
+  backgroundColor = "#070114",
+  textColor = "rgba(255,255,255,0.5)",
+}: {
+  backgroundColor?: string;
+  textColor?: string;
+}) {
   const { message, visible } = useLoadingMessage(LOADING_MESSAGES);
   return (
-    <div className="flex flex-col items-center justify-center gap-3 h-dvh w-full bg-[#070114]">
+    <div
+      className="flex h-dvh w-full flex-col items-center justify-center gap-3"
+      style={{ backgroundColor }}
+    >
       <div className="w-7 h-7 rounded-full border-2 border-white/10 border-t-white animate-spin" />
       <span
-        className="text-white/50 text-sm tracking-wide transition-opacity duration-400"
-        style={{ opacity: visible ? 1 : 0 }}
+        className="text-sm tracking-wide transition-opacity duration-400"
+        style={{ opacity: visible ? 1 : 0, color: textColor }}
       >
         {message}
       </span>
     </div>
   );
 }
-export default function PDFViewer({ url, name }: PdfViewerProps) {
+export default function PDFViewer({
+  url,
+  name,
+  className,
+  height = "100dvh",
+  hideControls = false,
+  backgroundColor,
+  hideScrollbar = false,
+  isolateFromTheme = true,
+}: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
-  const {isMobile, isSmall} = useBreakpoint();
+  const { isMobile, isSmall } = useBreakpoint();
+  const { resolvedTheme } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
+  const effectiveBackgroundColor =
+    backgroundColor ?? (resolvedTheme === "light" ? "#F3F5FF" : "#070114");
+  const loaderTextColor =
+    resolvedTheme === "light" ? "rgba(17,24,39,0.6)" : "rgba(255,255,255,0.5)";
 
   const handleDownload = useCallback(async () => {
     window.dataLayer?.push({
@@ -389,21 +419,67 @@ export default function PDFViewer({ url, name }: PdfViewerProps) {
 
 if (isLoading || !engine) {
   return (
-<Loader />
+<Loader
+  backgroundColor={effectiveBackgroundColor}
+  textColor={loaderTextColor}
+/>
   );
 }
 
   return (
-    <div
-      ref={viewerRef}
-      style={{ height: "100dvh", width: "100%", position: "relative", backgroundColor: "#070114", display: "flex", flexDirection: "column" }}
-    >
-      <EmbedPDF engine={engine} plugins={plugins}>
+    <>
+      {hideScrollbar && (
+        <style jsx global>{`
+          [data-pdf-viewer-scrollbars="hidden"] *,
+          [data-pdf-viewer-scrollbars="hidden"] {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+          }
+
+          [data-pdf-viewer-scrollbars="hidden"] ::-webkit-scrollbar {
+            display: none;
+            width: 0;
+            height: 0;
+          }
+        `}</style>
+      )}
+      {isolateFromTheme && (
+        <style jsx global>{`
+          [data-pdf-viewer-theme="light"] {
+            color-scheme: light;
+            forced-color-adjust: none;
+          }
+
+          [data-pdf-viewer-theme="light"] canvas,
+          [data-pdf-viewer-theme="light"] img,
+          [data-pdf-viewer-theme="light"] svg {
+            filter: none !important;
+            forced-color-adjust: none;
+          }
+        `}</style>
+      )}
+      <div
+        ref={viewerRef}
+        data-pdf-viewer-theme={isolateFromTheme ? "light" : "inherited"}
+        data-pdf-viewer-scrollbars={hideScrollbar ? "hidden" : "visible"}
+        className={className}
+        style={{
+          height,
+          width: "100%",
+          position: "relative",
+          backgroundColor: effectiveBackgroundColor,
+          display: "flex",
+          flexDirection: "column",
+          colorScheme: isolateFromTheme ? "light" : undefined,
+          forcedColorAdjust: isolateFromTheme ? "none" : undefined,
+        }}
+      >
+        <EmbedPDF engine={engine} plugins={plugins}>
         {({ activeDocumentId }) =>
           activeDocumentId && (
             <>
               <WheelZoom documentId={activeDocumentId} viewerRef={viewerRef} />
-              {(isMobile && !isFullscreen) && 
+              {!hideControls && (isMobile && !isFullscreen) && 
               <Controls
                 documentId={activeDocumentId}
                 toggleFullscreen={toggleFullscreen}
@@ -421,19 +497,29 @@ if (isLoading || !engine) {
             style={{
             opacity: isLoaded ? 0 : 1,
             pointerEvents: isLoaded ? "none" : "auto",
-            transition: "opacity 0.3s"
+            transition: "opacity 0.3s",
+            backgroundColor: effectiveBackgroundColor,
           }}
           >
-            <Loader />
+            <Loader
+              backgroundColor={effectiveBackgroundColor}
+              textColor={loaderTextColor}
+            />
           </div>
       <Viewport
         documentId={activeDocumentId}
-        style={{ backgroundColor: "#070114", visibility: isLoaded ? "visible" : "hidden" }}
+        style={{
+          backgroundColor: effectiveBackgroundColor,
+          visibility: isLoaded ? "visible" : "hidden",
+        }}
       >
         <Scroller
           documentId={activeDocumentId}
           renderPage={({ width, height, pageIndex }) => (
-            <div style={{ width, height }}>
+            <div
+              style={{ width, height }}
+              onClick={(e) => e.stopPropagation()}
+            >
               <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
             </div>
           )}
@@ -443,7 +529,7 @@ if (isLoading || !engine) {
   )}
 </DocumentContent>
               
-              {(!isMobile || isFullscreen) && (
+              {!hideControls && (!isMobile || isFullscreen) && (
                 <Controls
                   documentId={activeDocumentId}
                   toggleFullscreen={toggleFullscreen}
@@ -457,7 +543,8 @@ if (isLoading || !engine) {
             </>
           )
         }
-      </EmbedPDF>
-    </div>
+        </EmbedPDF>
+      </div>
+    </>
   );
 }

@@ -3,8 +3,7 @@
 import React from "react";
 import { type IPaper } from "@/interface";
 import Image from "next/image";
-import { X } from "lucide-react";
-import { Eye, Download, Check } from "lucide-react";
+import { X, Eye, Download, Check } from "lucide-react";
 import {
   extractBracketContent,
   extractWithoutBracketContent,
@@ -16,6 +15,8 @@ import {
 } from "@/lib/utils/download";
 import { Capsule } from "@/components/ui/capsule";
 import { cn } from "@/lib/utils";
+import PDFViewer from "@/components/newPdfViewer";
+import { PaperProvider } from "@/context/PaperContext";
 
 interface CardProps {
   paper: IPaper;
@@ -26,7 +27,18 @@ interface CardProps {
 
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
-  const [iframeLoading, setIframeLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    if (!previewOpen) return;
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [previewOpen]);
+
   const handleDownload = async (paper: IPaper) => {
     await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
   };
@@ -86,7 +98,6 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
            className="cursor-pointer transition-all duration-200 ease-out hover:scale-110"
               onClick={(e) => {
                 e.stopPropagation();
-                setIframeLoading(true); 
                 setPreviewOpen(true);
               }}
             />
@@ -127,31 +138,42 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
 
       {previewOpen && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-6 py-8"
           onClick={() => setPreviewOpen(false)}
         >
           <div
-            className="relative w-[95%] max-w-5xl h-[90vh] rounded-lg bg-white p-2 dark:bg-[#171720]"
-            onClick={(e) => e.stopPropagation()}
+            className="relative h-full w-full max-w-5xl"
           >
             <div
-              className={`absolute inset-0 z-50 flex items-center justify-center bg-[#070114] transition-opacity duration-300 ${
-                iframeLoading ? "opacity-100" : "opacity-0 pointer-events-none"
-              }`}
+              className="relative mx-auto h-full max-w-[760px]"
             >
-      <div className="w-7 h-7 rounded-full border-2 border-white/20 border-t-white animate-spin" />
-    </div>
-          <button
-            className="absolute top-3 left-6 z-50 p-2 rounded-full bg-black/60 text-white hover:bg-black transition"
-            onClick={() => setPreviewOpen(false)}
-          >
-            <X size={18} />
-          </button>
-            <iframe
-              src={`${getSecureUrl(paper.file_url)}#toolbar=0`}
-              className="w-full h-full rounded-md"
-              onLoad={() => setIframeLoading(false)}
-            />
+              <PaperProvider
+                value={{
+                  paperId: paper._id,
+                  subject: paper.subject,
+                  exam: paper.exam,
+                  slot: paper.slot,
+                  year: paper.year,
+                }}
+              >
+              <button
+                className="fixed right-4 top-4 z-[60] rounded-full border border-black/10 bg-white/95 p-2 text-black shadow-md transition hover:bg-white"
+                onClick={() => setPreviewOpen(false)}
+                aria-label="Close preview"
+              >
+                <X size={18} />
+              </button>
+                <PDFViewer
+                  url={getSecureUrl(paper.file_url)}
+                  name={generateFileName(paper).replace(/\.[^.]+$/, "")}
+                  className="h-full overflow-hidden"
+                  height="100%"
+                  hideControls={true}
+                  backgroundColor="transparent"
+                  hideScrollbar={true}
+                />
+              </PaperProvider>
+            </div>
           </div>
         </div>
       )}
