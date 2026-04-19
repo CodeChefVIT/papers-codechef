@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongoose";
+import { connectToDatabase } from "@/lib/database/mongoose";
 import { PaperAdmin } from "@/db/papers";
-import { createPDFfromImages } from "@/lib/pdf";
-import { uploadPDF, uploadThumbnail } from "@/lib/storage";
+import { createPDFfromImages } from "@/lib/storage/pdf";
+import { uploadPDF, uploadThumbnail } from "@/lib/storage/gcp";
 
 export const runtime = "nodejs";
 

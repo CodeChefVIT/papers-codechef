@@ -8,6 +8,7 @@ const HomePage = () => {
       <Hero />
       <Info />
       <Faq />
+      {/* Happy Birthday Abhi broski, Hope you have an amazing year!!! Love you lots*/}
     </div>
   );
 };

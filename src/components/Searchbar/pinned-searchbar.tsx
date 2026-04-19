@@ -1,16 +1,12 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
-import { Search, X } from "lucide-react";
+import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import PinButton from "../PinButton";
 import Fuse from "fuse.js";
-import NavDropdownButton from "../NavDropdownButton";
-import { StoredSubjects } from "@/interface";
-import FloatingControls from "./floating-controls";
-import { type ICourseWithCount } from "@/interface";
-import { IUpcomingPaper } from "@/interface";
+import { type StoredSubjects, type ICourseWithCount, type IUpcomingPaper } from "@/interface";
 
 function PinnedSearchBar({
   initialSubjects,

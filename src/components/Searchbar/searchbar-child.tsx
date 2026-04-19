@@ -19,14 +19,26 @@ function SearchBarChild({
   const [suggestions, setSuggestions] = useState<ICourseWithCount[]>([]);
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
   const [fuzzy, setFuzzy] = useState(
-    () => new Fuse<ICourseWithCount>([], { keys: ["name"], threshold: 0.3 }),
+    () =>
+      new Fuse<ICourseWithCount>([], {
+        keys: ["name"],
+        threshold: 0.3,
+        ignoreLocation: true,
+      }),
   );
   const [highlightedIndex, setHighlightedIndex] = useState<number>(-1);
 
   useEffect(() => {
     if (initialSubjects && initialSubjects.length > 0) {
-      setFuzzy(new Fuse(initialSubjects, { keys: ["name"], threshold: 0.3 }));
+      setFuzzy(
+        new Fuse(initialSubjects, {
+          keys: ["name"],
+          threshold: 0.3,
+          ignoreLocation: true,
+        }),
+      );
     }
+    console.log(initialSubjects);
   }, [initialSubjects]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,24 +107,37 @@ function SearchBarChild({
                 setHighlightedIndex((prev) => (prev + 1) % suggestions.length);
               } else if (e.key === "ArrowUp") {
                 e.preventDefault();
-                setHighlightedIndex((prev) => (prev - 1 + suggestions.length) % suggestions.length);
+                setHighlightedIndex(
+                  (prev) =>
+                    (prev - 1 + suggestions.length) % suggestions.length,
+                );
               } else if (e.key === "Enter") {
                 e.preventDefault();
-                if (highlightedIndex >= 0 && highlightedIndex < suggestions.length && suggestions[highlightedIndex] !== undefined) {
+                if (
+                  highlightedIndex >= 0 &&
+                  highlightedIndex < suggestions.length &&
+                  suggestions[highlightedIndex] !== undefined
+                ) {
                   handleSelectSuggestion(suggestions[highlightedIndex]);
                 } else {
-                  router.push(`/catalogue?subject=${encodeURIComponent(searchText)}`);
+                  router.push(
+                    `/catalogue?subject=${encodeURIComponent(searchText)}`,
+                  );
                   setSuggestions([]);
                 }
               } else if (e.key === "Tab") {
                 e.preventDefault();
-                if(highlightedIndex == -1){
+                if (highlightedIndex == -1) {
                   if (suggestions.length > 0 && suggestions[0] != undefined) {
                     setSearchText(suggestions[0].name || "");
                     setSuggestions([]);
                   }
-                }else{
-                  if (highlightedIndex >= 0 && highlightedIndex < suggestions.length && suggestions[highlightedIndex] !== undefined) {
+                } else {
+                  if (
+                    highlightedIndex >= 0 &&
+                    highlightedIndex < suggestions.length &&
+                    suggestions[highlightedIndex] !== undefined
+                  ) {
                     setSearchText(suggestions[highlightedIndex].name || "");
                     setHighlightedIndex(-1);
                     setSuggestions([]);
@@ -134,15 +159,16 @@ function SearchBarChild({
               className={`absolute z-20 w-full max-w-xl overflow-y-auto rounded-md rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771] md:mx-0`}
               style={{ maxHeight: "400px" }}
             >
-              {suggestions.map((suggestion : ICourseWithCount, index) => (
+              {suggestions.map((suggestion: ICourseWithCount, index) => (
                 <li
                   key={suggestion._id}
                   onClick={() => handleSelectSuggestion(suggestion)}
-                  className={`flex cursor-pointer items-center rounded p-2 
-                  ${index === highlightedIndex
-                    ? "bg-gray-200 dark:bg-gray-800"
-                    : "hover:bg-gray-200 dark:hover:bg-gray-800"}`}
-                  >
+                  className={`flex cursor-pointer items-center rounded p-2 ${
+                    index === highlightedIndex
+                      ? "bg-gray-200 dark:bg-gray-800"
+                      : "hover:bg-gray-200 dark:hover:bg-gray-800"
+                  }`}
+                >
                   <div
                     id="paper_count"
                     className="mr-4 flex h-8 w-8 items-center justify-center rounded-md bg-[#171720] text-xs font-semibold text-white"

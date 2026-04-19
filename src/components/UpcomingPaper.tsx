@@ -1,13 +1,14 @@
 import {
-  capsule,
   extractBracketContent,
   extractWithoutBracketContent,
-} from "@/util/utils";
+} from "@/lib/utils/string";
+
 import { useRouter } from "next/navigation";
 import { Pin } from "lucide-react";
 import React, { useContext, useEffect, useState } from "react";
 import { StoredSubjects } from "@/interface";
 import { useCourses } from "@/context/courseContext";
+import { Capsule } from "@/components/ui/capsule";
 
 interface PaperCardProps {
   subject: string;
@@ -34,8 +35,7 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
 
     localStorage.setItem("userSubjects", JSON.stringify(updated));
     window.dispatchEvent(new Event("userSubjectsChanged"));
-    if(!current)
-      window.dispatchEvent(new Event("updatePapers"));
+    if (!current) window.dispatchEvent(new Event("updatePapers"));
   };
 
   useEffect(() => {
@@ -105,7 +105,9 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
 
         {
           <div className="mt-4 flex flex-wrap gap-2 font-play">
-            {slots?.map((slotValue) => capsule(slotValue))}
+            {slots?.map((slotValue, index) => (
+              <Capsule key={index}>{slotValue}</Capsule>
+            ))}
           </div>
         }
       </div>

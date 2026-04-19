@@ -31,7 +31,7 @@ export default function manifest(): MetadataRoute.Manifest {
         "url": "/upload",
         "icons": [
           {
-            "src": "/icons/icon-192x192.webp",
+            "src": "/assets/icons/icon-192x192.webp",
             "sizes": "192x192",
             "type": "image/webp"
           }
@@ -39,12 +39,12 @@ export default function manifest(): MetadataRoute.Manifest {
       },
     ],
     icons: [
-      { src: "/icons/icon-192x192.webp", sizes: "192x192", type: "image/webp", purpose: "maskable" },
-      { src: "/icons/icon-196x196.webp", sizes: "196x196", type: "image/webp" },
-      { src: "/icons/icon-228x228.webp", sizes: "228x228", type: "image/webp" },
-      { src: "/icons/icon-256x256.webp", sizes: "256x256", type: "image/webp" },
-      { src: "/icons/icon-384x384.webp", sizes: "384x384", type: "image/webp" },
-      { src: "/icons/icon-512x512.webp", sizes: "512x512", type: "image/webp", purpose: "maskable" },
+      { src: "/assets/icons/icon-192x192.webp", sizes: "192x192", type: "image/webp", purpose: "maskable" },
+      { src: "/assets/icons/icon-196x196.webp", sizes: "196x196", type: "image/webp" },
+      { src: "/assets/icons/icon-228x228.webp", sizes: "228x228", type: "image/webp" },
+      { src: "/assets/icons/icon-256x256.webp", sizes: "256x256", type: "image/webp" },
+      { src: "/assets/icons/icon-384x384.webp", sizes: "384x384", type: "image/webp" },
+      { src: "/assets/icons/icon-512x512.webp", sizes: "512x512", type: "image/webp", purpose: "maskable" },
     ],
     screenshots: [
       {

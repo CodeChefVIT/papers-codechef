@@ -6,13 +6,15 @@ export const fetchPaperID = async (id: string): Promise<PaperResponse> => {
 
   try {
     const response: AxiosResponse<PaperResponse> = await axios.get(
-      `${serverUrl}/api/paper-by-id/${id}`
+      `${serverUrl}/api/paper-by-id/${id}`,
     );
     return response.data;
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
       console.error("Axios error:", err.response?.data ?? err.message);
-      const errorMessage = (err.response?.data as { message?: string })?.message ?? "Failed to fetch paper";
+      const errorMessage =
+        (err.response?.data as { message?: string })?.message ??
+        "Failed to fetch paper";
       throw new Error(errorMessage);
     } else {
       console.error("Unexpected error:", err);

@@ -88,22 +88,22 @@
 
 @font-face {
   font-family: "jost";
-  src: url(/jostfont.ttf);
+  src: url(/assets/fonts/jostfont.ttf);
 }
 
 @font-face {
   font-family: "vipna";
-  src: url(/Vipnagorgialla.otf);
+  src: url(/assets/fonts/Vipnagorgialla.otf);
 }
 
 @font-face {
   font-family: "vipnabd";
-  src: url(/VipnagorgiallaBd.otf);
+  src: url(/assets/fonts/VipnagorgiallaBd.otf);
 }
 
 @font-face {
   font-family: "play";
-  src: url(/play.ttf);
+  src: url(/assets/fonts/play.ttf);
 }
 
 .dark ::-webkit-scrollbar {
@@ -146,7 +146,7 @@
 
 @font-face {
   font-family: "Yerk";
-  src: url("/fonts/yerk.woff") format("woff");
+  src: url("/assets/fonts/yerk.woff") format("woff");
   font-weight: 400;
   font-style: normal;
 }

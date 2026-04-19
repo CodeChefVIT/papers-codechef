@@ -15,6 +15,12 @@ import {
 } from "react-icons/fa6";
 import { Bold, Mail } from "lucide-react";
 import toast from "react-hot-toast";
+
+type SubscribeResponse = {
+  success?: boolean;
+  message?: string;
+};
+
 export default function Footer() {
   const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
@@ -25,8 +31,8 @@ export default function Footer() {
     }
   }, [theme]);
   const handleSubscribe = async () => {
-    if (!email?.includes("@")) {
-      toast.error("Please Enter A Valid Email.");
+    if (!email.trim()) {
+      toast.error("Please enter your email.");
       return;
     }
 
@@ -35,14 +41,16 @@ export default function Footer() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email }),
-      }).then((res) => {
-        if (!res.ok) throw new Error("Network response was not ok.");
-        return res.json();
+      })     
+      .then(async (res) => {
+        const data = (await res.json()) as SubscribeResponse;
+        if (!res.ok) throw new Error(data.message ?? "Something went wrong.");
+        return data;
       }),
       {
         loading: "Subscribing...",
         success: "You've Successfully Subscribed!",
-        error: "Something went wrong. Try again later.",
+        error: (err: Error) => err.message || "Subscription Failed.",
       },
     );
 
@@ -72,7 +80,7 @@ export default function Footer() {
                 <FaYoutube size={18} key="youtube" />,
               ],
               [
-                "https://github.com/CodeChefVIT",
+                "https://github.com/CodeChefVIT/papers-codechef",
                 <FaGithub size={18} key="github" />,
               ],
               [
@@ -96,7 +104,7 @@ export default function Footer() {
         {/* Events */}
         <div className="flex w-full flex-col gap-2 text-black dark:text-white  lg:w-[15%]">
           <h3 className="font-jost text-xl font-semibold">Events</h3>
-          <Link href="https://devsoc25.codechefvit.com" target="_blank">DevSoc</Link>
+          <Link href="https://devsoc25.codechefvit.com" target="_blank">DevSOC</Link>
           <Link href="https://gravitas.codechefvit.com" target="_blank">CookOff</Link>
           <Link href="https://gravitas.codechefvit.com" target="_blank">Clueminati</Link>
         </div>
@@ -143,7 +151,16 @@ export default function Footer() {
         </div>
       </div>
       <p className="mt-8 border-t border-[#130E1F] pt-12 text-center font-play text-lg text-black dark:border-white/10 dark:text-white">
-        Made with 💜 by Codechef-VIT
+        Made with 💜 by Codechef-VIT <br />
+        <span className="text-sm opacity-80">
+          This project is open source on{" "}
+          <a
+            href="https://github.com/CodeChefVIT/papers-codechef"
+            className="underline hover:text-purple-500"
+          >
+            Github
+          </a>
+        </span>
       </p>
     </footer>
   );

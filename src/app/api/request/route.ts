@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongoose";
+import { connectToDatabase } from "@/lib/database/mongoose";
 import PaperRequest from "@/db/paperRequest";
 
 export async function POST(req: Request) {

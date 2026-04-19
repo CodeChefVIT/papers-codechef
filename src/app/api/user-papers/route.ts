@@ -1,10 +1,10 @@
 import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/mongoose";
+import { connectToDatabase } from "@/lib/database/mongoose";
 import Paper from "@/db/papers";
-import { StoredSubjects, TransformedPaper } from "@/interface";
+import { StoredSubjects } from "@/interface";
+import { transformPapersToSubjectSlots } from "@/lib/services/paper-transform";
 
 export const dynamic = "force-dynamic";
-
 
 export async function POST(req: Request) {
   try {
@@ -17,22 +17,7 @@ export async function POST(req: Request) {
 
     console.log("Fetched user papers:", usersPapers);
 
-    const transformedPapers = usersPapers.reduce<TransformedPaper[]>(
-      (acc, paper) => {
-        const existing = acc.find((item) => item.subject === paper.subject);
-
-        if (existing) {
-          if (!existing.slots.includes(paper.slot)) {
-            existing.slots.push(paper.slot);
-          }
-        } else {
-          acc.push({ subject: paper.subject, slots: [paper.slot] });
-        }
-
-        return acc;
-      },
-      [],
-    );
+    const transformedPapers = transformPapersToSubjectSlots(usersPapers);
 
     return NextResponse.json(transformedPapers, {
       status: 200,

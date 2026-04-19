@@ -14,10 +14,10 @@ export const metadata: Metadata = {
   title: "Papers by CodeChef-VIT | Explore VIT Previous Year Question Papers",
   description:
     "Discover previous year question papers created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.",
-  icons: [{ rel: "icon", url: "/favicon.svg" }],
+  icons: [{ rel: "icon", url: "/assets/images/favicon.svg" }],
   openGraph: {
     title: "Papers by CodeChef-VIT | Exam Resources",
-    images: [{ url: "/papers.png" }],
+    images: [{ url: "/assets/images/papers.png" }],
     url: "https://papers.codechefvit.com/",
     type: "website",
     description:
@@ -29,7 +29,7 @@ export const metadata: Metadata = {
     title: "Papers by CodeChef-VIT | VIT Previous Year Question Papers",
     description:
       "Discover previous year question papers created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.",
-    images: [{ url: "/papers.png" }],
+    images: [{ url: "/assets/images/papers.png" }],
   },
   applicationName: "Papers by CodeChef-VIT",
   keywords: [
@@ -102,7 +102,7 @@ export default function RootLayout({
       />
       <head>
         <Script
-          async
+           async
           src="https://www.googletagmanager.com/gtag/js?id=G-J5CD036GJP"
         ></Script>
         <Script id="google-analytics">

@@ -1,66 +1,21 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { connectToDatabase } from "@/lib/mongoose";
-import Paper from "@/db/papers";
-import { type IPaper } from "@/interface";
+import { getPapersBySubject } from "@/lib/services/paper";
 
 export const dynamic = "force-dynamic";
 
 export async function GET(req: NextRequest) {
   try {
-    await connectToDatabase();
     const url = req.nextUrl.searchParams;
-    const subject = url.get("subject");
-    const escapeRegExp = (text: string) => {
-      return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    };
-    const escapedSubject = escapeRegExp(subject ?? "");
-
-    if (!subject) {
+    const sub = url.get("subject");
+    if (!sub) {
       return NextResponse.json(
         { message: "Subject query parameter is required" },
         { status: 400 },
       );
     }
+    const paper = await getPapersBySubject(sub);
 
-    const papers: IPaper[] = await Paper.find({
-      subject: { $regex: new RegExp(`${escapedSubject}`, "i") },
-    });
-
-    if (papers.length === 0) {
-      return NextResponse.json(
-        {
-          papers,
-          unique_years: [],
-          unique_slots: [],
-          unique_exams: [],
-          unique_campuses: [],
-          unique_semesters: [],
-        },
-        { status: 200 },
-      );
-    }
-
-    const unique_years = Array.from(new Set(papers.map((paper) => paper.year)));
-    const unique_slots = Array.from(new Set(papers.map((paper) => paper.slot)));
-    const unique_exams = Array.from(new Set(papers.map((paper) => paper.exam)));
-    const unique_campuses = Array.from(
-      new Set(papers.map((paper) => paper.campus)),
-    );
-    const unique_semesters = Array.from(
-      new Set(papers.map((paper) => paper.semester)),
-    );
-
-    return NextResponse.json(
-      {
-        papers,
-        unique_years,
-        unique_slots,
-        unique_exams,
-        unique_campuses,
-        unique_semesters,
-      },
-      { status: 200 },
-    );
+    return NextResponse.json(paper, { status: 200 });
   } catch (error) {
     return NextResponse.json(
       { message: "Failed to fetch papers", error },

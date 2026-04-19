@@ -1,6 +1,5 @@
  <p align="center"><a href="https://www.codechefvit.com" target="_blank"><img src="https://i.ibb.co/4J9LXxS/cclogo.png" width=160 title="CodeChef-VIT" alt="Codechef-VIT"></a>
 </p>
-.
 <h2 align="center"> Papers </h2>
 <br/>
 
@@ -66,6 +65,87 @@ pnpm dev
 
 
 Before getting started, please ensure that the .env file is properly configured. The .env.example file has been provided for your reference, with examples of environment variables to be listed.
+
+## Developers
+Dev names and stats be seen in [github stats](https://github.com/CodeChefVIT/papers-codechef/graphs/contributors) page
+
+## Maintainers
+Our top maintainers, making sure the database of papers is maintained and upto-date.
+<table>
+  <tr>
+    <td align="center">
+      <a href="https://github.com/monami-somsaha">
+        <img src="https://github.com/monami-somsaha.png?size=200" width="140" height="140" alt="Monami Som Saha avatar" />
+      </a>
+      <br />
+      <b>Monami Som Saha</b>
+      <br />
+      <a href="https://github.com/monami-somsaha" title="GitHub: monami-somsaha">
+        <img src="http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="24" height="24" alt="GitHub icon" />
+      </a>
+      <a href="https://www.linkedin.com/in/monami-somsaha" title="LinkedIn: Monami Som Saha">
+        <img src="http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="24" height="24" alt="LinkedIn icon" />
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/Skywalker-organa">
+        <img src="https://github.com/Skywalker-organa.png?size=200" width="140" height="140" alt="Sanjana Shyamsundar avatar" />
+      </a>
+      <br />
+      <b>Sanjana Shyamsundar</b>
+      <br />
+      <a href="https://github.com/Skywalker-organa" title="GitHub: Skywalker-organa">
+        <img src="http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="24" height="24" alt="GitHub icon" />
+      </a>
+      <a href="https://in.linkedin.com/in/sanjana-shyamsundar-156180332" title="LinkedIn: Sanjana Shyamsundar">
+        <img src="http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="24" height="24" alt="LinkedIn icon" />
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/AqViolet">
+        <img src="https://github.com/AqViolet.png?size=200" width="140" height="140" alt="~Heet avatar" />
+      </a>
+      <br />
+      <b>Heet Jatania</b>
+      <br />
+      <a href="https://github.com/AqViolet" title="GitHub: AqViolet">
+        <img src="http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="24" height="24" alt="GitHub icon" />
+      </a>
+      <a href="https://www.linkedin.com/in/heet-jatania-4a1294275" title="LinkedIn: Heet Jatania">
+        <img src="http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="24" height="24" alt="LinkedIn icon" />
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/samyamehta16">
+        <img src="https://github.com/samyamehta16.png?size=200" width="140" height="140" alt="Samya Mehta avatar" />
+      </a>
+      <br />
+      <b>Samya Mehta</b>
+      <br />
+      <a href="https://github.com/samyamehta16" title="GitHub: samyamehta16">
+        <img src="http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="24" height="24" alt="GitHub icon" />
+      </a>
+      <a href="https://in.linkedin.com/in/samyamehta16" title="LinkedIn: Samya Mehta">
+        <img src="http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="24" height="24" alt="LinkedIn icon" />
+      </a>
+    </td>
+    <td align="center">
+      <a href="https://github.com/aarushi-patidar">
+        <img src="https://github.com/aarushi-patidar.png?size=200" width="140" height="140" alt="Aarushi Patidar avatar" />
+      </a>
+      <br />
+      <b>Aarushi Patidar</b>
+      <br />
+      <a href="https://github.com/aarushi-patidar" title="GitHub: aarushi-patidar">
+        <img src="http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="24" height="24" alt="GitHub icon" />
+      </a>
+      <a href="https://in.linkedin.com/in/aarushi-patidar" title="LinkedIn: Aarushi Patidar">
+        <img src="http://www.iconninja.com/files/863/607/751/network-linkedin-social-connection-circular-circle-media-icon.svg" width="24" height="24" alt="LinkedIn icon" />
+      </a>
+    </td>
+  </tr>
+</table>
+
 
 ## License
 
