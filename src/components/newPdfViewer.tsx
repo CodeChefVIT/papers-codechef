@@ -114,6 +114,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
       <Button
       onClick={toggleFullscreen}
       className="h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]"
+      title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
       >
       {isFullscreen ? <Minimize2 size={24} /> : <Maximize2 size={24} />}
       </Button>
@@ -121,6 +122,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
       <Button
         onClick={onDownload}
         className="h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]"
+        title="Download PDF"
       >
         <Download size={24} />
       </Button>
@@ -131,6 +133,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
         onClick={zoomOut}
         disabled={typeof zoomLevel === "number" && zoomLevel <= 0.25}
         className="h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7] disabled:bg-gray-400"
+        title="Zoom out"
       >
         <ZoomOut size={24} />
       </Button>
@@ -143,6 +146,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
         onClick={zoomIn}
         disabled={typeof zoomLevel === "number" && zoomLevel >= 3}
         className="h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7] disabled:bg-gray-400"
+        title="Zoom in"
       >
         <ZoomIn size={24} />
       </Button>
