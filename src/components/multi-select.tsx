@@ -307,7 +307,9 @@ export const MultiSelect = React.forwardRef<
                   </div>
                   <span>(Select All)</span>
                 </CommandItem>
-                {options.map((option) => {
+                {options
+                  .sort((a, b) => a.label.localeCompare(b.label))
+                  .map((option) => {
                   const isSelected = selectedValues.includes(option.value);
                   return (
                     <CommandItem
