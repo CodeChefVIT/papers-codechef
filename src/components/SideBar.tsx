@@ -19,8 +19,9 @@ function SideBar() {
     handleApplyFilters,
   } = useFilters();
   const exams =
-    filterOptions?.unique_exams.map((exam) => ({ label: exam, value: exam })) ??
-    [];
+    filterOptions?.unique_exams
+      .sort((a, b) => a.localeCompare(b))
+      .map((exam) => ({ label: exam, value: exam })) ?? [];
   const slots =
     filterOptions?.unique_slots
       .sort((a, b) => a.localeCompare(b, undefined, { numeric: true }))
