@@ -61,13 +61,16 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
 
   const { provides: zoomProv, state: zoomState } = useZoom(documentId);
   const { provides: scrollProv, state: scrollState } = useScroll(documentId);
-  const [pageNo, setPageNo] = useState("1");
+  const [pageNo, setPageNo] = useState("");
 
   useEffect(() => {
     if (!scrollProv) return;
-    const unsub = scrollProv.onPageChange(() =>
-      setPageNo(String(scrollProv.getCurrentPage()))
-    );
+    const unsub = scrollProv.onPageChange(() => {
+      const current = scrollProv.getCurrentPage();
+      setPageNo(String(current));
+    });
+    const current = scrollProv.getCurrentPage();
+    setPageNo(String(current));
     return () => unsub();
   }, [scrollProv]);
 
@@ -75,7 +78,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key !== "Enter") return;
       const page = parseInt(pageNo, 10);
-      if (!isNaN(page) && page >= 1 && page <= (scrollState?.totalPages ?? 1)) {
+      if (!isNaN(page) && scrollState?.totalPages && page >= 1 && page <= scrollState.totalPages) {
         scrollProv?.scrollToPage({ pageNumber: page, behavior: "smooth" });
       }
     },
@@ -99,13 +102,20 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
     <div className={(!isFullscreen && !isMobile) ? "flex flex-col items-center gap-2" : "flex flex-row items-center gap-2"}>
         <input
           type="text"
-          value={pageNo}
+          value={totalPages ? pageNo : ""}
           onChange={(e) => setPageNo(e.target.value)}
           onKeyDown={pageChange}
-          onFocus={() => setPageNo("")}
+          onFocus={() => {
+            if (totalPages) setPageNo("");
+            }}
+            onBlur={() => {
+              if (!pageNo && scrollProv) {
+                setPageNo(String(scrollProv.getCurrentPage()));
+                }
+              }}
           className="h-9 w-14 rounded border bg-[#e7e9ff] p-1 text-center text-sm [appearance:textfield] dark:bg-[#1f1f2a] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
-        <span className="text-xs font-medium text-white">of {totalPages ?? 1}</span>
+        <span className="text-xs font-medium text-white">of {totalPages ?? "..."}</span>
     </div>
   )
   
