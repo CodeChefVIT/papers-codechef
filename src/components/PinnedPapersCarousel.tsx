@@ -199,18 +199,19 @@ function PinnedPapersCarousel() {
                 </CarouselItem>
               ) : (
                 chunkedPapers.map((paperGroup, index) => {
-                  const placeholdersNeeded =
-                    (chunkSize - paperGroup.length) % chunkSize;
+                  const columns = chunkSize === 2 ? 1 : chunkSize === 4 ? 2 : 4;
+                  const rows = Math.max(1, Math.ceil(paperGroup.length / columns));
+                  const placeholdersNeeded = columns * rows - paperGroup.length;
                   return (
                     <CarouselItem
                       key={`carousel-item-${index}`}
                       className={`grid ${
-                        chunkSize === 2
-                          ? "grid-cols-1 grid-rows-2"
-                          : chunkSize === 4
-                            ? "grid-cols-2 grid-rows-2"
+                        columns === 1
+                          ? "grid-cols-1"
+                          : columns === 2
+                            ? "grid-cols-2"
                             : "grid-cols-4"
-                      } gap-4 lg:auto-rows-fr`}
+                      } ${rows === 1 ? "grid-rows-1" : "grid-rows-2"} gap-4 lg:auto-rows-fr`}
                     >
                       {paperGroup.map((paper, subIndex) =>
                         paper.subject === "add_subject_button" ? (

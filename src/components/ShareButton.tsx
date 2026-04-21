@@ -29,8 +29,8 @@ export default function ShareButton() {
   const paperPath = origin + pathname;
   return (
     <Dialog>
-      <DialogTrigger>
-        <Button className="aspect-square h-10 w-10 p-0">
+      <DialogTrigger asChild>
+        <Button className="aspect-square h-10 w-10 p-0 rounded text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]" title="Share this paper">
           <FaShare />
         </Button>
       </DialogTrigger>
@@ -47,6 +47,7 @@ export default function ShareButton() {
             type="submit"
             size="sm"
             className="flex w-fit items-center justify-between gap-5 px-3"
+            title="Copy link to clipboard"
             onClick={async () => {
               await toast.promise(
                 navigator.clipboard.writeText(paperPath), // This is a promise

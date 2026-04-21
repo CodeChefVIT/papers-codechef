@@ -14,9 +14,6 @@ interface SidebarSectionProps {
   data: { label: string; value: string }[];
   selected: string[];
   updater: (newVal: string[]) => void;
-
-  openItem: string | undefined;
-  setOpenItem: (val: string | undefined) => void;
 }
 
 const SidebarSection: React.FC<SidebarSectionProps> = ({
@@ -24,8 +21,6 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({
   data,
   selected,
   updater,
-  openItem,
-  setOpenItem,
 }) => {
   return (
     <div className="flex w-full flex-col items-baseline justify-between border-b-2 border-[#36266d] px-[10px]">
@@ -33,8 +28,6 @@ const SidebarSection: React.FC<SidebarSectionProps> = ({
         className="w-full"
         type="single"
         collapsible
-        value={openItem}
-        onValueChange={setOpenItem}
       >
         <AccordionItem
           className="border-none"

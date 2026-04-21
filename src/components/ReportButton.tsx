@@ -10,10 +10,12 @@ export default function ReportButton(){
   const { paperId, subject, exam, slot, year } = usePaper();
   const [open, setOpen] = useState(false);
   return (
-    <>
+    <> 
       <Button
+    
         onClick={() => setOpen(true)}
         className="h-10 w-10 rounded p-0 text-white transition hover:bg-red-600 bg-red-500"
+        title="Report this paper"
       >
         <FaFlag className="text-sm" />
       </Button>
