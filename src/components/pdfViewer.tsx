@@ -32,7 +32,9 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
     setNumPages(numPages);
     setPageNumber(1);
     pageRefs.current = Array(numPages).fill(null) as (HTMLDivElement | null)[];
-  }
+
+  setTimeout(() => setIsReady(true), 0);
+}
 
   const scrollToPage = useCallback((page: number) => {
     if (pageRefs.current[page - 1] && containerRef.current) {
@@ -47,7 +49,8 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
   }, []);
 
   const handleScroll = useCallback(() => {
-    if (!containerRef.current || !pageRefs.current) return;
+    if (!containerRef.current || !pageRefs.current || !numPages) return;
+    if (pageRefs.current.length !== numPages) return;
     const container = containerRef.current;
     const scrollTop = container.scrollTop + container.offsetTop;
 
@@ -64,15 +67,20 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
     }
   }, []);
 
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
+    if (!isReady) return;
     const container = containerRef.current;
     if (container) {
       container.addEventListener("scroll", handleScroll);
       return () => container.removeEventListener("scroll", handleScroll);
-    }
-  }, [handleScroll]);
+  }
+}, [handleScroll, isReady]);
 
   const goToPreviousPage = () => {
+    if (!numPages) return;
+
     setPageNumber((prev) => {
       const newPage = Math.max(1, prev - 1);
       scrollToPage(newPage);
@@ -81,8 +89,9 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
   };
 
   const goToNextPage = () => {
+    if (!numPages) return;
     setPageNumber((prev) => {
-      const newPage = Math.min(numPages ?? 1, prev + 1);
+      const newPage = Math.min(numPages, prev + 1);
       scrollToPage(newPage);
       return newPage;
     });
@@ -208,7 +217,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
               className="h-9 w-14 rounded border bg-[#e7e9ff] p-1 text-center text-sm [appearance:textfield] dark:bg-[#1f1f2a] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
 
-            <span className="text-sm font-medium">of {numPages ?? 1}</span>
+            <span className="text-sm font-medium">of {numPages ?? "..."}</span>
           </div>
 
           <div className="flex items-center gap-2">
@@ -302,7 +311,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
                 onFocus={() => setInputValue("")}
                 className="h-10 w-16 rounded border p-1 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               />
-              <span>of {numPages ?? 1}</span>
+              <span>of {numPages ?? "..."}</span>
             </div>
 
             <div className="flex items-center gap-2">
@@ -387,7 +396,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
                 onFocus={() => setInputValue("")}
                 className="h-10 w-16 rounded border p-1 text-center [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
               />
-              <span className="mt-1 text-sm">of {numPages ?? 1}</span>
+              <span className="mt-1 text-sm">of {numPages ?? "..."}</span>
             </div>
           </div>
           <ReportButton />
