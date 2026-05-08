@@ -64,15 +64,17 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
   const [pageNo, setPageNo] = useState("");
 
   useEffect(() => {
-    if (!scrollProv) return;
-    const unsub = scrollProv.onPageChange(() => {
+    if (!scrollProv || !scrollState?.totalPages) return;
+    const updatePage = () => {
       const current = scrollProv.getCurrentPage();
-      setPageNo(String(current));
-    });
-    const current = scrollProv.getCurrentPage();
-    setPageNo(String(current));
+      if (scrollState.totalPages > 0) {
+        setPageNo(String(current));
+        }
+      };
+    const unsub = scrollProv.onPageChange(updatePage);
+    updatePage();
     return () => unsub();
-  }, [scrollProv]);
+    }, [scrollProv, scrollState?.totalPages]);
 
   const pageChange = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -115,7 +117,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
               }}
           className="h-9 w-14 rounded border bg-[#e7e9ff] p-1 text-center text-sm [appearance:textfield] dark:bg-[#1f1f2a] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
-        <span className="text-xs font-medium text-white">of {totalPages ?? "..."}</span>
+        <span className="text-xs font-medium text-white">{totalPages > 0 ? `of ${totalPages}` : "Loading..."}</span>
     </div>
   )
   
