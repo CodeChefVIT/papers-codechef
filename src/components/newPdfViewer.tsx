@@ -61,18 +61,16 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
 
   const { provides: zoomProv, state: zoomState } = useZoom(documentId);
   const { provides: scrollProv, state: scrollState } = useScroll(documentId);
-  const [pageNo, setPageNo] = useState("");
+  const [pageNo, setPageNo] = useState("1");
 
   useEffect(() => {
-    if (!scrollProv || !scrollState?.totalPages) return;
-    const updatePage = () => {
+    if (!scrollProv) return;
+    const unsub = scrollProv.onPageChange(() => {
       const current = scrollProv.getCurrentPage();
-      if (scrollState.totalPages > 0) {
-        setPageNo(String(current));
-        }
-      };
-    const unsub = scrollProv.onPageChange(updatePage);
-    updatePage();
+      setPageNo(String(current));
+    });
+    const current = scrollProv.getCurrentPage();
+    setPageNo(String(current));
     return () => unsub();
     }, [scrollProv, scrollState?.totalPages]);
 
@@ -80,7 +78,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key !== "Enter") return;
       const page = parseInt(pageNo, 10);
-      if (!isNaN(page) && scrollState?.totalPages && page >= 1 && page <= scrollState.totalPages) {
+      if (!isNaN(page) && page >= 1 && page <= (scrollState?.totalPages ?? 1)) {
         scrollProv?.scrollToPage({ pageNumber: page, behavior: "smooth" });
       }
     },
@@ -104,20 +102,13 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
     <div className={(!isFullscreen && !isMobile) ? "flex flex-col items-center gap-2" : "flex flex-row items-center gap-2"}>
         <input
           type="text"
-          value={totalPages ? pageNo : ""}
+          value={pageNo}
           onChange={(e) => setPageNo(e.target.value)}
           onKeyDown={pageChange}
-          onFocus={() => {
-            if (totalPages) setPageNo("");
-            }}
-            onBlur={() => {
-              if (!pageNo && scrollProv) {
-                setPageNo(String(scrollProv.getCurrentPage()));
-                }
-              }}
+          onFocus={() => setPageNo("")}
           className="h-9 w-14 rounded border bg-[#e7e9ff] p-1 text-center text-sm [appearance:textfield] dark:bg-[#1f1f2a] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
-        <span className="text-xs font-medium text-white">{totalPages > 0 ? `of ${totalPages}` : "Loading..."}</span>
+        <span className="text-xs font-medium text-white">of {totalPages ?? "..."}</span>
     </div>
   )
   

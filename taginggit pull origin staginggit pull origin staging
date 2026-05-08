@@ -1,0 +1,15 @@
+  feat/paper-preview-modal[m
+  fix/accordion-toggle[m
+* [32mfix/pdf-viewer-page-count[m
+  staging[m
+  [31mremotes/origin/HEAD[m -> origin/staging
+  [31mremotes/origin/feat/paper-preview-modal[m
+  [31mremotes/origin/fix/accordion-toggle[m
+  [31mremotes/origin/fix/pdf-viewer-page-count[m
+  [31mremotes/origin/staging[m
+  [31mremotes/upstream/HEAD[m -> upstream/staging
+  [31mremotes/upstream/dependabot/npm_and_yarn/axios-1.13.5[m
+  [31mremotes/upstream/dependabot/npm_and_yarn/lodash-4.17.23[m
+  [31mremotes/upstream/dependabot/npm_and_yarn/next-15.5.10[m
+  [31mremotes/upstream/prod[m
+  [31mremotes/upstream/staging[m
