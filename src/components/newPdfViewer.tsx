@@ -64,28 +64,17 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
   const [pageNo, setPageNo] = useState("");
 
   useEffect(() => {
-    if (!scrollProv || !scrollState?.totalPages) return;
-    const updatePage = () => {
-      setPageNo(String(scrollProv.getCurrentPage()));
-    };
-
-    updatePage();
-
-    const unsub = scrollProv.onPageChange(updatePage);
-    return () => unsub();
-    }, [scrollProv, scrollState?.totalPages]);
-
-  const pageChange = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key !== "Enter") return;
-      const page = parseInt(pageNo, 10);
-      if (!isNaN(page) && page >= 1 && page <= (scrollState?.totalPages ?? 1)) {
-        scrollProv?.scrollToPage({ pageNumber: page, behavior: "smooth" });
-      }
-    },
-    [pageNo, scrollState?.totalPages, scrollProv]
-  );
-
+    if (!scrollProv) return;
+    const timeout = setTimeout(() => {
+      const current = scrollProv.getCurrentPage();
+      setPageNo(String(current));
+      }, 300);
+      return () => {
+        clearTimeout(timeout);
+        unsub();
+        };
+        }, [scrollProv, scrollState?.totalPages]);
+    
   if (!zoomProv || !scrollProv) return null;
 
   const zoomIn = () => zoomProv.zoomIn();
@@ -109,7 +98,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
           onFocus={() => setPageNo("")}
           className="h-9 w-14 rounded border bg-[#e7e9ff] p-1 text-center text-sm [appearance:textfield] dark:bg-[#1f1f2a] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
-        <span className="text-xs font-medium text-white">{totalPages ? `of ${totalPages}` : "Loading..."}</span>
+        <span className="text-xs font-medium text-white">{totalPages > 0 ? `of ${totalPages}` : ""}</span>
     </div>
   )
   
