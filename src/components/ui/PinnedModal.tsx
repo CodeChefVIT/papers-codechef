@@ -180,7 +180,7 @@ const PinnedModal = ({
       }}
     >
       {page === "Navbar" ? (
-        <DialogTrigger className="flex h-full w-full flex-row items-center gap-2 rounded-xl px-2 py-2 hover:bg-[#1A2333]">
+        <DialogTrigger className="flex h-full w-full flex-row items-center gap-2 rounded-xl px-2 py-2 hover:bg-[#1A2333] transition-all duration-200">
           <Pin size={16} />
           {triggerName}
         </DialogTrigger>
