@@ -106,7 +106,7 @@ Our top maintainers, making sure the database of papers is maintained and upto-d
         <img src="https://github.com/AqViolet.png?size=200" width="140" height="140" alt="~Heet avatar" />
       </a>
       <br />
-      <b>Heet Jatnia</b>
+      <b>Heet Jatania</b>
       <br />
       <a href="https://github.com/AqViolet" title="GitHub: AqViolet">
         <img src="http://www.iconninja.com/files/241/825/211/round-collaboration-social-github-code-circle-network-icon.svg" width="24" height="24" alt="GitHub icon" />

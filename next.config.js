@@ -8,7 +8,12 @@ await import("./src/env.js");
 const config = {
   swcMinify: false,
   images: {
-    domains: ["storage.googleapis.com"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "storage.googleapis.com",
+      },
+    ],
   },
   async headers() {
     return [

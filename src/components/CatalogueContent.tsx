@@ -180,31 +180,6 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   useEffect(() => {
     if (!papers.length) return;
 
-    const filtered = [...papers];
-
-    if (sortOption === "asc") {
-      filtered.sort((a, b) => a.year.localeCompare(b.year));
-    } else if (sortOption === "desc") {
-      filtered.sort((a, b) => b.year.localeCompare(a.year));
-    }
-
-    setFilteredPapers(filtered);
-  }, [
-    papers,
-    selectedExams,
-    selectedSlots,
-    selectedYears,
-    selectedSemesters,
-    selectedCampuses,
-    selectedAnswerKeyIncluded,
-    sortOption,
-    setFilteredPapers,
-    setAppliedFilters,
-  ]);
-
-  useEffect(() => {
-    if (!papers.length) return;
-
     const filtered = papers.filter((paper) => {
       const examCondition = selectedExams.length
         ? selectedExams.includes(paper.exam)
@@ -255,6 +230,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
     selectedSemesters,
     selectedCampuses,
     selectedAnswerKeyIncluded,
+    sortOption,
     setFilteredPapers,
     setAppliedFilters,
   ]);
