@@ -25,6 +25,7 @@ interface ControlProps {
   forceMobile?: boolean;
   isMobile: boolean;
   isSmall: boolean;
+  viewerRef: React.RefObject<HTMLDivElement>;
 }
 
 interface PdfViewerProps {
@@ -57,7 +58,7 @@ function useBreakpoint() {
 }
 
 const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, onDownload,
-  forceMobile, isMobile, isSmall}: ControlProps) {
+  forceMobile, isMobile, isSmall, viewerRef}: ControlProps) {
 
   const { provides: zoomProv, state: zoomState } = useZoom(documentId);
   const { provides: scrollProv, state: scrollState } = useScroll(documentId);
@@ -127,7 +128,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
         <Download size={24} />
       </Button>
 
-      <ShareButton />
+      <ShareButton isFullscreen={isFullscreen} viewerRef={viewerRef} />
 
       <Button
         onClick={zoomOut}
@@ -492,47 +493,48 @@ if (isLoading || !engine) {
                 forceMobile={true}
                 isMobile={isMobile}
                 isSmall={isSmall}
+                viewerRef={viewerRef}
               />}
               <DocumentContent documentId={activeDocumentId}>
-            {({ isLoaded }) => (
-              <>
-                <div
-            className="absolute inset-0 z-50 flex items-center justify-center bg-[#070114]"
-            style={{
-            opacity: isLoaded ? 0 : 1,
-            pointerEvents: isLoaded ? "none" : "auto",
-            transition: "opacity 0.3s",
-            backgroundColor: effectiveBackgroundColor,
-          }}
-          >
-            <Loader
-              backgroundColor={effectiveBackgroundColor}
-              textColor={loaderTextColor}
-            />
-          </div>
-      <Viewport
-        documentId={activeDocumentId}
-        style={{
-          backgroundColor: effectiveBackgroundColor,
-          visibility: isLoaded ? "visible" : "hidden",
-        }}
-      >
-        <Scroller
-          documentId={activeDocumentId}
-          renderPage={({ width, height, pageIndex }) => (
-            <div
-              style={{ width, height }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
-            </div>
-          )}
-        />
-      </Viewport>
-    </>
-  )}
-</DocumentContent>
-              
+                {({ isLoaded }) => (
+                  <>
+                    <div
+                      className="absolute inset-0 z-50 flex items-center justify-center bg-[#070114]"
+                      style={{
+                      opacity: isLoaded ? 0 : 1,
+                      pointerEvents: isLoaded ? "none" : "auto",
+                      transition: "opacity 0.3s",
+                      backgroundColor: effectiveBackgroundColor,
+                      }}
+                    >
+                      <Loader
+                        backgroundColor={effectiveBackgroundColor}
+                        textColor={loaderTextColor}
+                      />
+                    </div>
+                    <Viewport
+                      documentId={activeDocumentId}
+                      style={{
+                        backgroundColor: effectiveBackgroundColor,
+                        visibility: isLoaded ? "visible" : "hidden",
+                      }}
+                    >
+                      <Scroller
+                        documentId={activeDocumentId}
+                        renderPage={({ width, height, pageIndex }) => (
+                          <div
+                            style={{ width, height }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
+                          </div>
+                        )}
+                      />
+                    </Viewport>
+                  </>
+                )}
+              </DocumentContent>
+                  
               {!hideControls && (!isMobile || isFullscreen) && (
                 <Controls
                   documentId={activeDocumentId}
@@ -542,6 +544,7 @@ if (isLoading || !engine) {
                   forceMobile={false}
                   isMobile={isMobile}
                   isSmall={isSmall}
+                  viewerRef={viewerRef}
                 />
               )}
             </>
