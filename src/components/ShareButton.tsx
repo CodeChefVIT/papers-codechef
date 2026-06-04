@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Dialog,
   DialogDescription,
@@ -9,7 +9,6 @@ import {
   DialogTrigger,
   DialogContent,
 } from "./ui/dialog";
-import * as DialogPrimitive from "@radix-ui/react-dialog";
 import { Copy } from "lucide-react";
 import toast from "react-hot-toast";
 import { FaShare } from "react-icons/fa";
