@@ -31,7 +31,6 @@ export default function ShareButton({ isFullscreen, viewerRef }: ShareButtonProp
   }, []);
 
   const paperPath = origin + pathname;
-  console.log("isFullscreen:", isFullscreen, "container:", isFullscreen ? viewerRef.current : document.body);
   return (
     <Dialog>
       <DialogTrigger asChild>
