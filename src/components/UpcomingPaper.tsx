@@ -105,7 +105,7 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
 
         {
           <div className="mt-4 flex flex-wrap gap-2 font-play">
-            {slots?.map((slotValue, index) => (
+            {[...slots].sort().map((slotValue, index) => (
               <Capsule key={index}>{slotValue}</Capsule>
             ))}
           </div>

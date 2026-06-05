@@ -52,11 +52,7 @@ export default function PaperRequest() {
           "/api/upcoming-papers",
         );
 
-        const randomPapers = [...response.data]
-          .sort(() => Math.random() - 0.5)
-          .slice(0, 8);
-
-        setDisplayPapers(randomPapers);
+        setDisplayPapers(response.data);
       } catch (error) {
         console.error("Failed to fetch papers:", error);
       } finally {
