@@ -1,4 +1,4 @@
-import { NextResponse } from "next/server";
+import { failure } from "@/lib/utils/response"
 
 export class CustomError extends Error {
     status: number;
@@ -12,14 +12,8 @@ export class CustomError extends Error {
 
 export function customErrorHandler(error: unknown, defaultMessage: string) {
     if (error instanceof CustomError) {
-        return NextResponse.json(
-            {message: error.message},
-            {status: error.status}
-        );
+        return failure(error.message, error.status);
     } else {
-        return NextResponse.json(
-            {message: defaultMessage},
-            {status: 500}
-        );
+        return failure(defaultMessage, 500)
     }
 }
