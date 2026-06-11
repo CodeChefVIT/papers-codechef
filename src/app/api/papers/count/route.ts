@@ -1,5 +1,5 @@
-import { NextResponse } from "next/server";
 import { getCourseCounts } from "@/lib/services/paper";
+import { success, failure } from "@/lib/utils/response";
 
 export const dynamic = "force-dynamic";
 
@@ -7,11 +7,8 @@ export async function GET(req: Request) {
   try {
     const courseCount = await getCourseCounts();
 
-    return NextResponse.json(courseCount, { status: 200 });
+    return success(courseCount);
   } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to fetch course counts", error },
-      { status: 500 },
-    );
+    return failure("Failed to fetch course counts", 500, error);
   }
 }
