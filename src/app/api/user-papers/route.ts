@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import Paper from "@/db/papers";
 import { StoredSubjects } from "@/interface";
 import { transformPapersToSubjectSlots } from "@/lib/services/paper-transform";
+import { success, failure } from "@/lib/utils/response";
 
 export const dynamic = "force-dynamic";
 
@@ -19,16 +19,9 @@ export async function POST(req: Request) {
 
     const transformedPapers = transformPapersToSubjectSlots(usersPapers);
 
-    return NextResponse.json(transformedPapers, {
-      status: 200,
-    });
+    return success(transformedPapers);
   } catch (error) {
     console.error("Error fetching papers:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to fetch papers.",
-      },
-      { status: 500 },
-    );
+    return failure("Failed to fetch papers.", 500, error);
   }
 }
