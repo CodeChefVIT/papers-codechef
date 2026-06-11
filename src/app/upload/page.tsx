@@ -25,6 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import Dropzone from "react-dropzone";
 import { Upload, XIcon } from "lucide-react";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+import { type ApiResponse } from "@/interface"
 
 GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs";
@@ -34,6 +35,10 @@ interface APIResponse {
   message?: string;
 }
 
+interface uploadResponse {
+  file_url: string;
+  thumbnail_url: string;
+}
 export default function Page() {
   const campus = "Vellore";
   const [files, setFiles] = useState<File[]>([]);
@@ -273,11 +278,11 @@ export default function Page() {
       await toast.promise(
         async () => {
           try {
-            await axios.post<APIResponse>("/api/upload", formData);
+            await axios.post<ApiResponse<uploadResponse>>("/api/upload", formData);
             return { message: "Papers uploaded successfully!" };
           } catch (error) {
             if (error instanceof AxiosError && error.response?.data) {
-              const errorData = error.response.data as APIResponse;
+              const errorData = error.response.data;
               const errorMessage =
                 errorData.message ?? "Failed to upload papers";
               throw new Error(errorMessage);

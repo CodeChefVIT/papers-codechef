@@ -1,8 +1,8 @@
-import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import { PaperAdmin } from "@/db/papers";
 import { createPDFfromImages } from "@/lib/storage/pdf";
 import { uploadPDF, uploadThumbnail } from "@/lib/storage/gcp";
+import { success, failure } from "@/lib/utils/response";
 
 export const runtime = "nodejs";
 
@@ -15,19 +15,13 @@ export async function POST(req: Request) {
     const thumb = formData.get("thumbnail") as File | null;
 
     if (files.length === 0) {
-      return NextResponse.json(
-        { error: "No files received." },
-        { status: 400 },
-      );
+      return failure("No files received.", 400);
     }
 
     let pdfBytes: Uint8Array;
     if (isPdf) {
       if (!files[0]) {
-        return NextResponse.json(
-          { error: "No PDF file provided." },
-          { status: 400 },
-        );
+        return failure("No PDF file provided.", 400);
       }
       pdfBytes = new Uint8Array(await files[0].arrayBuffer());
     } else {
@@ -57,15 +51,9 @@ export async function POST(req: Request) {
     });
     await paper.save();
 
-    return NextResponse.json(
-      { status: "success", file_url, thumbnail_url },
-      { status: 201 },
-    );
+    return success({ file_url, thumbnail_url }, "Created", 201);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { message: "Failed to upload papers", error },
-      { status: 500 },
-    );
+    return failure("Failed to upload papers", 500, error);
   }
 }
