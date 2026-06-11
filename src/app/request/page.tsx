@@ -20,6 +20,7 @@ import toast from "react-hot-toast";
 import { Search } from "lucide-react";
 import SkeletonPaperCard from "@/components/SkeletonPaperCard";
 import { useCourses } from "@/context/courseContext";
+import { type ApiResponse } from '@/interface'
 
 type Course = {
   name?: string | null;
@@ -48,11 +49,9 @@ export default function PaperRequest() {
     async function fetchPapers() {
       try {
         setIsLoading(true);
-        const response = await axios.get<IUpcomingPaper[]>(
-          "/api/upcoming-papers",
-        );
+        const response = await axios.get<ApiResponse<IUpcomingPaper[]>>("/api/upcoming-papers");
 
-        setDisplayPapers(response.data);
+        setDisplayPapers(response.data.data ?? []);
       } catch (error) {
         console.error("Failed to fetch papers:", error);
       } finally {
