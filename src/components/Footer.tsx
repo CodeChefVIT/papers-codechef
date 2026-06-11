@@ -43,7 +43,7 @@ export default function Footer() {
         body: JSON.stringify({ email }),
       })     
       .then(async (res) => {
-        const data = (await res.json()) as SubscribeResponse;
+        const data = (await res.json()).data as SubscribeResponse;
         if (!res.ok) throw new Error(data.message ?? "Something went wrong.");
         return data;
       }),
