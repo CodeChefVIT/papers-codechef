@@ -8,6 +8,7 @@ import { type IPaper, type Filters } from "@/interface";
 import Card from "@/components/Card";
 import Loader from "@/components/ui/loader";
 import { Button } from "./ui/button";
+import { type ApiResponse } from "@/interface"
 
 const RelatedPapers = () => {
   const params = useParams();
@@ -24,11 +25,14 @@ const RelatedPapers = () => {
         const paper = getpaper.data;
         setCurrentPaper(paper);
 
-        const allPapersBySubject = await axios.get<Filters>("/api/papers", {
-          params: { subject: paper.subject },
-        });
+        const allPapersBySubject = await axios.get<ApiResponse<Filters>>(
+          "/api/papers",
+          {
+            params: { subject: paper.subject },
+          },
+        );
 
-        const all = allPapersBySubject.data.papers;
+        const all = allPapersBySubject.data.data?.papers ?? [];
 
         const sameExam = all
           .filter((p) => p._id !== paper._id && p.exam === paper.exam)

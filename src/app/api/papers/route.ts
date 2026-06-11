@@ -1,5 +1,6 @@
-import { NextResponse, type NextRequest } from "next/server";
+import { type NextRequest } from "next/server";
 import { getPapersBySubject } from "@/lib/services/paper";
+import { success, failure } from "@/lib/utils/response";
 
 export const dynamic = "force-dynamic";
 
@@ -8,18 +9,12 @@ export async function GET(req: NextRequest) {
     const url = req.nextUrl.searchParams;
     const sub = url.get("subject");
     if (!sub) {
-      return NextResponse.json(
-        { message: "Subject query parameter is required" },
-        { status: 400 },
-      );
+      return failure("Subject query parameter is required", 400);
     }
     const paper = await getPapersBySubject(sub);
 
-    return NextResponse.json(paper, { status: 200 });
+    return success(paper);
   } catch (error) {
-    return NextResponse.json(
-      { message: "Failed to fetch papers", error },
-      { status: 500 },
-    );
+    return failure("Failed to fetch papers", 500, error);
   }
 }
