@@ -52,6 +52,13 @@ export interface APIResponse {
   status: number;
 }
 
+export interface ApiResponse<T> {
+  status: "success" | "error";
+  data: T | null;
+  message: string;
+  error?: any;
+}
+
 export interface ConverttoPDFResponse {
   url: string;
   secure_url: string;
