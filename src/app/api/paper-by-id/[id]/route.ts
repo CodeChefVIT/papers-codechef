@@ -1,23 +1,19 @@
-import { NextResponse } from "next/server";
 import { Types } from "mongoose";
 import { getPaperById } from "@/lib/services/paper";
+import { success, failure } from "@/lib/utils/response"
 
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;
     
     if (!Types.ObjectId.isValid(id)) {
-      return NextResponse.json({ message: "Invalid paper ID" }, { status: 400 });
+      return failure("Invalid paper ID");
     }
-
     const paper = await getPaperById(id);
-
-    return NextResponse.json(paper, { status: 200 });
+    
+    return success(paper);
   } catch (error) {
     console.error(error);
-    return NextResponse.json(
-      { message: "Failed to fetch paper", error },
-      { status: 500 },
-    );
+    return failure("Failed to fetch paper", 500, error);
   }
 }

@@ -21,8 +21,11 @@ const RelatedPapers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const getpaper = await axios.get<IPaper>(`/api/paper-by-id/${id}`);
-        const paper = getpaper.data;
+        const getpaper = await axios.get<ApiResponse<IPaper>>(`/api/paper-by-id/${id}`);
+        if (!getpaper.data.data) {
+          throw new Error("Paper not found");
+        }
+        const paper = getpaper.data.data;
         setCurrentPaper(paper);
 
         const allPapersBySubject = await axios.get<ApiResponse<Filters>>(
