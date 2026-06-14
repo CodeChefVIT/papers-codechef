@@ -9,6 +9,6 @@ export async function GET() {
     return success(courses);
   } catch (error) {
     console.error(error);
-    return failure("Failed to fetch courses", 500, error);
+    return failure("Failed to fetch courses", 500);
   }
 }

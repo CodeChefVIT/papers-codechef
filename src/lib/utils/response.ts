@@ -14,9 +14,8 @@ export const success = <T>(
 export const failure = <T>(
   message: string,
   status = 400,
-  error?: any
 ) =>
   NextResponse.json<ApiResponse<T>>(
-    { status: "error", data: null, message, error },
+    { status: "error", data: null, message},
     { status }
   )

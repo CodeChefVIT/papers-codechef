@@ -19,6 +19,6 @@ export async function GET() {
     return success(selectedSubjects);
   } catch (error) {
     console.error("Error fetching papers:", error);
-    return failure("Failed to fetch papers.", 500, error);
+    return failure("Failed to fetch papers.", 500);
   }
 }

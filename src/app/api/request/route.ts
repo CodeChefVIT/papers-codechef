@@ -22,6 +22,6 @@ export async function POST(req: Request) {
     return success({ message: "Paper request submitted successfully!", request: newRequest }, "Created", 201);
   } catch (error) {
     console.error("Error creating paper request:", error);
-    return failure("Failed to submit request.", 500, error);
+    return failure("Failed to submit request.", 500);
   }
 }

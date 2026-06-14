@@ -9,12 +9,13 @@ export async function GET(req: NextRequest) {
     const url = req.nextUrl.searchParams;
     const sub = url.get("subject");
     if (!sub) {
-      return failure("Subject query parameter is required", 400);
+      return failure("Subject query parameter is required");
     }
     const paper = await getPapersBySubject(sub);
 
     return success(paper);
   } catch (error) {
-    return failure("Failed to fetch papers", 500, error);
+    console.error(error);
+    return failure("Failed to fetch papers", 500);
   }
 }

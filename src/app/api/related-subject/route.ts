@@ -16,6 +16,7 @@ export async function GET(req: NextRequest) {
 
     return success({ related_subjects: relatedSubjects });
   } catch (error) {
-    return failure("Failed to fetch related subject", 500, error);
+    console.error(error);
+    return failure("Failed to fetch related subject", 500);
   }
 }

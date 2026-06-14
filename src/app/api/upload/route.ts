@@ -54,6 +54,6 @@ export async function POST(req: Request) {
     return success({ file_url, thumbnail_url }, "Created", 201);
   } catch (error) {
     console.error(error);
-    return failure("Failed to upload papers", 500, error);
+    return failure("Failed to upload papers", 500);
   }
 }

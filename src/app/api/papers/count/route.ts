@@ -9,6 +9,7 @@ export async function GET(req: Request) {
 
     return success(courseCount);
   } catch (error) {
-    return failure("Failed to fetch course counts", 500, error);
+    console.error(error);
+    return failure("Failed to fetch course counts", 500);
   }
 }

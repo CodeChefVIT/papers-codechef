@@ -14,6 +14,6 @@ export async function GET(req: Request, { params }: { params: { id: string } }) 
     return success(paper);
   } catch (error) {
     console.error(error);
-    return failure("Failed to fetch paper", 500, error);
+    return failure("Failed to fetch paper", 500);
   }
 }
