@@ -35,12 +35,9 @@ export async function POST(req: Request) {
           : rawPdfBytes;
 
         if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
-          return NextResponse.json(
-            {
-              error:
-                "PDF is too large after compression. The compressed file must be under 5MB.",
-            },
-            { status: 413 },
+          return failure(
+            "PDF is too large after compression. The compressed file must be under 5MB.",
+            413,
           );
         }
       } else {
@@ -49,12 +46,9 @@ export async function POST(req: Request) {
     } else {
       pdfBytes = await createPDFfromImages(files);
       if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
-        return NextResponse.json(
-          {
-            error:
-              "Generated PDF is too large after compression. Please upload fewer or smaller images.",
-          },
-          { status: 413 },
+        return failure(
+          "Generated PDF is too large after compression. Please upload fewer or smaller images.",
+          413,
         );
       }
     }
