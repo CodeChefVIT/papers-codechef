@@ -25,7 +25,7 @@ import { CSS } from "@dnd-kit/utilities";
 import Dropzone from "react-dropzone";
 import { Upload, XIcon } from "lucide-react";
 import { GlobalWorkerOptions } from "pdfjs-dist";
-import type { ApiResponse } from "@/interface"
+import type { ApiResponse } from "@/interface";
 
 GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs";
@@ -79,7 +79,6 @@ export default function Page() {
 
   const fileCheckAndSelect = useCallback(
     (acceptedFiles: File[]) => {
-      const maxFileSize = 5 * 1024 * 1024;
       const allowedFileTypes = [
         "application/pdf",
         "image/jpeg",
@@ -137,28 +136,18 @@ export default function Page() {
       }
 
       const allFiles = [...files, ...acceptedFiles];
-      if (allFiles.length > 5) {
-        toast.error("You can upload up to 5 files only", { id: toastId });
-        return;
-      }
-
-      const totalSize = allFiles.reduce(
-        (sum, f) => sum + f.size,
-        0,
-      );
-      if (totalSize > maxFileSize){
-        toast.error("The total upload size exceeds 5MB.", { id: toastId });
+      if (allFiles.length > 10) {
+        toast.error("You can upload up to 10 files only", { id: toastId });
         return;
       }
 
       const invalidFiles = acceptedFiles.filter(
-        (file) =>
-          file.size > maxFileSize || !allowedFileTypes.includes(file.type),
+        (file) => !allowedFileTypes.includes(file.type),
       );
 
       if (invalidFiles.length > 0) {
         toast.error(
-          "Some files are invalid. Make sure the total size is below 5MB and files are of allowed types (PDF, JPEG, PNG, GIF).",
+          "Some files are invalid. Make sure they are PDFs, JPEGs, PNGs, or GIFs.",
           { id: toastId },
         );
         return;
@@ -279,7 +268,10 @@ export default function Page() {
       await toast.promise(
         async () => {
           try {
-            await axios.post<ApiResponse<uploadResponse>>("/api/upload", formData);
+            await axios.post<ApiResponse<uploadResponse>>(
+              "/api/upload",
+              formData,
+            );
             return { message: "Papers uploaded successfully!" };
           } catch (error) {
             if (error instanceof AxiosError) {
@@ -447,12 +439,14 @@ export default function Page() {
                 );
 
                 return (
-                  <section 
+                  <section
                     {...getRootProps()}
-                    className="mt-6 flex w-full flex-col items-center">
+                    className="mt-6 flex w-full flex-col items-center"
+                  >
                     <input {...getInputProps()} />
                     <div className="flex w-max gap-4">
-                      <div className="scrollbar-hide flex w-[80vw] max-w-4xl flex-col justify-between overflow-x-auto overflow-y-hidden rounded-[40px] border-[6px] border-[#A78BFA] bg-indigo-900/10 p-4 dark:border-indigo-900 sm:p-6 md:w-max md:p-8">j
+                      <div className="scrollbar-hide flex w-[80vw] max-w-4xl flex-col justify-between overflow-x-auto overflow-y-hidden rounded-[40px] border-[6px] border-[#A78BFA] bg-indigo-900/10 p-4 dark:border-indigo-900 sm:p-6 md:w-max md:p-8">
+                        j
                         <DndContext
                           sensors={sensors}
                           collisionDetection={closestCenter}
@@ -528,10 +522,9 @@ export default function Page() {
                       </div>
                     )}
                   </section>
-                )
+                );
               }}
             </Dropzone>
-
           )}
 
           <Button
@@ -543,7 +536,6 @@ export default function Page() {
           </Button>
         </div>
       </div>
-      
 
       {zoomIndex !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
