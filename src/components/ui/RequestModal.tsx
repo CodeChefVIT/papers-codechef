@@ -78,15 +78,15 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
         try {
         await toast.promise(
             axios.post("/api/request", {
-            subject: selectedSubject,
-            exam: selectedExam,
-            slot: selectedSlot,
-            year: selectedYear,
+                subject: selectedSubject,
+                exam: selectedExam,
+                slot: selectedSlot,
+                year: selectedYear,
             }),
             {
-            loading: "Submitting your request...",
-            success: "Your paper request was submitted successfully",
-            error: "Failed to submit your request. Please try again later.",
+                loading: "Submitting your request...",
+                success: "Your paper request was submitted successfully",
+                error: "Failed to submit your request. Please try again later.",
             },
         );
 

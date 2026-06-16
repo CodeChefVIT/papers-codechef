@@ -27,7 +27,15 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from "@dnd-kit/sortable";
+
+import { type ApiResponse } from '@/interface'
+
 import { CSS } from "@dnd-kit/utilities";
+
+interface userPaperResponse {
+  subject: string;
+  slots: string[]
+}
 
 const SortableItem = ({
   id,
@@ -97,11 +105,11 @@ const PinnedModal = ({
       const storedSubjects = JSON.parse(
         localStorage.getItem("userSubjects") ?? "[]",
       ) as StoredSubjects;
-      const response = await axios.post<{ subject: string; slots: string[] }[]>(
+      const response = await axios.post<ApiResponse<userPaperResponse[]>>(
         "/api/user-papers",
         storedSubjects,
       );
-      const fetchedPapers = response.data;
+      const fetchedPapers = response.data.data!;
       const fetchedSubjectsSet = new Set(
         fetchedPapers.map((paper) => paper.subject),
       );
