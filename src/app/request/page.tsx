@@ -14,19 +14,12 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import Fuse from "fuse.js";
 import { type IUpcomingPaper } from "@/interface";
-import { Skeleton } from "../../components/ui/skeleton";
 import UpcomingPaper from "../../components/UpcomingPaper";
 import toast from "react-hot-toast";
 import { Search } from "lucide-react";
 import SkeletonPaperCard from "@/components/SkeletonPaperCard";
 import { useCourses } from "@/context/courseContext";
 import { type ApiResponse } from '@/interface'
-
-type Course = {
-  name?: string | null;
-  courseName?: string | null;
-  title?: string | null;
-};
 
 export default function PaperRequest() {
   const [subjects, setSubjects] = useState<string[]>([]);
@@ -39,7 +32,7 @@ export default function PaperRequest() {
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
   const [displayPapers, setDisplayPapers] = useState<IUpcomingPaper[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { courses, loading, error, refetch } = useCourses();
+  const { courses } = useCourses();
 
   useEffect(() => {
     setSubjects(courses.map((course) => course.name));

@@ -1,4 +1,4 @@
-import { mongo } from "mongoose";
+import { type mongo } from "mongoose";
 
 export interface IUpcomingSlot {
   slot: string;

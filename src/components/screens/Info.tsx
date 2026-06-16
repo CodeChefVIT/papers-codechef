@@ -4,13 +4,10 @@ import {
   Check,
   Filter,
   Book,
-  ArrowUpRight,
 } from "lucide-react";
 import Image from "next/image";
-import man from "@/assets/man.svg" assert { type: "image/svg" };
-import man1 from "@/assets/man1.svg" assert { type: "image/svg" };
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
+import man from "@/assets/man.svg" with { type: "image/svg" };
+import man1 from "@/assets/man1.svg" with { type: "image/svg" };
 import PWAInstallButton from "../ui/PWAInstallButton";
 
 function Info() {

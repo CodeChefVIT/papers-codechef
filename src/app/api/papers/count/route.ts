@@ -3,7 +3,7 @@ import { success, failure } from "@/lib/utils/response";
 
 export const dynamic = "force-dynamic";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
     const courseCount = await getCourseCounts();
 

@@ -1,4 +1,4 @@
-import { reportTag, ReportTagBody } from "@/lib/services/report";
+import { reportTag, type ReportTagBody } from "@/lib/services/report";
 import { rateLimitCheck } from "@/lib/utils/rate-limiter";
 import { success, failure } from "@/lib/utils/response";
 import { customErrorHandler } from "@/lib/utils/error";

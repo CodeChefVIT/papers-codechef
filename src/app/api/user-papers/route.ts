@@ -1,6 +1,6 @@
 import { connectToDatabase } from "@/lib/database/mongoose";
 import Paper from "@/db/papers";
-import { StoredSubjects } from "@/interface";
+import { type StoredSubjects } from "@/interface";
 import { transformPapersToSubjectSlots } from "@/lib/services/paper-transform";
 import { success, failure } from "@/lib/utils/response";
 

@@ -4,9 +4,7 @@ import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useState } from "react";
 import {
-  ArrowUpRight,
   ChevronDown,
-  Pin,
   UploadIcon,
 } from "lucide-react";
 import ModeToggle from "./toggle-theme";

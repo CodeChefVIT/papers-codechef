@@ -311,7 +311,7 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
       viewer.removeEventListener("wheel", handleWheel);
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     };
-  }, [handleWheel]);
+  }, [handleWheel, viewerRef]);
 
   return null;
 }

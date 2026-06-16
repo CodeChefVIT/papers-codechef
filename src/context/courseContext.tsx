@@ -17,10 +17,6 @@ interface CoursesContextType {
   refetch: () => Promise<void>;
 }
 
-interface ApiError {
-  message?: string;
-}
-
 const CoursesContext = createContext<CoursesContextType | undefined>(undefined);
 
 export function CoursesProvider({ children }: { children: React.ReactNode }) {

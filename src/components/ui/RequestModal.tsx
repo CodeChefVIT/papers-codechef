@@ -27,12 +27,6 @@ import { exams, slots, years } from "@/components/select_options";
 import Fuse from 'fuse.js';
 import { useCourses } from "@/context/courseContext";
 
-type Course = {
-  name?: string | null;
-  courseName?: string | null;
-  title?: string | null;
-};
-
 const RequestModal = ({section = "navbar"} : {section? : string}) => {
     const [open, setOpen] = useState(false);
     const [subjects, setSubjects] = useState<string[]>([]);
@@ -43,7 +37,7 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
     const [selectedExam, setSelectedExam] = useState<string | null>(null);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [selectedYear, setSelectedYear] = useState<string | null>(null);
-    const { courses, loading, error, refetch } = useCourses();
+    const { courses } = useCourses();
 
     useEffect(() => {
         setSubjects(courses.map((course) => course.name));

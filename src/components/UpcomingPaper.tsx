@@ -5,8 +5,8 @@ import {
 
 import { useRouter } from "next/navigation";
 import { Pin } from "lucide-react";
-import React, { useContext, useEffect, useState } from "react";
-import { StoredSubjects } from "@/interface";
+import React, { useEffect, useState } from "react";
+import { type StoredSubjects } from "@/interface";
 import { useCourses } from "@/context/courseContext";
 import { Capsule } from "@/components/ui/capsule";
 
@@ -18,7 +18,7 @@ interface PaperCardProps {
 export default function PaperCard({ subject, slots }: PaperCardProps) {
   const courseName = extractWithoutBracketContent(subject);
   const courseCode = extractBracketContent(subject);
-  const { courses, loading, error, refetch } = useCourses();
+  const { courses } = useCourses();
   const [pinned, setPinned] = useState<boolean>(false);
   const [paperCount, setPaperCount] = useState<number>(0);
 
@@ -54,7 +54,7 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
     } else {
       setPaperCount(0);
     }
-  }, [subject, courseName]);
+  }, [subject, courseName, courses]);
 
   const router = useRouter();
   return (

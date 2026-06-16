@@ -1,22 +1,18 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Image, { StaticImageData } from "next/image";
+import Image, { type StaticImageData } from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ccLogo from "../assets/codechef_logo.svg";
 import ModeToggle from "@/components/toggle-theme";
 import {
   ArrowDownLeftIcon,
-  Pin,
-  ArrowUpRight,
   ChevronDown,
 } from "lucide-react";
 import FloatingNavbar from "./FloatingNavbar";
 import PWAInstallButton from "./ui/PWAInstallButton";
 import SearchBarChild from "./Searchbar/searchbar-child";
-import Banner from "@/components/ui/banners/bannerDismiss";
-import type { ICourses } from "@/interface";
 import {
   DropdownMenu,
   DropdownMenuTrigger,
@@ -32,7 +28,7 @@ function Navbar() {
   const pathname: string = usePathname() ?? "/";
 
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-  const { courses, loading, error, refetch } = useCourses();
+  const { courses } = useCourses();
 
   useEffect(() => {
     if (pathname !== "/catalogue") return;
