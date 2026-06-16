@@ -1,10 +1,13 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import { PaperAdmin } from "@/db/papers";
-import { createPDFfromImages } from "@/lib/storage/pdf";
+import { createPDFfromImages, compressPDF } from "@/lib/storage/pdf";
 import { uploadPDF, uploadThumbnail } from "@/lib/storage/gcp";
 
 export const runtime = "nodejs";
+
+const MAX_COMPRESSED_PDF_SIZE = 5 * 1024 * 1024; // 5MB compressed
+const COMPRESS_THRESHOLD = 5 * 1024 * 1024; // 5MB
 
 export async function POST(req: Request) {
   try {
@@ -29,9 +32,37 @@ export async function POST(req: Request) {
           { status: 400 },
         );
       }
-      pdfBytes = new Uint8Array(await files[0].arrayBuffer());
+
+      const rawPdfBytes = new Uint8Array(await files[0].arrayBuffer());
+      if (rawPdfBytes.length > COMPRESS_THRESHOLD) {
+        const compressedPdfBytes = await compressPDF(rawPdfBytes);
+        pdfBytes = compressedPdfBytes.length <= rawPdfBytes.length
+          ? compressedPdfBytes
+          : rawPdfBytes;
+
+        if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
+          return NextResponse.json(
+            {
+              error:
+                "PDF is too large after compression. The compressed file must be under 5MB.",
+            },
+            { status: 413 },
+          );
+        }
+      } else {
+        pdfBytes = rawPdfBytes;
+      }
     } else {
       pdfBytes = await createPDFfromImages(files);
+      if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
+        return NextResponse.json(
+          {
+            error:
+              "Generated PDF is too large after compression. Please upload fewer or smaller images.",
+          },
+          { status: 413 },
+        );
+      }
     }
 
     const buffer = Buffer.from(pdfBytes);
