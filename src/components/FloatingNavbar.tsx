@@ -43,7 +43,7 @@ export default function FloatingNavbar({ onNavigate }: Props) {
         </DropdownMenuTrigger>
 
         <DropdownMenuContent
-          className="xl:hidden mt-2 py-2 w-72 space-y-1 rounded-3xl 
+          className="xl:hidden mt-2 py-2 w-72 space-y-1 rounded-[22px] 
           border border-[#3A3745] shadow-lg backdrop-blur-sm transition-colors
           bg-[#e8e9ff] text-gray-700 
           dark:bg-black dark:text-white dark:border-[#3A3745]"
@@ -53,7 +53,7 @@ export default function FloatingNavbar({ onNavigate }: Props) {
             <Link
               href={pathname === "/upload" ? "/" : "/upload"}
               onClick={() => onNavigate()}
-              className="flex w-full items-center gap-3 rounded-lg px-3 py-1 hover:bg-[#1A1823] transition"
+              className="flex w-full items-center gap-3 rounded-md px-3 py-1 hover:bg-[#1A1823] transition"
             >
               <UploadIcon className="h-4 w-4" />
               <span className="text-sm font-medium">
@@ -62,18 +62,20 @@ export default function FloatingNavbar({ onNavigate }: Props) {
             </Link>
           </DropdownMenuItem>
 
-          <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-            <div className="flex w-full items-center gap-3 rounded-lg px-3 py-1 hover:bg-[#1A1823] transition">
-              <PinnedModal/>
-            </div>
-          </DropdownMenuItem>
+          <DropdownMenuItem
+  onSelect={(e) => e.preventDefault()}
+  className="mx-1 my-1 hover:bg-[#1F2A3D]"
+>
+  <PinnedModal />
+</DropdownMenuItem>
 
-          <DropdownMenuItem asChild onSelect={(e) => e.preventDefault()}>
-            <div className="flex w-full items-center gap-3 rounded-lg px-3 py-1 hover:bg-[#1A1823] transition">
-              <RequestModal/>
-            </div>
-          </DropdownMenuItem>
-          <div className="flex w-full items-center gap-3 rounded-lg px-3 py-1">
+          <DropdownMenuItem
+  onSelect={(e) => e.preventDefault()}
+  className="mx-1 my-1 hover:bg-[#1F2A3D]"
+>
+  <RequestModal />
+</DropdownMenuItem>
+          <div className="flex h-full w-full items-center gap-3 rounded-md">
             <div className="border rounded-full">
               <ModeToggle />
             </div>

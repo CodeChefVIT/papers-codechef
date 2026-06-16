@@ -63,7 +63,7 @@ const SortableItem = ({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className={`mb-2 flex items-center justify-between rounded-md border border-[#3A3745] px-4 py-2 pl-2 shadow-sm ${
+      className={`mb-2 flex items-center justify-between rounded-2xl border border-[#3A3745] px-2 py-1 pl-2 shadow-sm ${
         isDragging ? "scale-[1.02] cursor-grabbing opacity-90" : "cursor-grab"
       }`}
     >
@@ -188,7 +188,7 @@ const PinnedModal = ({
       }}
     >
       {page === "Navbar" ? (
-        <DialogTrigger className="flex h-full w-full flex-row items-center gap-2">
+        <DialogTrigger className="flex h-full w-full flex-row items-center gap-2 rounded-xl px-2 py-2 hover:bg-[#1A2333] transition-all duration-200">
           <Pin size={16} />
           {triggerName}
         </DialogTrigger>
@@ -214,7 +214,7 @@ const PinnedModal = ({
               </div>
             </div>
             <div className="mt-4">
-              <div className="h-64 w-full overflow-y-auto rounded-md border border-[#3A3745] p-2">
+              <div className="h-64 w-full overflow-y-auto rounded-sm border border-[#3A3745] p-2">
                 {displayPapers.length > 0 ? (
                   <DndContext
                     sensors={sensors}

@@ -143,7 +143,7 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     placeholder="Search by subject..."
-                    className={`text-md rounded-lg bg-[#B2B8FF] px-4 py-6 pr-10 font-play tracking-wider text-black shadow-sm ring-0 placeholder:text-black focus:outline-none focus:ring-0 dark:bg-[#7480FF66] dark:text-white placeholder:dark:text-white ${suggestions.length > 0 ? "rounded-b-none" : ""}`}
+                    className={`text-md rounded-2xl bg-[#B2B8FF] px-4 py-6 pr-10 font-play tracking-wider text-black shadow-sm ring-0 placeholder:text-black focus:outline-none focus:ring-0 dark:bg-[#7480FF66] dark:text-white placeholder:dark:text-white ${suggestions.length > 0 ? "rounded-b-none" : ""}`}
                     />
                     <button
                     type="button"
@@ -154,7 +154,7 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
                     {suggestions.length > 0 && (
                     <ul
                         ref={suggestionsRef}
-                        className="absolute z-20 max-h-[250px] w-full max-w-xl overflow-y-auto rounded-md rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771]"
+                        className="absolute z-20 max-h-[250px] w-full max-w-xl overflow-y-auto rounded-2xl rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771]"
                     >
                         {suggestions.map((s, idx) => (
                         <li
