@@ -433,84 +433,105 @@ export default function Page() {
             </Dropzone>
           )}
           {previews.length > 0 && (
-            <section className="mt-6 flex w-full flex-col items-center">
-              <div className="flex w-max gap-4">
-                <div className="scrollbar-hide flex w-[80vw] max-w-4xl flex-col justify-between overflow-x-auto overflow-y-hidden rounded-[40px] border-[6px] border-[#A78BFA] bg-indigo-900/10 p-4 dark:border-indigo-900 sm:p-6 md:w-max md:p-8">
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={handleDndKitDragEnd}
-                  >
-                    <SortableContext
-                      items={previews.map((item) => item.id)}
-                      strategy={horizontalListSortingStrategy}
-                    >
-                      <div className="flex w-full snap-x snap-mandatory gap-3 sm:gap-4 md:gap-5">
-                        {previews.map((item, index) => (
-                          <SortablePreview key={item.id} id={item.id}>
-                            <div className="group relative w-full flex-shrink-0 snap-start sm:w-1/2 md:w-1/3 lg:w-1/4">
-                              <div className="relative h-64 w-48 overflow-hidden rounded-xl outline outline-2 outline-white sm:h-60">
-                                {/* Index badge */}
-                                <div className="absolute left-0 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-br-xl rounded-tl-xl bg-slate-600 sm:h-10 sm:w-10">
-                                  <span className="text-sm font-bold text-white sm:text-xl">
-                                    {index + 1}
-                                  </span>
-                                </div>
+            <Dropzone
+              onDrop={onDrop}
+              accept={{
+                "image/*": [".jpeg", ".jpg", ".png", ".gif", ".bmp", ".webp"],
+                "application/pdf": [".pdf"],
+              }}
+              multiple={true}
+            >
+              {({ getRootProps, getInputProps, isDragActive }) => {
+                const pdfUploaded = files.some(
+                  (f) => f.type === "application/pdf",
+                );
 
-                                {/* Delete button */}
-                                <Button
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    e.stopPropagation();
-                                    handleDelete(index);
-                                  }}
-                                  variant="destructive"
-                                  size="icon"
-                                  className="absolute right-0 top-0 z-20 h-8 w-8 rounded-bl-xl rounded-tr-xl bg-pink-800 hover:bg-red-900 sm:h-10 sm:w-10"
-                                  title="Delete"
-                                >
-                                  <FiTrash className="h-4 w-4 sm:h-5 sm:w-5" />
-                                </Button>
+                return (
+                  <section 
+                    {...getRootProps()}
+                    className="mt-6 flex w-full flex-col items-center">
+                    <input {...getInputProps()} />
+                    <div className="flex w-max gap-4">
+                      <div className="scrollbar-hide flex w-[80vw] max-w-4xl flex-col justify-between overflow-x-auto overflow-y-hidden rounded-[40px] border-[6px] border-[#A78BFA] bg-indigo-900/10 p-4 dark:border-indigo-900 sm:p-6 md:w-max md:p-8">j
+                        <DndContext
+                          sensors={sensors}
+                          collisionDetection={closestCenter}
+                          onDragEnd={handleDndKitDragEnd}
+                        >
+                          <SortableContext
+                            items={previews.map((item) => item.id)}
+                            strategy={horizontalListSortingStrategy}
+                          >
+                            <div className="flex w-full snap-x snap-mandatory gap-3 sm:gap-4 md:gap-5">
+                              {previews.map((item, index) => (
+                                <SortablePreview key={item.id} id={item.id}>
+                                  <div className="group relative w-full flex-shrink-0 snap-start sm:w-1/2 md:w-1/3 lg:w-1/4">
+                                    <div className="relative h-64 w-48 overflow-hidden rounded-xl outline outline-2 outline-white sm:h-60">
+                                      {/* Index badge */}
+                                      <div className="absolute left-0 top-0 z-20 flex h-8 w-8 items-center justify-center rounded-br-xl rounded-tl-xl bg-slate-600 sm:h-10 sm:w-10">
+                                        <span className="text-sm font-bold text-white sm:text-xl">
+                                          {index + 1}
+                                        </span>
+                                      </div>
 
-                                {/* Preview */}
-                                <div className="absolute inset-0 z-10">
-                                  {item.file.type.startsWith("image/") ? (
-                                    <Image
-                                      src={item.preview}
-                                      alt={`Page ${index + 1}`}
-                                      fill
-                                      className="object-cover"
-                                      unoptimized
-                                    />
-                                  ) : (
-                                    <iframe
-                                      src={item.preview}
-                                      title={`PDF preview ${index + 1}`}
-                                      className="h-full w-full border-0"
-                                    />
-                                  )}
-                                </div>
-                              </div>
+                                      {/* Delete button */}
+                                      <Button
+                                        onClick={(e) => {
+                                          e.preventDefault();
+                                          e.stopPropagation();
+                                          handleDelete(index);
+                                        }}
+                                        variant="destructive"
+                                        size="icon"
+                                        className="absolute right-0 top-0 z-20 h-8 w-8 rounded-bl-xl rounded-tr-xl bg-pink-800 hover:bg-red-900 sm:h-10 sm:w-10"
+                                        title="Delete"
+                                      >
+                                        <FiTrash className="h-4 w-4 sm:h-5 sm:w-5" />
+                                      </Button>
+
+                                      {/* Preview */}
+                                      <div className="absolute inset-0 z-10">
+                                        {item.file.type.startsWith("image/") ? (
+                                          <Image
+                                            src={item.preview}
+                                            alt={`Page ${index + 1}`}
+                                            fill
+                                            className="object-cover"
+                                            unoptimized
+                                          />
+                                        ) : (
+                                          <iframe
+                                            src={item.preview}
+                                            title={`PDF preview ${index + 1}`}
+                                            className="h-full w-full border-0"
+                                          />
+                                        )}
+                                      </div>
+                                    </div>
+                                  </div>
+                                </SortablePreview>
+                              ))}
                             </div>
-                          </SortablePreview>
-                        ))}
-                      </div>
 
-                      {previews.length > 2 && (
-                        <div className="mt-3 text-center text-sm text-white/50">
-                          Swipe to view more &gt;&gt;
-                        </div>
-                      )}
-                    </SortableContext>
-                  </DndContext>
-                </div>
-              </div>
-              {previews.length > 1 && (
-                <div className="mt-4 text-right text-xl text-white/50">
-                  Drag to reorder
-                </div>
-              )}
-            </section>
+                            {previews.length > 2 && (
+                              <div className="mt-3 text-center text-sm text-white/50">
+                                Swipe to view more &gt;&gt;
+                              </div>
+                            )}
+                          </SortableContext>
+                        </DndContext>
+                      </div>
+                    </div>
+                    {previews.length > 1 && (
+                      <div className="mt-4 text-right text-xl text-white/50">
+                        Drag to reorder
+                      </div>
+                    )}
+                  </section>
+                )
+              }}
+            </Dropzone>
+
           )}
 
           <Button
@@ -522,6 +543,7 @@ export default function Page() {
           </Button>
         </div>
       </div>
+      
 
       {zoomIndex !== null && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70">
