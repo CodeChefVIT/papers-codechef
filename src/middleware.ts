@@ -4,6 +4,7 @@ import {
   paperRequestRatelimit,
   subscribeRatelimit,
 } from "./lib/utils/ratelimit";
+import { failure } from "@/lib/utils/response"
 
 export const config = {
   matcher: ["/api/upload", "/api/request", "/api/subscribe"],
@@ -16,30 +17,21 @@ export default async function middleware(request: NextRequest) {
   if (pathname === "/api/upload") {
     const { success } = await aiUploadRatelimit.limit(ip);
     if (!success) {
-      return NextResponse.json(
-        { message: "You can upload a maximum of 5 papers every 15 minutes" },
-        { status: 429 },
-      );
+      return failure("You can upload a maximum of 5 papers every 15 minutes", 429);
     }
   }
 
   if (pathname === "/api/request") {
     const { success } = await paperRequestRatelimit.limit(ip);
     if (!success) {
-      return NextResponse.json(
-        { message: "You can submit a maximum of 5 requests every 15 minutes" },
-        { status: 429 },
-      );
+      return failure("You can submit a maximum of 5 requests every 15 minutes", 429);
     }
   }
 
   if (pathname === "/api/subscribe") {
     const { success } = await subscribeRatelimit.limit(ip);
     if (!success) {
-      return NextResponse.json(
-        { message: "Maximum of 3 newsletter subscriptions per hour" },
-        { status: 429 },
-      );
+      return failure("Maximum of 3 newsletter subscriptions per hour", 429);
     }
   }
 

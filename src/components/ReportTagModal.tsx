@@ -16,8 +16,9 @@ import LabeledInput from "@/components/ui/LabeledInput";
 import LabeledSelect from "@/components/ui/LabeledSelect";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";  
+import { type ApiResponse } from '@/interface'
 
-type ReportResponse = { error?: string; message?: string };
+type ReportResponse = ApiResponse<{ error?: string; message?: string }>;
 
 interface ReportTagModalProps {
   paperId: string;

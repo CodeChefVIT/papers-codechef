@@ -1,6 +1,6 @@
-import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/database/mongoose";
 import PaperRequest from "@/db/paperRequest";
+import { success, failure } from "@/lib/utils/response";
 
 export async function POST(req: Request) {
   try {
@@ -15,22 +15,13 @@ export async function POST(req: Request) {
     const { subject, exam, slot, year } = body;
 
     if (!subject || !exam || !slot || !year) {
-      return NextResponse.json(
-        { error: "All fields are required." },
-        { status: 400 },
-      );
+      return failure("All fields are required.", 400);
     }
 
     const newRequest = await PaperRequest.create({ subject, exam, slot, year });
-    return NextResponse.json(
-      { message: "Paper request submitted successfully!", request: newRequest },
-      { status: 201 },
-    );
+    return success({ message: "Paper request submitted successfully!", request: newRequest }, "Created", 201);
   } catch (error) {
     console.error("Error creating paper request:", error);
-    return NextResponse.json(
-      { error: "Failed to submit request." },
-      { status: 500 },
-    );
+    return failure("Failed to submit request.", 500);
   }
 }

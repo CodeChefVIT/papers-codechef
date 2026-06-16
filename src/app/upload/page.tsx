@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import toast from "react-hot-toast";
 import { Button } from "@/components/ui/button";
 import axios, { AxiosError } from "axios";
@@ -13,7 +13,7 @@ import {
   TouchSensor,
   useSensor,
   useSensors,
-  DragEndEvent,
+  type DragEndEvent,
 } from "@dnd-kit/core";
 import {
   arrayMove,
@@ -24,16 +24,16 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import Dropzone from "react-dropzone";
 import { Upload, XIcon } from "lucide-react";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
+import { GlobalWorkerOptions } from "pdfjs-dist";
+import type { ApiResponse } from "@/interface"
 
 GlobalWorkerOptions.workerSrc =
   "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/4.8.69/pdf.worker.min.mjs";
 
-interface APIResponse {
-  status: string;
-  message?: string;
+interface uploadResponse {
+  file_url: string;
+  thumbnail_url: string;
 }
-
 export default function Page() {
   const campus = "Vellore";
   const [files, setFiles] = useState<File[]>([]);
@@ -43,6 +43,12 @@ export default function Page() {
   const [isUploading, setIsUploading] = useState(false);
   const [isGlobalDragging, setIsGlobalDragging] = useState(false);
   const [zoomIndex, setZoomIndex] = useState<number | null>(null);
+
+  const previewsRef = useRef(previews);
+
+  useEffect(() => {
+    previewsRef.current = previews;
+  }, [previews]);
 
   useEffect(() => {
     const onDragEnter = () => setIsGlobalDragging(true);
@@ -63,7 +69,7 @@ export default function Page() {
   // Cleanup previews on unmount
   useEffect(() => {
     return () => {
-      previews.forEach((item) => {
+      previewsRef.current.forEach((item) => {
         try {
           URL.revokeObjectURL(item.preview);
         } catch {}
@@ -273,13 +279,13 @@ export default function Page() {
       await toast.promise(
         async () => {
           try {
-            await axios.post<APIResponse>("/api/upload", formData);
+            await axios.post<ApiResponse<uploadResponse>>("/api/upload", formData);
             return { message: "Papers uploaded successfully!" };
           } catch (error) {
-            if (error instanceof AxiosError && error.response?.data) {
-              const errorData = error.response.data as APIResponse;
+            if (error instanceof AxiosError) {
+              const errorData = error?.response?.data as ApiResponse<unknown>;
               const errorMessage =
-                errorData.message ?? "Failed to upload papers";
+                errorData?.message ?? "Failed to upload papers";
               throw new Error(errorMessage);
             }
             throw new Error("Failed to upload papers");
