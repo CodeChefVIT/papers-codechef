@@ -73,7 +73,6 @@ export default function Page() {
 
   const fileCheckAndSelect = useCallback(
     (acceptedFiles: File[]) => {
-      const maxFileSize = 5 * 1024 * 1024;
       const allowedFileTypes = [
         "application/pdf",
         "image/jpeg",
@@ -131,28 +130,18 @@ export default function Page() {
       }
 
       const allFiles = [...files, ...acceptedFiles];
-      if (allFiles.length > 5) {
-        toast.error("You can upload up to 5 files only", { id: toastId });
-        return;
-      }
-
-      const totalSize = allFiles.reduce(
-        (sum, f) => sum + f.size,
-        0,
-      );
-      if (totalSize > maxFileSize){
-        toast.error("The total upload size exceeds 5MB.", { id: toastId });
+      if (allFiles.length > 10) {
+        toast.error("You can upload up to 10 files only", { id: toastId });
         return;
       }
 
       const invalidFiles = acceptedFiles.filter(
-        (file) =>
-          file.size > maxFileSize || !allowedFileTypes.includes(file.type),
+        (file) => !allowedFileTypes.includes(file.type),
       );
 
       if (invalidFiles.length > 0) {
         toast.error(
-          "Some files are invalid. Make sure the total size is below 5MB and files are of allowed types (PDF, JPEG, PNG, GIF).",
+          "Some files are invalid. Make sure they are PDFs, JPEGs, PNGs, or GIFs.",
           { id: toastId },
         );
         return;
