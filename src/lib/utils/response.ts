@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { ApiResponse } from '@/interface'
+import { type ApiResponse } from '@/interface'
 
 export const success = <T>(
   data: T,

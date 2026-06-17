@@ -95,7 +95,7 @@ const PinnedModal = ({
   page?: string;
 }) => {
   const [displayPapers, setDisplayPapers] = useState<IUpcomingPaper[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [, setIsLoading] = useState(true);
   const [open, setOpen] = useState(false);
   const sensors = useSensors(useSensor(PointerSensor));
 

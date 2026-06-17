@@ -433,11 +433,7 @@ export default function Page() {
               }}
               multiple={true}
             >
-              {({ getRootProps, getInputProps, isDragActive }) => {
-                const pdfUploaded = files.some(
-                  (f) => f.type === "application/pdf",
-                );
-
+              {({ getRootProps, getInputProps }) => {
                 return (
                   <section
                     {...getRootProps()}

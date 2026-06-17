@@ -16,7 +16,7 @@ const PWAInstallButton = () => {
   const [deferredPrompt, setDeferredPrompt] =
     useState<BeforeInstallPromptEvent | null>(null);
   const [canInstall, setCanInstall] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [, setIsMobile] = useState(false);
 
   useEffect(() => {
     const checkMobile = () => {

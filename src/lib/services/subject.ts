@@ -1,5 +1,5 @@
 import { connectToDatabase } from "@/lib/database/mongoose";
-import { IRelatedSubject } from "@/interface";
+import { type IRelatedSubject } from "@/interface";
 import { escapeRegExp } from "@/lib/utils/regex";
 import { Course } from "@/db/course";
 import RelatedSubject from "@/db/relatedSubjects";

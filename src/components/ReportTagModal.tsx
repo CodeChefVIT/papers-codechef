@@ -14,7 +14,7 @@ import { Button } from "@/components/ui/button";
 import { MultiSelect } from "@/components/multi-select";
 import LabeledInput from "@/components/ui/LabeledInput";
 import LabeledSelect from "@/components/ui/LabeledSelect";
-import axios, { AxiosError } from "axios";
+import axios from "axios";
 import toast from "react-hot-toast";  
 import { type ApiResponse } from '@/interface'
 
@@ -54,7 +54,6 @@ const ReportTagModal = ({
   const [originalCategoryValues, setOriginalCategoryValues] = useState<
     Record<string, string>
   >({});
-  const [originalEmail, setOriginalEmail] = useState("");
   const [loading, setLoading] = useState(false);
 
   const SCROLL_THRESHOLD = 4;
@@ -102,7 +101,7 @@ const ReportTagModal = ({
       else if (c === "year" && year)
         setCategoryValues((s) => ({ ...s, [c]: year }));
     }
-  }, [selectedCategories, subject, exam, slot, year]);
+  }, [selectedCategories, subject, exam, slot, year, categoryValues]);
 
   useEffect(() => {
     if (open) {
@@ -121,14 +120,12 @@ const ReportTagModal = ({
       if (slot) base.slot = slot;
       if (year) base.year = year;
       setOriginalCategoryValues(base);
-      setOriginalEmail("");
     } else {
       setSelectedCategories([]);
       setCategoryValues({});
       setComment("");
       setEmail("");
       setOriginalCategoryValues({});
-      setOriginalEmail("");
     }
   }, [open, subject, exam, slot, year]);
 

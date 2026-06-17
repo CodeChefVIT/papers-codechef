@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import Fuse from "fuse.js";
-import { ICourseWithCount } from "@/interface";
+import { type ICourseWithCount } from "@/interface";
 
 function SearchBarChild({
   initialSubjects,

@@ -1,5 +1,5 @@
 import mongoose, { Schema, type Model } from "mongoose";
-import { type IPaper, type IAdminPaper, type ICourses } from "@/interface";
+import { type IPaper, type IAdminPaper } from "@/interface";
 
 const adminSchema = new Schema<IAdminPaper>({
   file_url: { type: String, required: true },

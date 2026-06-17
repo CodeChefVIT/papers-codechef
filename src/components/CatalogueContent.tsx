@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios, { type AxiosError } from "axios";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { type IPaper, type Filters, type StoredSubjects, type ApiResponse } from "@/interface";
 import Card from "./Card";
@@ -64,7 +64,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [subject]);
+  }, [subject, setCurrentPage]);
 
   // Fetch related subjects when subject changes
   useEffect(() => {

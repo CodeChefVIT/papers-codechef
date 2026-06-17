@@ -1,4 +1,4 @@
-import { IPaper } from "../../interface";
+import { type IPaper } from "../../interface";
 import { extractBracketContent } from "./string";
 import axios from "axios";
 
