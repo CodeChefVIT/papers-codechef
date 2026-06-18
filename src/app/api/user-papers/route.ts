@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   try {
     const subjects = (await req.json()) as StoredSubjects;
 
-    const transformedPapers = getPapersBySubjects(subjects)
+    const transformedPapers = await getPapersBySubjects(subjects)
 
     return success(transformedPapers);
   } catch (error) {

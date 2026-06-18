@@ -9,7 +9,7 @@ export async function POST(req: Request) {
       return failure("All fields are required.", 400);
     }
 
-    const newRequest = createPaperRequest({subject, exam, slot, year});
+    const newRequest = await createPaperRequest({subject, exam, slot, year});
     return success({ message: "Paper request submitted successfully!", request: newRequest }, "Created", 201);
   } catch (error) {
     console.error("Error creating paper request:", error);

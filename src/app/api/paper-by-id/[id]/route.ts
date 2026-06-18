@@ -2,6 +2,8 @@ import { Types } from "mongoose";
 import { getPaperById } from "@/lib/services/paper";
 import { success, failure } from "@/lib/utils/response"
 
+export const dynamic = "force-dynamic";
+
 export async function GET(req: Request, { params }: { params: { id: string } }) {
   try {
     const { id } = params;

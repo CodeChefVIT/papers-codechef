@@ -1,4 +1,3 @@
-import { connectToDatabase } from "@/lib/database/mongoose";
 import { success, failure } from "@/lib/utils/response";
 import { getUpcomingSubjects } from "@/lib/services/subject";
 
@@ -6,7 +5,6 @@ export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await connectToDatabase();
     const selectedSubjects = await getUpcomingSubjects();
 
     if (selectedSubjects.length === 0) {

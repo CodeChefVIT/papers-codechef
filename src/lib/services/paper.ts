@@ -60,10 +60,12 @@ export async function getCourseCounts(){
 }
 
 export async function createPaperRequest({ subject, exam, slot, year} : CreatePaperRequestInput){
+  await connectToDatabase();
   return await PaperRequest.create({ subject, exam, slot, year });
 }
 
 export async function getSelectedPapers() {
+	await connectToDatabase();
   return await Paper.find({ isSelected: true }).limit(8);
 }
 

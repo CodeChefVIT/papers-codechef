@@ -21,6 +21,7 @@ export async function getRelatedSubjects(subject: string) {
 }
 
 export async function getUpcomingSubjects() {
+	await connectToDatabase();
   return await UpcomingSubject.find()
     .sort({ _id: 1 })
     .limit(16)

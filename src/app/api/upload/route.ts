@@ -1,4 +1,3 @@
-import { connectToDatabase } from "@/lib/database/mongoose";
 import { success, failure } from "@/lib/utils/response";
 import { uploadPaper } from "@/lib/services/upload";
 
@@ -6,7 +5,6 @@ export const runtime = "nodejs";
 
 export async function POST(req: Request) {
   try {
-    await connectToDatabase();
     const formData = await req.formData();
     const files = formData.getAll("files").filter(Boolean) as File[];
     const isPdf = formData.get("isPdf") === "true";

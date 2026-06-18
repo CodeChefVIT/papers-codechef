@@ -1,6 +1,7 @@
 import { PaperAdmin } from "@/db/papers";
 import { createPDFfromImages, compressPDF } from "@/lib/storage/pdf";
 import { uploadPDF, uploadThumbnail } from "@/lib/storage/gcp";
+import { connectToDatabase } from "@/lib/database/mongoose";
 
 const MAX_COMPRESSED_PDF_SIZE = 5 * 1024 * 1024; // 5MB compressed
 const COMPRESS_THRESHOLD = 5 * 1024 * 1024; // 5MB
@@ -22,6 +23,8 @@ export async function uploadPaper({
   thumbnail,
   campus,
 }: UploadPaperInput): Promise<UploadPaperResult> {
+  await connectToDatabase();
+  
   let pdfBytes: Uint8Array;
 
   if (isPdf) {
