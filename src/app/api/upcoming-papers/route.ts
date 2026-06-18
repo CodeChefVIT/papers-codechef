@@ -1,17 +1,14 @@
 import { connectToDatabase } from "@/lib/database/mongoose";
-import UpcomingSubject from "@/db/upcoming-paper";
 import { success, failure } from "@/lib/utils/response";
+import { getUpcomingSubjects } from "@/lib/services/subject";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
     await connectToDatabase();
-    const selectedSubjects = await UpcomingSubject.find()
-      .sort({ _id: 1 })
-      .limit(16)
-      .lean();
-    
+    const selectedSubjects = await getUpcomingSubjects();
+
     if (selectedSubjects.length === 0) {
       return failure("No selected papers found.", 404);
     }
