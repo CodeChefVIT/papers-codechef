@@ -5,6 +5,8 @@ import { extractUniqueValues } from "@/lib/utils/paper-aggregation";
 import { connectToDatabase } from "../database/mongoose";
 import CourseCount from "@/db/course";
 import PaperRequest from "@/db/paperRequest";
+import { type StoredSubjects } from "@/interface";
+import { transformPapersToSubjectSlots } from "@/lib/services/paper-transform";
 
 type CreatePaperRequestInput = {
   subject: string;
@@ -63,4 +65,14 @@ export async function createPaperRequest({ subject, exam, slot, year} : CreatePa
 
 export async function getSelectedPapers() {
   return await Paper.find({ isSelected: true }).limit(8);
+}
+
+export async function getPapersBySubjects(subjects: StoredSubjects) {
+	await connectToDatabase();
+
+  const usersPapers = await Paper.find({
+    subject: { $in: subjects },
+  });
+
+	return transformPapersToSubjectSlots(usersPapers);
 }
