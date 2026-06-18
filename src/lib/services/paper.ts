@@ -4,6 +4,14 @@ import { escapeRegExp } from "@/lib/utils/regex";
 import { extractUniqueValues } from "@/lib/utils/paper-aggregation";
 import { connectToDatabase } from "../database/mongoose";
 import CourseCount from "@/db/course";
+import PaperRequest from "@/db/paperRequest";
+
+type CreatePaperRequestInput = {
+  subject: string;
+  exam: string;
+  slot: string;
+  year: string;
+}
 
 export async function getPapersBySubject(subject: string) {
 	if (!subject){
@@ -47,4 +55,8 @@ export async function getCourseCounts(){
 	}));
 
 	return formatted;
+}
+
+export async function createPaperRequest({ subject, exam, slot, year} : CreatePaperRequestInput){
+  return await PaperRequest.create({ subject, exam, slot, year });
 }
