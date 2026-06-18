@@ -8,7 +8,7 @@ import PaperRequest from "@/db/paperRequest";
 import { type StoredSubjects } from "@/interface";
 import { transformPapersToSubjectSlots } from "@/lib/services/paper-transform";
 
-type CreatePaperRequestInput = {
+export interface CreatePaperInputType {
   subject: string;
   exam: string;
   slot: string;
@@ -59,7 +59,7 @@ export async function getCourseCounts(){
 	return formatted;
 }
 
-export async function createPaperRequest({ subject, exam, slot, year} : CreatePaperRequestInput){
+export async function createPaperRequest({ subject, exam, slot, year} : CreatePaperInputType){
   await connectToDatabase();
   return await PaperRequest.create({ subject, exam, slot, year });
 }

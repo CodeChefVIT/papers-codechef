@@ -1,9 +1,10 @@
 import { success, failure } from "@/lib/utils/response";
 import { createPaperRequest } from "@/lib/services/paper"
+import type { CreatePaperInputType } from "@/lib/services/paper"
 
 export async function POST(req: Request) {
   try {
-    const {subject, exam, slot, year} = await req.json()
+    const {subject, exam, slot, year} = (await req.json()) as CreatePaperInputType
 
     if (!subject || !exam || !slot || !year) {
       return failure("All fields are required.", 400);
