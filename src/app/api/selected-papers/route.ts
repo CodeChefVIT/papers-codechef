@@ -1,14 +1,11 @@
-import { connectToDatabase } from "@/lib/database/mongoose";
-import Paper from "@/db/papers";
 import { success, failure } from "@/lib/utils/response";
+import { getSelectedPapers } from "@/lib/services/paper";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await connectToDatabase();
-
-    const selectedPapers = await Paper.find({ isSelected: true }).limit(8);
+    const selectedPapers = await getSelectedPapers();
 
     if (selectedPapers.length === 0) {
       return failure("No selected papers found.", 404);

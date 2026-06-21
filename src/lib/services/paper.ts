@@ -4,6 +4,16 @@ import { escapeRegExp } from "@/lib/utils/regex";
 import { extractUniqueValues } from "@/lib/utils/paper-aggregation";
 import { connectToDatabase } from "../database/mongoose";
 import CourseCount from "@/db/course";
+import PaperRequest from "@/db/paperRequest";
+import { type StoredSubjects } from "@/interface";
+import { transformPapersToSubjectSlots } from "@/lib/services/paper-transform";
+
+export interface CreatePaperInputType {
+  subject: string;
+  exam: string;
+  slot: string;
+  year: string;
+}
 
 export async function getPapersBySubject(subject: string) {
 	if (!subject){
@@ -47,4 +57,24 @@ export async function getCourseCounts(){
 	}));
 
 	return formatted;
+}
+
+export async function createPaperRequest({ subject, exam, slot, year} : CreatePaperInputType){
+  await connectToDatabase();
+  return await PaperRequest.create({ subject, exam, slot, year });
+}
+
+export async function getSelectedPapers() {
+	await connectToDatabase();
+  return await Paper.find({ isSelected: true }).limit(8);
+}
+
+export async function getPapersBySubjects(subjects: StoredSubjects) {
+	await connectToDatabase();
+
+  const usersPapers = await Paper.find({
+    subject: { $in: subjects },
+  });
+
+	return transformPapersToSubjectSlots(usersPapers);
 }

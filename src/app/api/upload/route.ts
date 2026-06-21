@@ -1,82 +1,31 @@
-import { connectToDatabase } from "@/lib/database/mongoose";
-import { PaperAdmin } from "@/db/papers";
-import { createPDFfromImages, compressPDF } from "@/lib/storage/pdf";
-import { uploadPDF, uploadThumbnail } from "@/lib/storage/gcp";
 import { success, failure } from "@/lib/utils/response";
+import { uploadPaper } from "@/lib/services/upload";
 
 export const runtime = "nodejs";
 
-const MAX_COMPRESSED_PDF_SIZE = 5 * 1024 * 1024; // 5MB compressed
-const COMPRESS_THRESHOLD = 5 * 1024 * 1024; // 5MB
-
 export async function POST(req: Request) {
   try {
-    await connectToDatabase();
     const formData = await req.formData();
     const files = formData.getAll("files").filter(Boolean) as File[];
     const isPdf = formData.get("isPdf") === "true";
-    const thumb = formData.get("thumbnail") as File | null;
+    const thumbnail = formData.get("thumbnail") as File | null;
+    const campus = formData.get("campus") as string | null;
 
     if (files.length === 0) {
       return failure("No files received.", 400);
     }
 
-    let pdfBytes: Uint8Array;
-    if (isPdf) {
-      if (!files[0]) {
-        return failure("No PDF file provided.", 400);
-      }
+    const result = await uploadPaper({ files, isPdf, thumbnail, campus });
 
-      const rawPdfBytes = new Uint8Array(await files[0].arrayBuffer());
-      if (rawPdfBytes.length > COMPRESS_THRESHOLD) {
-        const compressedPdfBytes = await compressPDF(rawPdfBytes);
-        pdfBytes = compressedPdfBytes.length <= rawPdfBytes.length
-          ? compressedPdfBytes
-          : rawPdfBytes;
-
-        if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
-          return failure(
-            "PDF is too large after compression. The compressed file must be under 5MB.",
-            413,
-          );
-        }
-      } else {
-        pdfBytes = rawPdfBytes;
-      }
-    } else {
-      pdfBytes = await createPDFfromImages(files);
-      if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
-        return failure(
-          "Generated PDF is too large after compression. Please upload fewer or smaller images.",
-          413,
-        );
-      }
+    if (!result.success) {
+      return failure(result.message, result.status);
     }
 
-    const buffer = Buffer.from(pdfBytes);
-
-    const file_url = await uploadPDF("unapproved", buffer);
-
-    let thumbnail_url: string | null = null;
-    if (thumb) {
-      const thumbBuffer = Buffer.from(await thumb.arrayBuffer());
-      thumbnail_url = await uploadThumbnail(thumbBuffer, file_url);
-    }
-
-    const paper = new PaperAdmin({
-      file_url,
-      thumbnail_url,
-      campus: formData.get("campus"),
-      subject: null,
-      slot: null,
-      year: null,
-      exam: null,
-      semester: null,
-      ambiguous_tags: [],
-    });
-    await paper.save();
-
-    return success({ file_url, thumbnail_url }, "Created", 201);
+    return success(
+      { file_url: result.file_url, thumbnail_url: result.thumbnail_url },
+      "Created",
+      201,
+    );
   } catch (error) {
     console.error(error);
     return failure("Failed to upload papers", 500);
