@@ -1,5 +1,5 @@
-import { google, sheets_v4 } from "googleapis";
-import { JWT } from "google-auth-library";
+import { google, type sheets_v4 } from "googleapis";
+import { type JWT } from "google-auth-library";
 
 const SCOPES = ["https://www.googleapis.com/auth/spreadsheets"];
 const SHEET_ID = process.env.SHEET_ID;

@@ -8,15 +8,13 @@ import {
   type ICourseWithCount,
 } from "@/interface";
 
+import { type ApiResponse } from '@/interface'
+
 interface CoursesContextType {
   courses: ICourseWithCount[];
   loading: boolean;
   error: string | null;
   refetch: () => Promise<void>;
-}
-
-interface ApiError {
-  message?: string;
 }
 
 const CoursesContext = createContext<CoursesContextType | undefined>(undefined);
@@ -30,19 +28,17 @@ export function CoursesProvider({ children }: { children: React.ReactNode }) {
     setLoading(true);
     setError(null);
     try {
-      const res = await axios.get<ICourse[]>("/api/course-list", {
+      const res = await axios.get<ApiResponse<ICourse[]>>("/api/course-list", {
         headers: { "Cache-Control": "no-cache" },
       });
-
-      const countRes = await axios.get<ICourseCount[]>("/api/papers/count", {
+      const countRes = await axios.get<ApiResponse<ICourseCount[]>>("/api/papers/count", {
         headers: { "Cache-Control": "no-cache" },
       });
-
       const countMap = new Map<string, number>(
-        countRes.data.map((c) => [c.name, c.count]),
+        (countRes.data.data ?? []).map((c) => [c.name, c.count]),
       );
 
-      const mergedCourses: ICourseWithCount[] = res.data.map((course) => ({
+      const mergedCourses: ICourseWithCount[] = (res.data.data ?? []).map((course) => ({
         _id: course._id,
         name: course.name,
         count: countMap.get(course.name) ?? 0,
@@ -50,7 +46,7 @@ export function CoursesProvider({ children }: { children: React.ReactNode }) {
 
       setCourses(mergedCourses);
     } catch (err: unknown) {
-      if (axios.isAxiosError<ApiError>(err)) {
+      if (axios.isAxiosError<ApiResponse<never>>(err)) {
         setError(err.response?.data?.message ?? err.message);
       } else if (err instanceof Error) {
         setError(err.message);

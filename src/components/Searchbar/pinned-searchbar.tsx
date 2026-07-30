@@ -2,7 +2,6 @@
 
 import { useState, useRef, useEffect } from "react";
 import { Search } from "lucide-react";
-import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import PinButton from "../PinButton";
 import Fuse from "fuse.js";
@@ -11,7 +10,6 @@ import { type StoredSubjects, type ICourseWithCount, type IUpcomingPaper } from 
 function PinnedSearchBar({
   initialSubjects,
   setDisplayPapers,
-  displayPapers,
   filtersNotPulled,
 }: {
   initialSubjects: ICourseWithCount[];
@@ -19,7 +17,6 @@ function PinnedSearchBar({
   displayPapers : IUpcomingPaper[];
   filtersNotPulled?: () => void;
 }) {
-  const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
@@ -153,11 +150,6 @@ function PinnedSearchBar({
       window.removeEventListener("userSubjectsChanged", handlePinsChange);
     };
   }, []);
-
-  const handleRemoveAll = () => {
-    localStorage.setItem("userSubjects", JSON.stringify([]));
-    window.dispatchEvent(new Event("userSubjectsChanged"));
-  };
 
   useEffect(() => {
     const storedSubjects = JSON.parse(

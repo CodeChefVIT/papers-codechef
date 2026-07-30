@@ -1,6 +1,5 @@
 import React from "react";
 import SearchBar from "@/components/Searchbar/searchbar";
-import PinnedPapersCarousel from "@/components/PinnedPapersCarousel";
 
 const Pinned = () => {
   return (

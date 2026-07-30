@@ -1,8 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -13,23 +12,12 @@ import {
   FaXTwitter,
   FaYoutube,
 } from "react-icons/fa6";
-import { Bold, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
-
-type SubscribeResponse = {
-  success?: boolean;
-  message?: string;
-};
+import type { ApiResponse } from '@/interface'
 
 export default function Footer() {
-  const { theme } = useTheme();
-  const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
   const [email, setEmail] = useState("");
-  useEffect(() => {
-    if (theme) {
-      setIsDarkMode(theme === "dark");
-    }
-  }, [theme]);
   const handleSubscribe = async () => {
     if (!email.trim()) {
       toast.error("Please enter your email.");
@@ -43,7 +31,7 @@ export default function Footer() {
         body: JSON.stringify({ email }),
       })     
       .then(async (res) => {
-        const data = (await res.json()) as SubscribeResponse;
+        const data = (await res.json()) as ApiResponse<never>;
         if (!res.ok) throw new Error(data.message ?? "Something went wrong.");
         return data;
       }),

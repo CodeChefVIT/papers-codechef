@@ -15,7 +15,7 @@ export default function SearchBar({
   displayPapers?:IUpcomingPaper[]
   setDisplayPapers?: React.Dispatch<React.SetStateAction<IUpcomingPaper[]>> 
 }) {
-  const { courses, loading, error, refetch } = useCourses();
+  const { courses } = useCourses();
 
   return type === "pinned" && setDisplayPapers !== undefined && displayPapers !== undefined ? (
     <PinnedSearchBar initialSubjects={courses} setDisplayPapers={setDisplayPapers} displayPapers={displayPapers} />

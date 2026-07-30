@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useContext, ReactNode } from "react";
+import { createContext, useContext, type ReactNode } from "react";
 
 interface PaperContextType {
   paperId: string;

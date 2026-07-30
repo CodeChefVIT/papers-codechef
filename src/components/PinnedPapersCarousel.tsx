@@ -16,6 +16,12 @@ import { chunkArray } from "@/lib/utils/array";
 import { type StoredSubjects } from "@/interface";
 import SkeletonPaperCard from "./SkeletonPaperCard";
 import PinnedModal from "./ui/PinnedModal";
+import { type ApiResponse } from "@/interface"
+
+interface userPaperResponse {
+  subject: string;
+  slots: string[]
+}
 
 function PinnedPapersCarousel() {
   const [isLoading, setIsLoading] = useState(true);
@@ -61,12 +67,12 @@ function PinnedPapersCarousel() {
         localStorage.getItem("userSubjects") ?? "[]",
       ) as StoredSubjects;
 
-      const response = await axios.post<{ subject: string; slots: string[] }[]>(
+      const response = await axios.post<ApiResponse<userPaperResponse[]>>(
         "/api/user-papers",
         storedSubjects,
       );
 
-      const fetchedPapers = response.data;
+      const fetchedPapers = response.data.data!;
 
       const fetchedSubjectsSet = new Set(
         fetchedPapers.map((paper) => paper.subject),
@@ -114,11 +120,9 @@ function PinnedPapersCarousel() {
             localStorage.getItem("userSubjects") ?? "[]",
           ) as StoredSubjects;
 
-          const response = await axios.post<
-            { subject: string; slots: string[] }[]
-          >("/api/user-papers", storedSubjects);
+          const response = await axios.post<ApiResponse<userPaperResponse[]>>("/api/user-papers", storedSubjects);
 
-          const fetchedPapers = response.data;
+          const fetchedPapers = response.data.data!;
 
           const fetchedSubjectsSet = new Set(
             fetchedPapers.map((paper) => paper.subject),

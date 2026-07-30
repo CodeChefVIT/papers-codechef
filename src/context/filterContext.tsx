@@ -8,7 +8,7 @@ import React, {
   type ReactNode,
 } from "react";
 import {
-  ReadonlyURLSearchParams,
+  type ReadonlyURLSearchParams,
   useRouter,
   useSearchParams,
 } from "next/navigation";
@@ -179,7 +179,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     a.remove();
     URL.revokeObjectURL(url);
     toast.success("Download Initiated");
-  }, [searchParams, selectedPapers, subject]);
+  }, [searchParams, selectedPapers]);
 
   const handleApplyFilters = useCallback(
     (

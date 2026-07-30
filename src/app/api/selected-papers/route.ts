@@ -1,33 +1,18 @@
-import { NextResponse } from "next/server";
-import { connectToDatabase } from "@/lib/database/mongoose";
-import Paper from "@/db/papers";
+import { success, failure } from "@/lib/utils/response";
+import { getSelectedPapers } from "@/lib/services/paper";
 
 export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    await connectToDatabase();
-
-    const selectedPapers = await Paper.find({ isSelected: true }).limit(8);
+    const selectedPapers = await getSelectedPapers();
 
     if (selectedPapers.length === 0) {
-      return NextResponse.json(
-        {
-          message: "No selected papers found.",
-        },
-        { status: 404 },
-      );
+      return failure("No selected papers found.", 404);
     }
-    return NextResponse.json(selectedPapers, {
-      status: 200,
-    });
+    return success(selectedPapers);
   } catch (error) {
     console.error("Error fetching papers:", error);
-    return NextResponse.json(
-      {
-        error: "Failed to fetch papers.",
-      },
-      { status: 500 },
-    );
+    return failure("Failed to fetch papers.", 500);
   }
 }
