@@ -58,7 +58,7 @@ export async function checkAndSyncUpcomingSlots(): Promise<void> {
   for (const groupKey of selectedGroupKeys) {
     const subSlots = [`${groupKey}1`, `${groupKey}2`];
     for (const subSlot of subSlots) {
-      const subjects = slotToSubjectsMap[subSlot] || [];
+      const subjects = slotToSubjectsMap[subSlot] ?? [];
       for (const subject of subjects) {
         candidateSubjects.add(subject);
       }
