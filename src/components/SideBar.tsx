@@ -100,7 +100,9 @@ function SideBar() {
   ];
 
   return (
-    <div className="no-scrollbar sticky top-0 h-[100vh] flex-col items-baseline overflow-y-auto border-r-2 border-[#36266d] bg-[#f3f5ff] pt-[10px] dark:bg-[#070114] md:flex">
+    <div
+  className="no-scrollbar sticky top-[92px] md:top-[100px] h-[calc(100vh-92px)] md:h-[calc(100vh-100px)] flex-col items-baseline overflow-y-auto border-r-2 border-[#36266d] bg-[#f3f5ff] pt-[10px] dark:bg-[#070114] md:flex"
+>
       <div className="flex w-full items-center justify-between border-b-2 border-[#36266d] px-[10px] py-4">
         <div className="flex items-center gap-1">
           <Filter size={24} />
