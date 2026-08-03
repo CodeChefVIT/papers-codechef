@@ -3,7 +3,7 @@ import { createPluginRegistration } from '@embedpdf/core';
 import { EmbedPDF }                 from '@embedpdf/core/react';
 import { usePdfiumEngine }          from '@embedpdf/engines/react';
 import { Viewport, ViewportPluginPackage }               from '@embedpdf/plugin-viewport/react';
-import { useScroll, Scroller, ScrollPluginPackage }      from '@embedpdf/plugin-scroll/react';
+import { useScroll, useScrollCapability, Scroller, ScrollPluginPackage } from '@embedpdf/plugin-scroll/react';
 import { DocumentContent, DocumentManagerPluginPackage } from '@embedpdf/plugin-document-manager/react';
 import { useZoom, ZoomPluginPackage, ZoomMode }          from '@embedpdf/plugin-zoom/react';
 import { RenderLayer, RenderPluginPackage }              from '@embedpdf/plugin-render/react';
@@ -62,25 +62,50 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
 
   const { provides: zoomProv, state: zoomState } = useZoom(documentId);
   const { provides: scrollProv, state: scrollState } = useScroll(documentId);
+  const { provides: scrollCapability } = useScrollCapability();
   const [pageNo, setPageNo] = useState("1");
+  const [totalPages, setTotalPages] = useState(0);
+  const editingRef = useRef(false);
+
+  useEffect(() => {
+    if (!scrollCapability) return;
+    const unsub = scrollCapability.onLayoutReady((event) => {
+      if (event.documentId === documentId) {
+        setTotalPages(event.totalPages);
+      }
+    });
+    return () => {
+      unsub();
+      setTotalPages(0);
+    };
+  }, [scrollCapability, documentId]);
 
   useEffect(() => {
     if (!scrollProv) return;
-    const unsub = scrollProv.onPageChange(() =>
-      setPageNo(String(scrollProv.getCurrentPage()))
-    );
+    const unsub = scrollProv.onPageChange((event) => {
+      setTotalPages(event.totalPages);
+      if (!editingRef.current) {
+        setPageNo(String(event.pageNumber));
+      }
+    });
     return () => unsub();
   }, [scrollProv]);
-
-  const pageChange = useCallback(
+  
+  const effectiveTotalPages =
+    totalPages > 0 ? totalPages : (scrollState?.totalPages ?? 0);
+  
+const pageChange = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key !== "Enter") return;
       const page = parseInt(pageNo, 10);
-      if (!isNaN(page) && page >= 1 && page <= (scrollState?.totalPages ?? 1)) {
+      if (isNaN(page)) return;
+      if (page >= 1 && page <= effectiveTotalPages) {
         scrollProv?.scrollToPage({ pageNumber: page, behavior: "smooth" });
+      } else {
+        setPageNo(String(scrollProv?.getCurrentPage() ?? 1));
       }
     },
-    [pageNo, scrollState?.totalPages, scrollProv]
+    [pageNo, effectiveTotalPages, scrollProv]
   );
 
   if (!zoomProv || !scrollProv) return null;
@@ -88,8 +113,6 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
   const zoomIn = () => zoomProv.zoomIn();
   const zoomOut = () => zoomProv.zoomOut();
   const { zoomLevel } = zoomState;
-  const { totalPages } = scrollState;
-  
   const fullScreenStyle = {
     bottom: 20,
     left: "50%",
