@@ -92,6 +92,16 @@ export default function Page() {
         return;
       }
 
+      const MAX_FILE_SIZE = 5 * 1024 * 1024;
+      const oversizedFiles = acceptedFiles.filter((file) => file.size > MAX_FILE_SIZE);
+      if (oversizedFiles.length > 0) {
+        toast.error(
+          `File "${oversizedFiles[0]?.name}" exceeds the 5 MB limit. Please select a file under 5 MB.`,
+          { id: toastId },
+        );
+        return;
+      }
+
       const isNewPdf = acceptedFiles.some(
         (file) => file.type === "application/pdf",
       );

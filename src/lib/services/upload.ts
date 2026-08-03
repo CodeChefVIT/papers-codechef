@@ -32,21 +32,22 @@ export async function uploadPaper({
       return { success: false, message: "No PDF file provided.", status: 400 };
     }
 
-    const rawPdfBytes = new Uint8Array(await files[0].arrayBuffer());
-    if (rawPdfBytes.length > COMPRESS_THRESHOLD) {
-      const compressedPdfBytes = await compressPDF(rawPdfBytes);
-      pdfBytes =
-        compressedPdfBytes.length <= rawPdfBytes.length ? compressedPdfBytes : rawPdfBytes;
+    if (files[0].size > COMPRESS_THRESHOLD) {
+      return {
+        success: false,
+        message: "PDF file exceeds the 5MB limit. Please select a PDF file under 5MB.",
+        status: 400,
+      };
+    }
 
-      if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
-        return {
-          success: false,
-          message: "PDF is too large after compression. The compressed file must be under 5MB.",
-          status: 413,
-        };
-      }
-    } else {
-      pdfBytes = rawPdfBytes;
+    const rawPdfBytes = new Uint8Array(await files[0].arrayBuffer());
+    pdfBytes = await compressPDF(rawPdfBytes);
+    if (pdfBytes.length > MAX_COMPRESSED_PDF_SIZE) {
+      return {
+        success: false,
+        message: "PDF is too large after compression. The compressed file must be under 5MB.",
+        status: 413,
+      };
     }
   } else {
     pdfBytes = await createPDFfromImages(files);
