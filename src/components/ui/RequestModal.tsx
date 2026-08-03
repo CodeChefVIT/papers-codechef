@@ -115,9 +115,9 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
     if (isOpen) resetModal();
     }}>
         {section === "navbar" ?
-        <DialogTrigger className='flex items-center gap-2'>
+        <DialogTrigger className="flex w-full items-center gap-2.5 bg-transparent hover:bg-transparent focus:bg-transparent text-left cursor-pointer border-0 shadow-none outline-none">
             <ArrowUpRight className="h-4 w-4"/>
-            <span className="font-medium">Request Paper</span>
+            <span className="text-xs font-medium">Request Paper</span>
         </DialogTrigger> :
         <DialogTrigger className='underline text-[#562EE7] dark:text-[#A47DE5] '>
             <span className="font-medium">request a paper.</span>

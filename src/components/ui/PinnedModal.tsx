@@ -188,9 +188,9 @@ const PinnedModal = ({
       }}
     >
       {page === "Navbar" ? (
-        <DialogTrigger className="flex h-full w-full flex-row items-center gap-2 rounded-xl px-2 py-2 hover:bg-[#1A2333] transition-all duration-200">
-          <Pin size={16} />
-          {triggerName}
+        <DialogTrigger className="flex w-full items-center gap-2.5 bg-transparent hover:bg-transparent focus:bg-transparent text-left cursor-pointer border-0 shadow-none outline-none">
+          <Pin className="h-4 w-4" />
+          <span className="text-xs font-medium">{triggerName}</span>
         </DialogTrigger>
       ) : (
         <DialogTrigger className="flex h-full w-full flex-row items-center justify-center gap-2">
