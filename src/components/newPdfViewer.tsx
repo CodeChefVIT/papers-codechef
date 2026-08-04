@@ -174,7 +174,7 @@ const pageChange = useCallback(
       </Button>
 
       <span className="text-xs text-[16.5px] py-2 text-white font-small bg-[#262635] rounded px-1">
-        {typeof zoomLevel === "number" && `${Math.round(zoomLevel * 100)}%`}
+        {typeof zoomLevel === "number" ? `${Math.round(zoomLevel * 100)}%` : "100%"}
       </span>
 
       <Button
