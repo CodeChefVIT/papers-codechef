@@ -105,7 +105,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
           onFocus={() => setPageNo("")}
           className="h-9 w-14 rounded border bg-[#e7e9ff] p-1 text-center text-sm [appearance:textfield] dark:bg-[#1f1f2a] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
-        <span className="text-xs font-medium text-white">{totalPages > 0 ? `of ${totalPages}` : "loading…"}</span>
+        <span className="text-xs font-medium text-white">of {totalPages ?? 1}</span>
     </div>
   )
   
