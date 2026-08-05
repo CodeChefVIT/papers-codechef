@@ -2,9 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
-import axios, { type AxiosError } from "axios";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { type IPaper, type Filters, type StoredSubjects } from "@/interface";
+import { type IPaper, type Filters, type StoredSubjects, type ApiResponse } from "@/interface";
 import Card from "./Card";
 import Loader from "./ui/loader";
 import SideBar from "../components/SideBar";
@@ -64,20 +64,17 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [subject]);
+  }, [subject, setCurrentPage]);
 
   // Fetch related subjects when subject changes
   useEffect(() => {
     if (!subject) return;
     const fetchRelatedSubjects = async () => {
       try {
-        const res = await axios.get<{ related_subjects: string[] }>(
-          "/api/related-subject",
-          {
-            params: { subject },
-          },
-        );
-        const data = res.data.related_subjects;
+        const res = await axios.get<ApiResponse<{ related_subjects: string[] }>>("/api/related-subject", {
+          params: { subject },
+        });
+        const data = res.data.data?.related_subjects;
         if (data && data.length > 0) {
           setRelatedSubjects(data);
         } else {
@@ -153,20 +150,23 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
     const fetchPapers = async () => {
       setLoading(true);
       try {
-        const papersResponse = await axios.get<Filters>("/api/papers", {
-          params: { subject },
-        });
-        const data: Filters = papersResponse.data;
-        const papersData = data.papers;
+        const papersResponse = await axios.get<ApiResponse<Filters>>(
+          "/api/papers",
+          {
+            params: { subject },
+          },
+        );
+        
+        const data = papersResponse.data.data!;
+        const papersData = data?.papers ?? [];
         setFilterOptions(data);
         setPapers(papersData);
       } catch (error) {
         setPapers([]);
-        const axiosError = error as AxiosError;
+
         setError(
-          axios.isAxiosError(axiosError)
-            ? ((axiosError.response?.data as { message?: string })?.message ??
-                "Error fetching papers")
+          axios.isAxiosError<ApiResponse<never>>(error)
+            ? (error.response?.data.message ?? "Error fetching papers")
             : "Error fetching papers",
         );
       } finally {

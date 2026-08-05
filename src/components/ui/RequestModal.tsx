@@ -27,12 +27,6 @@ import { exams, slots, years } from "@/components/select_options";
 import Fuse from 'fuse.js';
 import { useCourses } from "@/context/courseContext";
 
-type Course = {
-  name?: string | null;
-  courseName?: string | null;
-  title?: string | null;
-};
-
 const RequestModal = ({section = "navbar"} : {section? : string}) => {
     const [open, setOpen] = useState(false);
     const [subjects, setSubjects] = useState<string[]>([]);
@@ -43,7 +37,7 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
     const [selectedExam, setSelectedExam] = useState<string | null>(null);
     const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
     const [selectedYear, setSelectedYear] = useState<string | null>(null);
-    const { courses, loading, error, refetch } = useCourses();
+    const { courses } = useCourses();
 
     useEffect(() => {
         setSubjects(courses.map((course) => course.name));
@@ -78,15 +72,15 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
         try {
         await toast.promise(
             axios.post("/api/request", {
-            subject: selectedSubject,
-            exam: selectedExam,
-            slot: selectedSlot,
-            year: selectedYear,
+                subject: selectedSubject,
+                exam: selectedExam,
+                slot: selectedSlot,
+                year: selectedYear,
             }),
             {
-            loading: "Submitting your request...",
-            success: "Your paper request was submitted successfully",
-            error: "Failed to submit your request. Please try again later.",
+                loading: "Submitting your request...",
+                success: "Your paper request was submitted successfully",
+                error: "Failed to submit your request. Please try again later.",
             },
         );
 
@@ -121,9 +115,9 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
     if (isOpen) resetModal();
     }}>
         {section === "navbar" ?
-        <DialogTrigger className='flex items-center gap-2'>
+        <DialogTrigger className="flex w-full items-center gap-2.5 bg-transparent hover:bg-transparent focus:bg-transparent text-left cursor-pointer border-0 shadow-none outline-none">
             <ArrowUpRight className="h-4 w-4"/>
-            <span className="font-medium">Request Paper</span>
+            <span className="text-xs font-medium">Request Paper</span>
         </DialogTrigger> :
         <DialogTrigger className='underline text-[#562EE7] dark:text-[#A47DE5] '>
             <span className="font-medium">request a paper.</span>
@@ -143,7 +137,7 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
                     value={searchText}
                     onChange={(e) => setSearchText(e.target.value)}
                     placeholder="Search by subject..."
-                    className={`text-md rounded-lg bg-[#B2B8FF] px-4 py-6 pr-10 font-play tracking-wider text-black shadow-sm ring-0 placeholder:text-black focus:outline-none focus:ring-0 dark:bg-[#7480FF66] dark:text-white placeholder:dark:text-white ${suggestions.length > 0 ? "rounded-b-none" : ""}`}
+                    className={`text-md rounded-2xl bg-[#B2B8FF] px-4 py-6 pr-10 font-play tracking-wider text-black shadow-sm ring-0 placeholder:text-black focus:outline-none focus:ring-0 dark:bg-[#7480FF66] dark:text-white placeholder:dark:text-white ${suggestions.length > 0 ? "rounded-b-none" : ""}`}
                     />
                     <button
                     type="button"
@@ -154,7 +148,7 @@ const RequestModal = ({section = "navbar"} : {section? : string}) => {
                     {suggestions.length > 0 && (
                     <ul
                         ref={suggestionsRef}
-                        className="absolute z-20 max-h-[250px] w-full max-w-xl overflow-y-auto rounded-md rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771]"
+                        className="absolute z-20 max-h-[250px] w-full max-w-xl overflow-y-auto rounded-2xl rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771]"
                     >
                         {suggestions.map((s, idx) => (
                         <li

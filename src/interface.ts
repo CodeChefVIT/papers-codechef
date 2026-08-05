@@ -1,7 +1,9 @@
-import { mongo } from "mongoose";
+import { type mongo } from "mongoose";
 
 export interface IUpcomingSlot {
   slot: string;
+  lastSyncedDate?: string;
+  syncMode?: "CAT" | "FAT";
 }
 
 export interface IUpcomingSubject {
@@ -50,6 +52,12 @@ export interface ICourses {
 export interface APIResponse {
   message: string;
   status: number;
+}
+
+export interface ApiResponse<T> {
+  status: "success" | "error";
+  data: T | null;
+  message: string;
 }
 
 export interface ConverttoPDFResponse {

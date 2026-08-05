@@ -5,7 +5,7 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import Fuse from "fuse.js";
-import { ICourseWithCount } from "@/interface";
+import { type ICourseWithCount } from "@/interface";
 
 function SearchBarChild({
   initialSubjects,
@@ -171,14 +171,14 @@ function SearchBarChild({
                 >
                   <div
                     id="paper_count"
-                    className="mr-4 flex h-8 w-8 items-center justify-center rounded-md bg-[#171720] text-xs font-semibold text-white"
+                    className="mr-4 flex h-8 w-8 shrink-0 items-center justify-center rounded-md bg-[#171720] text-xs font-semibold text-white"
                   >
                     {suggestion.count}
                   </div>
 
                   <span
                     id="subject"
-                    className="items-center text-sm tracking-wide text-black dark:text-white sm:text-base"
+                    className="flex-1 min-w-0 flex items-center text-sm tracking-wide text-black dark:text-white sm:text-base"
                   >
                     {(() => {
                       const codeMatch = /\[[^\]]+\]$/.exec(suggestion.name);

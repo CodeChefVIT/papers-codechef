@@ -3,7 +3,7 @@ import { createPluginRegistration } from '@embedpdf/core';
 import { EmbedPDF }                 from '@embedpdf/core/react';
 import { usePdfiumEngine }          from '@embedpdf/engines/react';
 import { Viewport, ViewportPluginPackage }               from '@embedpdf/plugin-viewport/react';
-import { useScroll, Scroller, ScrollPluginPackage }      from '@embedpdf/plugin-scroll/react';
+import { useScroll, useScrollCapability, Scroller, ScrollPluginPackage } from '@embedpdf/plugin-scroll/react';
 import { DocumentContent, DocumentManagerPluginPackage } from '@embedpdf/plugin-document-manager/react';
 import { useZoom, ZoomPluginPackage, ZoomMode }          from '@embedpdf/plugin-zoom/react';
 import { RenderLayer, RenderPluginPackage }              from '@embedpdf/plugin-render/react';
@@ -25,6 +25,7 @@ interface ControlProps {
   forceMobile?: boolean;
   isMobile: boolean;
   isSmall: boolean;
+  viewerRef: React.RefObject<HTMLDivElement>;
 }
 
 interface PdfViewerProps {
@@ -57,29 +58,54 @@ function useBreakpoint() {
 }
 
 const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, onDownload,
-  forceMobile, isMobile, isSmall}: ControlProps) {
+  forceMobile, isMobile, isSmall, viewerRef}: ControlProps) {
 
   const { provides: zoomProv, state: zoomState } = useZoom(documentId);
   const { provides: scrollProv, state: scrollState } = useScroll(documentId);
+  const { provides: scrollCapability } = useScrollCapability();
   const [pageNo, setPageNo] = useState("1");
+  const [totalPages, setTotalPages] = useState(0);
+  const editingRef = useRef(false);
+
+  useEffect(() => {
+    if (!scrollCapability) return;
+    const unsub = scrollCapability.onLayoutReady((event) => {
+      if (event.documentId === documentId) {
+        setTotalPages(event.totalPages);
+      }
+    });
+    return () => {
+      unsub();
+      setTotalPages(0);
+    };
+  }, [scrollCapability, documentId]);
 
   useEffect(() => {
     if (!scrollProv) return;
-    const unsub = scrollProv.onPageChange(() =>
-      setPageNo(String(scrollProv.getCurrentPage()))
-    );
+    const unsub = scrollProv.onPageChange((event) => {
+      setTotalPages(event.totalPages);
+      if (!editingRef.current) {
+        setPageNo(String(event.pageNumber));
+      }
+    });
     return () => unsub();
   }, [scrollProv]);
-
-  const pageChange = useCallback(
+  
+  const effectiveTotalPages =
+    totalPages > 0 ? totalPages : (scrollState?.totalPages ?? 0);
+  
+const pageChange = useCallback(
     (e: React.KeyboardEvent<HTMLInputElement>) => {
       if (e.key !== "Enter") return;
       const page = parseInt(pageNo, 10);
-      if (!isNaN(page) && page >= 1 && page <= (scrollState?.totalPages ?? 1)) {
+      if (isNaN(page)) return;
+      if (page >= 1 && page <= effectiveTotalPages) {
         scrollProv?.scrollToPage({ pageNumber: page, behavior: "smooth" });
+      } else {
+        setPageNo(String(scrollProv?.getCurrentPage() ?? 1));
       }
     },
-    [pageNo, scrollState?.totalPages, scrollProv]
+    [pageNo, effectiveTotalPages, scrollProv]
   );
 
   if (!zoomProv || !scrollProv) return null;
@@ -87,8 +113,6 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
   const zoomIn = () => zoomProv.zoomIn();
   const zoomOut = () => zoomProv.zoomOut();
   const { zoomLevel } = zoomState;
-  const { totalPages } = scrollState;
-  
   const fullScreenStyle = {
     bottom: 20,
     left: "50%",
@@ -100,9 +124,20 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
         <input
           type="text"
           value={pageNo}
-          onChange={(e) => setPageNo(e.target.value)}
+          onChange={(e) => {
+            editingRef.current = true;
+            setPageNo(e.target.value.replace(/[^0-9]/g, ""));
+          }}
           onKeyDown={pageChange}
-          onFocus={() => setPageNo("")}
+          onFocus={(e) => {
+            editingRef.current = true;
+            e.target.select();
+          }}
+          onBlur={() => {
+            editingRef.current = false;
+            setPageNo(String(scrollProv?.getCurrentPage() ?? 1));
+          }}
+          inputMode="numeric"
           className="h-9 w-14 rounded border bg-[#e7e9ff] p-1 text-center text-sm [appearance:textfield] dark:bg-[#1f1f2a] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
         />
         <span className="text-xs font-medium text-white">of {totalPages ?? 1}</span>
@@ -127,7 +162,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
         <Download size={24} />
       </Button>
 
-      <ShareButton />
+      <ShareButton isFullscreen={isFullscreen} viewerRef={viewerRef} />
 
       <Button
         onClick={zoomOut}
@@ -139,7 +174,7 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
       </Button>
 
       <span className="text-xs text-[16.5px] py-2 text-white font-small bg-[#262635] rounded px-1">
-        {typeof zoomLevel === "number" && `${Math.round(zoomLevel * 100)}%`}
+        {typeof zoomLevel === "number" ? `${Math.round(zoomLevel * 100)}%` : "100%"}
       </span>
 
       <Button
@@ -310,7 +345,7 @@ function WheelZoom({ documentId, viewerRef }: WheelZoomProps) {
       viewer.removeEventListener("wheel", handleWheel);
       if (rafId.current !== null) cancelAnimationFrame(rafId.current);
     };
-  }, [handleWheel]);
+  }, [handleWheel, viewerRef]);
 
   return null;
 }
@@ -492,47 +527,48 @@ if (isLoading || !engine) {
                 forceMobile={true}
                 isMobile={isMobile}
                 isSmall={isSmall}
+                viewerRef={viewerRef}
               />}
               <DocumentContent documentId={activeDocumentId}>
-            {({ isLoaded }) => (
-              <>
-                <div
-            className="absolute inset-0 z-50 flex items-center justify-center bg-[#070114]"
-            style={{
-            opacity: isLoaded ? 0 : 1,
-            pointerEvents: isLoaded ? "none" : "auto",
-            transition: "opacity 0.3s",
-            backgroundColor: effectiveBackgroundColor,
-          }}
-          >
-            <Loader
-              backgroundColor={effectiveBackgroundColor}
-              textColor={loaderTextColor}
-            />
-          </div>
-      <Viewport
-        documentId={activeDocumentId}
-        style={{
-          backgroundColor: effectiveBackgroundColor,
-          visibility: isLoaded ? "visible" : "hidden",
-        }}
-      >
-        <Scroller
-          documentId={activeDocumentId}
-          renderPage={({ width, height, pageIndex }) => (
-            <div
-              style={{ width, height }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
-            </div>
-          )}
-        />
-      </Viewport>
-    </>
-  )}
-</DocumentContent>
-              
+                {({ isLoaded }) => (
+                  <>
+                    <div
+                      className="absolute inset-0 z-50 flex items-center justify-center bg-[#070114]"
+                      style={{
+                      opacity: isLoaded ? 0 : 1,
+                      pointerEvents: isLoaded ? "none" : "auto",
+                      transition: "opacity 0.3s",
+                      backgroundColor: effectiveBackgroundColor,
+                      }}
+                    >
+                      <Loader
+                        backgroundColor={effectiveBackgroundColor}
+                        textColor={loaderTextColor}
+                      />
+                    </div>
+                    <Viewport
+                      documentId={activeDocumentId}
+                      style={{
+                        backgroundColor: effectiveBackgroundColor,
+                        visibility: isLoaded ? "visible" : "hidden",
+                      }}
+                    >
+                      <Scroller
+                        documentId={activeDocumentId}
+                        renderPage={({ width, height, pageIndex }) => (
+                          <div
+                            style={{ width, height }}
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <RenderLayer documentId={activeDocumentId} pageIndex={pageIndex} />
+                          </div>
+                        )}
+                      />
+                    </Viewport>
+                  </>
+                )}
+              </DocumentContent>
+                  
               {!hideControls && (!isMobile || isFullscreen) && (
                 <Controls
                   documentId={activeDocumentId}
@@ -542,6 +578,7 @@ if (isLoading || !engine) {
                   forceMobile={false}
                   isMobile={isMobile}
                   isSmall={isSmall}
+                  viewerRef={viewerRef}
                 />
               )}
             </>

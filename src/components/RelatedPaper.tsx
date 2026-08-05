@@ -8,6 +8,7 @@ import { type IPaper, type Filters } from "@/interface";
 import Card from "@/components/Card";
 import Loader from "@/components/ui/loader";
 import { Button } from "./ui/button";
+import { type ApiResponse } from "@/interface"
 
 const RelatedPapers = () => {
   const params = useParams();
@@ -20,15 +21,21 @@ const RelatedPapers = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const getpaper = await axios.get<IPaper>(`/api/paper-by-id/${id}`);
-        const paper = getpaper.data;
+        const getpaper = await axios.get<ApiResponse<IPaper>>(`/api/paper-by-id/${id}`);
+        if (!getpaper.data.data) {
+          throw new Error("Paper not found");
+        }
+        const paper = getpaper.data.data;
         setCurrentPaper(paper);
 
-        const allPapersBySubject = await axios.get<Filters>("/api/papers", {
-          params: { subject: paper.subject },
-        });
+        const allPapersBySubject = await axios.get<ApiResponse<Filters>>(
+          "/api/papers",
+          {
+            params: { subject: paper.subject },
+          },
+        );
 
-        const all = allPapersBySubject.data.papers;
+        const all = allPapersBySubject.data.data?.papers ?? [];
 
         const sameExam = all
           .filter((p) => p._id !== paper._id && p.exam === paper.exam)

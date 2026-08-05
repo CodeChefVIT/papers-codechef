@@ -8,7 +8,7 @@ import React, {
   type ReactNode,
 } from "react";
 import {
-  ReadonlyURLSearchParams,
+  type ReadonlyURLSearchParams,
   useRouter,
   useSearchParams,
 } from "next/navigation";
@@ -147,17 +147,22 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       new Set(selectedPapers.map((paper) => paper._id)),
     ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
 
-    for (const paper of uniquePapers) {
-      try {
-        console.log(paper);
-        const response = await fetch(getSecureUrl(paper.file_url));
-        const blob = await response.blob();
-        const filename = generateFileName(paper);
-        zip.file(filename, blob);
-      } catch (err) {
-        console.error(`Failed to fetch ${paper.file_url}`, err);
-      }
-    }
+    await Promise.all(
+       uniquePapers.map(async (paper) => {
+        try {
+          const response = await fetch(getSecureUrl(paper.file_url));
+          if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+          }
+          const blob = await response.blob();
+          const filename = generateFileName(paper);
+          zip.file(filename, blob);
+          } catch (err) {
+            console.error(`Failed to fetch ${paper.file_url}`, err);
+          }
+        }),
+    );   
+
     function getDownloadName(
       params: ReadonlyURLSearchParams,
       key: string,
@@ -179,7 +184,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     a.remove();
     URL.revokeObjectURL(url);
     toast.success("Download Initiated");
-  }, [searchParams, selectedPapers, subject]);
+  }, [searchParams, selectedPapers]);
 
   const handleApplyFilters = useCallback(
     (

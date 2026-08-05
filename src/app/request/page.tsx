@@ -14,18 +14,12 @@ import { Input } from "@/components/ui/input";
 import axios from "axios";
 import Fuse from "fuse.js";
 import { type IUpcomingPaper } from "@/interface";
-import { Skeleton } from "../../components/ui/skeleton";
 import UpcomingPaper from "../../components/UpcomingPaper";
 import toast from "react-hot-toast";
 import { Search } from "lucide-react";
 import SkeletonPaperCard from "@/components/SkeletonPaperCard";
 import { useCourses } from "@/context/courseContext";
-
-type Course = {
-  name?: string | null;
-  courseName?: string | null;
-  title?: string | null;
-};
+import { type ApiResponse } from '@/interface'
 
 export default function PaperRequest() {
   const [subjects, setSubjects] = useState<string[]>([]);
@@ -38,7 +32,7 @@ export default function PaperRequest() {
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
   const [displayPapers, setDisplayPapers] = useState<IUpcomingPaper[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const { courses, loading, error, refetch } = useCourses();
+  const { courses } = useCourses();
 
   useEffect(() => {
     setSubjects(courses.map((course) => course.name));
@@ -48,11 +42,9 @@ export default function PaperRequest() {
     async function fetchPapers() {
       try {
         setIsLoading(true);
-        const response = await axios.get<IUpcomingPaper[]>(
-          "/api/upcoming-papers",
-        );
+        const response = await axios.get<ApiResponse<IUpcomingPaper[]>>("/api/upcoming-papers");
 
-        setDisplayPapers(response.data);
+        setDisplayPapers(response.data.data ?? []);
       } catch (error) {
         console.error("Failed to fetch papers:", error);
       } finally {
