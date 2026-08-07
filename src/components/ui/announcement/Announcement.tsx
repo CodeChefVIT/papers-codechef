@@ -281,14 +281,14 @@ export default function Announcement({
         className,
       )}
     >
-      {/* NO X MARK button here when dismissible=false, ensuring in-feed grid event cards are persistent */}
       {dismissible && (
         <button
           onClick={handleDismiss}
-          aria-label="Dismiss announcement"
-          className="absolute right-2 top-2 z-20 rounded-full bg-black/50 p-1.5 text-white transition hover:bg-black/80 hover:scale-105"
+          aria-label="Hide announcement"
+          className="absolute right-2.5 top-2.5 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur-md transition-all hover:bg-black/80 hover:scale-105 active:scale-95"
         >
-          <X className="h-3.5 w-3.5" />
+          <span>Hide</span>
+          <X className="h-3 w-3" />
         </button>
       )}
 

@@ -265,7 +265,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
             href={currentEvent.registrationUrl}
             secondaryCtaLabel="Learn More"
             secondaryHref={currentEvent.landingPageUrl}
-            dismissible={false}
+            dismissible={true}
           />,
         );
       }
@@ -295,7 +295,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
           href={currentEvent.registrationUrl}
           secondaryCtaLabel="Learn More"
           secondaryHref={currentEvent.landingPageUrl}
-          dismissible={false}
+          dismissible={true}
         />,
       );
     }
