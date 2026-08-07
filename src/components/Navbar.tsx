@@ -22,17 +22,20 @@ import {
 import { useCourses } from "@/context/courseContext";
 import PinnedModal from "./ui/PinnedModal";
 import RequestModal from "./ui/RequestModal";
-//import CookoffBanner from "./CookoffBanner";
+import Announcement from "./ui/announcement/Announcement";
+import { EVENTS } from "@/config/events";
 
 function Navbar() {
   const pathname: string = usePathname() ?? "/";
 
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const [bannerEvent, setBannerEvent] = useState<(typeof EVENTS)[0] | null>(null);
   const { courses } = useCourses();
 
   useEffect(() => {
-    if (pathname !== "/catalogue") return;
-  }, [pathname]);
+    const randomIndex = Math.floor(Math.random() * EVENTS.length);
+    setBannerEvent(EVENTS[randomIndex] ?? EVENTS[0]!);
+  }, []);
 
   const renderHomePageButtons = () => (
     <>
@@ -59,16 +62,23 @@ function Navbar() {
 
   return (
     <div className="sticky top-0 z-[50] w-full bg-[#B2B8FF] dark:bg-[#130E1F]">
-      {/*<Banner
-        bannerId="freshers"
-        bgColor="#fef3c7"
-        textColor="#5a3000"
-        iconColor="#d97706"
-        accentColor="#78350f"
-        title="Attention Freshers!"
-        message="If papers for your subject are not yet available, click on your subject and explore related subjects until papers become available, as these are newly introduced courses."
-      />*/}
-      {/* <CookoffBanner /> */}
+      {bannerEvent && (
+        <Announcement
+          id="top-announcement-banner-2026"
+          variant="banner"
+          title="Registrations are Live at Gravitas!"
+          message={bannerEvent.tagline}
+          badge={bannerEvent.badge}
+          logoType={bannerEvent.logoType}
+          imageUrl={bannerEvent.imageUrl}
+          accent={bannerEvent.accent}
+          ctaLabel="Register Now"
+          href={bannerEvent.registrationUrl}
+          secondaryCtaLabel="Event Details"
+          secondaryHref={bannerEvent.landingPageUrl}
+          dismissible={true}
+        />
+      )}
 
       <div className="flex items-center justify-between bg-inherit px-4 py-4 md:px-8 md:py-5">
         {}
