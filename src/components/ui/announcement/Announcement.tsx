@@ -208,50 +208,56 @@ export default function Announcement({
         aria-label={sponsored ? `Sponsored announcement: ${title}` : `Announcement: ${title}`}
         onClick={handleBannerClick}
         className={cn(
-          "relative w-full font-play border-b border-purple-200/40 dark:border-purple-900/40 shadow-sm transition-all duration-200",
+          "relative w-full font-play border-b border-purple-200/40 dark:border-purple-900/40 shadow-xs transition-all duration-200",
           href && "cursor-pointer",
           styles.bannerSurface,
           className,
         )}
       >
-        <div className="mx-auto flex max-w-screen-2xl flex-col items-start gap-3 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4 md:px-8">
-          {imageUrl ? (
-            <Image
-              src={imageUrl}
-              alt={imageAlt ?? title}
-              width={36}
-              height={36}
-              className="h-8 w-8 flex-shrink-0 rounded-lg object-cover shadow-xs ring-1 ring-purple-500/20"
-            />
-          ) : (
-            <EventLogo type={logoType} size="sm" className="flex-shrink-0" />
-          )}
-
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3">
-            {badge && (
-              <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide uppercase shadow-xs", styles.badgeBg)}>
-                {badge}
-              </span>
+        <div className="relative mx-auto flex max-w-screen-2xl items-center justify-between gap-1.5 px-2 py-1.5 sm:gap-3 sm:px-4 sm:py-2.5 md:px-8">
+          {/* Info section - grouped neatly right next to the logo */}
+          <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+            {imageUrl ? (
+              <Image
+                src={imageUrl}
+                alt={imageAlt ?? title}
+                width={32}
+                height={32}
+                className="h-7 w-7 flex-shrink-0 rounded-lg object-cover shadow-xs ring-1 ring-purple-500/20 sm:h-8 sm:w-8"
+              />
+            ) : (
+              <EventLogo type={logoType} size="sm" className="flex-shrink-0 scale-90 sm:scale-100" />
             )}
-            <span className={cn("whitespace-nowrap text-sm font-bold", styles.accentText)}>
-              {title}
-            </span>
-            <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 sm:truncate">
-              {message}
-            </span>
+
+            <div className="flex min-w-0 items-center gap-1.5 sm:gap-2.5">
+              {badge && (
+                <span className={cn("inline-flex items-center rounded-full px-2 py-0.5 text-[10px] sm:text-[11px] font-bold tracking-wide uppercase shadow-xs flex-shrink-0", styles.badgeBg)}>
+                  {badge}
+                </span>
+              )}
+
+              <span className={cn("truncate text-xs sm:text-sm font-bold", styles.accentText)}>
+                {title}
+              </span>
+
+              <span className="truncate text-xs font-medium text-gray-700 dark:text-gray-200 hidden md:inline-block">
+                {message}
+              </span>
+            </div>
           </div>
 
-          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
+          {/* Right Action & Dismiss buttons */}
+          <div className="flex flex-shrink-0 items-center gap-1 sm:gap-2.5">
             {ctaLabel && href && (
               <SmartLink
                 href={href}
                 className={cn(
-                  "inline-flex flex-shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold shadow-sm transition-all duration-200 hover:scale-105 active:scale-95",
+                  "inline-flex flex-shrink-0 items-center gap-1 rounded-full px-2 py-1 sm:px-3.5 sm:py-1.5 text-[10px] sm:text-xs font-bold shadow-xs transition-all duration-200 hover:scale-105 active:scale-95",
                   styles.cta,
                 )}
               >
-                {ctaLabel}
-                <ArrowUpRight className="h-3.5 w-3.5" />
+                <span>{ctaLabel}</span>
+                <ArrowUpRight className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
               </SmartLink>
             )}
 
@@ -272,9 +278,9 @@ export default function Announcement({
               <button
                 onClick={handleDismiss}
                 aria-label="Dismiss announcement"
-                className={cn("flex-shrink-0 rounded-full p-1.5 transition-transform hover:scale-110 hover:opacity-80 active:scale-90", styles.accentText)}
+                className={cn("flex-shrink-0 rounded-full p-1 sm:p-1.5 transition-transform hover:scale-110 hover:opacity-80 active:scale-90", styles.accentText)}
               >
-                <X className="h-4 w-4" />
+                <X className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
               </button>
             )}
           </div>
