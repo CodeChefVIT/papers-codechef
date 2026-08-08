@@ -48,7 +48,7 @@ const accentStyles: Record<
 > = {
   purple: {
     cardBorder: "border-[#734DFF] dark:border-[#562EE7]",
-    cardSurface: "bg-white dark:bg-[#120B24]",
+    cardSurface: "bg-white dark:bg-[#120B24] hover:bg-[#EFEAFF] hover:dark:bg-[#1D1438]",
     bannerSurface: "bg-[#EFEAFF] dark:bg-[#1A1133]",
     chip: "bg-[#EFEAFF] dark:bg-[#231845]",
     chipIcon: "text-[#562EE7] dark:text-[#C4B5FD]",
@@ -60,7 +60,7 @@ const accentStyles: Record<
   },
   amber: {
     cardBorder: "border-[#D97706] dark:border-[#B45309]",
-    cardSurface: "bg-white dark:bg-[#1C1305]",
+    cardSurface: "bg-white dark:bg-[#1C1305] hover:bg-[#FEF3C7] hover:dark:bg-[#2B1B07]",
     bannerSurface: "bg-[#FEF3C7] dark:bg-[#2A1C07]",
     chip: "bg-[#FDE8B8] dark:bg-[#3D290A]",
     chipIcon: "text-[#92600B] dark:text-[#FCD34D]",
@@ -72,7 +72,7 @@ const accentStyles: Record<
   },
   green: {
     cardBorder: "border-[#16A34A] dark:border-[#15803D]",
-    cardSurface: "bg-white dark:bg-[#071C0F]",
+    cardSurface: "bg-white dark:bg-[#071C0F] hover:bg-[#DCFCE7] hover:dark:bg-[#0E2918]",
     bannerSurface: "bg-[#DCFCE7] dark:bg-[#0B331A]",
     chip: "bg-[#C7F7D4] dark:bg-[#124D28]",
     chipIcon: "text-[#15803D] dark:text-[#86EFAC]",
@@ -84,7 +84,7 @@ const accentStyles: Record<
   },
   rose: {
     cardBorder: "border-[#E11D48] dark:border-[#BE123C]",
-    cardSurface: "bg-white dark:bg-[#1F070C]",
+    cardSurface: "bg-white dark:bg-[#1F070C] hover:bg-[#FFE4E6] hover:dark:bg-[#2F0B13]",
     bannerSurface: "bg-[#FFE4E6] dark:bg-[#380D17]",
     chip: "bg-[#FFD2D6] dark:bg-[#521323]",
     chipIcon: "text-[#BE123C] dark:text-[#FDA4AF]",
@@ -269,13 +269,27 @@ export default function Announcement({
     );
   }
 
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!href) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button, a, input, svg")) return;
+
+    if (isExternal(href)) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.href = href;
+    }
+  };
+
   // Card variant — sized to sit inside the same grid as paper Cards in Catalogue.
   return (
     <div
       role="region"
       aria-label={sponsored ? `Sponsored event: ${title}` : `Event: ${title}`}
+      onClick={handleCardClick}
       className={cn(
-        "relative flex flex-col justify-between overflow-hidden rounded-sm border-2 font-play shadow-md transition-all duration-200 hover:shadow-xl dark:shadow-purple-950/20",
+        "group relative flex flex-col justify-between overflow-hidden rounded-sm border-2 font-play shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl dark:shadow-purple-950/20",
+        href && "cursor-pointer",
         styles.cardBorder,
         styles.cardSurface,
         className,
@@ -300,10 +314,10 @@ export default function Announcement({
             alt={imageAlt ?? title}
             width={320}
             height={180}
-            className="w-full object-cover p-2"
+            className="w-full object-cover p-2 transition-transform duration-300 group-hover:scale-105"
           />
         ) : (
-          <div className="flex flex-col items-center justify-center gap-3">
+          <div className="flex flex-col items-center justify-center gap-3 transition-transform duration-300 group-hover:scale-105">
             <EventLogo type={logoType} size="lg" />
             {badge && (
               <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider shadow-md", styles.badgeBg)}>
@@ -328,7 +342,7 @@ export default function Announcement({
             </span>
           </div>
 
-          <h3 className="font-play text-xl font-bold leading-tight text-gray-900 dark:text-white">
+          <h3 className="font-play text-xl font-bold leading-tight text-gray-900 dark:text-white transition-colors duration-200 group-hover:text-[#562EE7] dark:group-hover:text-[#A78BFA]">
             {title}
           </h3>
           <p className="text-xs md:text-sm font-medium leading-relaxed text-gray-600 dark:text-gray-300">
