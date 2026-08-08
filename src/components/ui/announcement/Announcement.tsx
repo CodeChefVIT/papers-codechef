@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ArrowUpRight, ExternalLink } from "lucide-react";
+import { X, ArrowUpRight, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EventLogo } from "./EventLogo";
 
@@ -29,6 +29,11 @@ export interface AnnouncementProps {
   sponsored?: boolean;
   onDismiss?: () => void;
   className?: string;
+  onPrev?: () => void;
+  onNext?: () => void;
+  currentSlide?: number;
+  totalSlides?: number;
+  onSlideSelect?: (index: number) => void;
 }
 
 const accentStyles: Record<
@@ -150,6 +155,11 @@ export default function Announcement({
   sponsored = true,
   onDismiss,
   className,
+  onPrev,
+  onNext,
+  currentSlide = 0,
+  totalSlides = 1,
+  onSlideSelect,
 }: AnnouncementProps) {
   const [mounted, setMounted] = React.useState(false);
   const [dismissed, setDismissed] = React.useState(false);
@@ -167,7 +177,7 @@ export default function Announcement({
     setMounted(true);
     if (dismissible) {
       try {
-        setDismissed(window.localStorage.getItem(storageKey) === "true");
+        setDismissed(window.sessionStorage.getItem(storageKey) === "true");
       } catch {
         setDismissed(false);
       }
@@ -178,7 +188,7 @@ export default function Announcement({
     e.stopPropagation();
     setDismissed(true);
     try {
-      window.localStorage.setItem(storageKey, "true");
+      window.sessionStorage.setItem(storageKey, "true");
     } catch {
       // ignore quota / security error
     }
@@ -189,13 +199,27 @@ export default function Announcement({
 
   const styles = accentStyles[accent];
 
+  const handleBannerClick = (e: React.MouseEvent) => {
+    if (!href) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button, a, input, svg")) return;
+
+    if (isExternal(href)) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.href = href;
+    }
+  };
+
   if (variant === "banner") {
     return (
       <div
         role="region"
         aria-label={sponsored ? `Sponsored announcement: ${title}` : `Announcement: ${title}`}
+        onClick={handleBannerClick}
         className={cn(
           "relative w-full font-play border-b border-purple-200/40 dark:border-purple-900/40 shadow-sm transition-all duration-200",
+          href && "cursor-pointer",
           styles.bannerSurface,
           className,
         )}
@@ -227,7 +251,7 @@ export default function Announcement({
             </span>
           </div>
 
-          <div className="flex w-full items-center justify-between gap-2.5 sm:w-auto sm:justify-end">
+          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
             {ctaLabel && href && (
               <SmartLink
                 href={href}
@@ -252,6 +276,57 @@ export default function Announcement({
                 {secondaryCtaLabel}
                 <ExternalLink className="h-3 w-3" />
               </SmartLink>
+            )}
+
+            {totalSlides > 1 && (
+              <div className="flex items-center gap-1 sm:gap-1.5 ml-1 flex-shrink-0">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onPrev?.();
+                  }}
+                  aria-label="Previous announcement"
+                  className={cn(
+                    "rounded-full p-1 transition-all hover:scale-110 active:scale-95 hover:bg-black/10 dark:hover:bg-white/10",
+                    styles.accentText
+                  )}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </button>
+
+                <div className="flex items-center gap-1 px-0.5">
+                  {Array.from({ length: totalSlides }).map((_, idx) => (
+                    <button
+                      key={idx}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onSlideSelect?.(idx);
+                      }}
+                      aria-label={`Go to slide ${idx + 1}`}
+                      className={cn(
+                        "h-1.5 rounded-full transition-all duration-300",
+                        currentSlide === idx
+                          ? cn("w-3.5", styles.cta)
+                          : "w-1.5 bg-gray-400/60 hover:bg-gray-600 dark:bg-gray-600/60 dark:hover:bg-gray-400"
+                      )}
+                    />
+                  ))}
+                </div>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onNext?.();
+                  }}
+                  aria-label="Next announcement"
+                  className={cn(
+                    "rounded-full p-1 transition-all hover:scale-110 active:scale-95 hover:bg-black/10 dark:hover:bg-white/10",
+                    styles.accentText
+                  )}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </button>
+              </div>
             )}
 
             {dismissible && (

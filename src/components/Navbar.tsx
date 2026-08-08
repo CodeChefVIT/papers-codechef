@@ -29,13 +29,27 @@ function Navbar() {
   const pathname: string = usePathname() ?? "/";
 
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-  const [bannerEvent, setBannerEvent] = useState<(typeof EVENTS)[0] | null>(null);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
   const { courses } = useCourses();
 
   useEffect(() => {
-    const randomIndex = Math.floor(Math.random() * EVENTS.length);
-    setBannerEvent(EVENTS[randomIndex] ?? EVENTS[0]!);
-  }, []);
+    if (isPaused || EVENTS.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % EVENTS.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  const handlePrevBanner = () => {
+    setCurrentBannerIndex((prevIndex) => (prevIndex - 1 + EVENTS.length) % EVENTS.length);
+  };
+
+  const handleNextBanner = () => {
+    setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % EVENTS.length);
+  };
 
   const renderHomePageButtons = () => (
     <>
@@ -60,24 +74,46 @@ function Navbar() {
     </>
   );
 
+  const currentEvent = EVENTS[currentBannerIndex] ?? EVENTS[0]!;
+
   return (
     <div className="sticky top-0 z-[50] w-full bg-[#B2B8FF] dark:bg-[#130E1F]">
-      {bannerEvent && (
-        <Announcement
-          id="top-announcement-banner-2026"
-          variant="banner"
-          title="Registrations are Live at Gravitas!"
-          message={bannerEvent.tagline}
-          badge={bannerEvent.badge}
-          logoType={bannerEvent.logoType}
-          imageUrl={bannerEvent.imageUrl}
-          accent={bannerEvent.accent}
-          ctaLabel="Register Now"
-          href={bannerEvent.registrationUrl}
-          secondaryCtaLabel="Event Details"
-          secondaryHref={bannerEvent.landingPageUrl}
-          dismissible={true}
-        />
+      {EVENTS.length > 0 && (
+        <div
+          className="relative w-full overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <div
+            className="flex w-full transition-transform duration-700 ease-in-out"
+            style={{ transform: `translateX(-${currentBannerIndex * 100}%)` }}
+          >
+            {EVENTS.map((event) => (
+              <div key={event.id} className="w-full min-w-full flex-shrink-0">
+                <Announcement
+                  id={`top-announcement-banner-2026-${event.id}`}
+                  variant="banner"
+                  title="Registrations are Live at Gravitas!"
+                  message={event.tagline}
+                  badge={event.badge}
+                  logoType={event.logoType}
+                  imageUrl={event.imageUrl}
+                  accent={event.accent}
+                  ctaLabel="Register Now"
+                  href={event.registrationUrl}
+                  secondaryCtaLabel="Event Details"
+                  secondaryHref={event.landingPageUrl}
+                  dismissible={true}
+                  onPrev={handlePrevBanner}
+                  onNext={handleNextBanner}
+                  currentSlide={currentBannerIndex}
+                  totalSlides={EVENTS.length}
+                  onSlideSelect={(idx) => setCurrentBannerIndex(idx)}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
       )}
 
       <div className="flex items-center justify-between bg-inherit px-4 py-4 md:px-8 md:py-5">
