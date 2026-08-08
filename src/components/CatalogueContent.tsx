@@ -238,6 +238,27 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   ]);
 
   const [activeEvent, setActiveEvent] = useState<EventData | null>(null);
+  const [isGridEventsDismissed, setIsGridEventsDismissed] = useState<boolean>(false);
+
+  useEffect(() => {
+    try {
+      setIsGridEventsDismissed(
+        window.sessionStorage.getItem("announcement:global-grid-card:dismissed") === "true",
+      );
+    } catch {
+      setIsGridEventsDismissed(false);
+    }
+  }, []);
+
+  const handleDismissGridEvents = () => {
+    setIsGridEventsDismissed(true);
+    try {
+      window.sessionStorage.setItem(
+        "announcement:global-grid-card:dismissed",
+        "true",
+      );
+    } catch {}
+  };
 
   useEffect(() => {
     setActiveEvent(getSubjectEvent(subject));
@@ -249,11 +270,11 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
 
     const items: React.ReactNode[] = [];
     paperList.forEach((paper, index) => {
-      if (index === 2) {
+      if (index === 2 && !isGridEventsDismissed) {
         items.push(
           <Announcement
-            key={`grid-event-${currentEvent.id}-${subject ?? "all"}`}
-            id={`grid-event-${currentEvent.id}`}
+            key={`grid-event-${subject ?? "all"}`}
+            id={`grid-card-${currentEvent.id}`}
             variant="card"
             title={currentEvent.title}
             message={currentEvent.description}
@@ -266,6 +287,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
             secondaryCtaLabel="Learn More"
             secondaryHref={currentEvent.landingPageUrl}
             dismissible={true}
+            onDismiss={handleDismissGridEvents}
           />,
         );
       }
@@ -279,11 +301,11 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
       );
     });
 
-    if (paperList.length > 0 && paperList.length < 2) {
+    if (paperList.length > 0 && paperList.length < 2 && !isGridEventsDismissed) {
       items.push(
         <Announcement
-          key={`grid-event-${currentEvent.id}-${subject ?? "all"}`}
-          id={`grid-event-${currentEvent.id}`}
+          key={`grid-event-${subject ?? "all"}`}
+          id={`grid-card-${currentEvent.id}`}
           variant="card"
           title={currentEvent.title}
           message={currentEvent.description}
@@ -296,6 +318,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
           secondaryCtaLabel="Learn More"
           secondaryHref={currentEvent.landingPageUrl}
           dismissible={true}
+          onDismiss={handleDismissGridEvents}
         />,
       );
     }

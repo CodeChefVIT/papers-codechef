@@ -3,7 +3,7 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, ArrowUpRight, ExternalLink, ChevronLeft, ChevronRight } from "lucide-react";
+import { X, ArrowUpRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { EventLogo } from "./EventLogo";
 
@@ -29,11 +29,6 @@ export interface AnnouncementProps {
   sponsored?: boolean;
   onDismiss?: () => void;
   className?: string;
-  onPrev?: () => void;
-  onNext?: () => void;
-  currentSlide?: number;
-  totalSlides?: number;
-  onSlideSelect?: (index: number) => void;
 }
 
 const accentStyles: Record<
@@ -155,11 +150,6 @@ export default function Announcement({
   sponsored = true,
   onDismiss,
   className,
-  onPrev,
-  onNext,
-  currentSlide = 0,
-  totalSlides = 1,
-  onSlideSelect,
 }: AnnouncementProps) {
   const [mounted, setMounted] = React.useState(false);
   const [dismissed, setDismissed] = React.useState(false);
@@ -278,57 +268,6 @@ export default function Announcement({
               </SmartLink>
             )}
 
-            {totalSlides > 1 && (
-              <div className="flex items-center gap-1 sm:gap-1.5 ml-1 flex-shrink-0">
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onPrev?.();
-                  }}
-                  aria-label="Previous announcement"
-                  className={cn(
-                    "rounded-full p-1 transition-all hover:scale-110 active:scale-95 hover:bg-black/10 dark:hover:bg-white/10",
-                    styles.accentText
-                  )}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </button>
-
-                <div className="flex items-center gap-1 px-0.5">
-                  {Array.from({ length: totalSlides }).map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onSlideSelect?.(idx);
-                      }}
-                      aria-label={`Go to slide ${idx + 1}`}
-                      className={cn(
-                        "h-1.5 rounded-full transition-all duration-300",
-                        currentSlide === idx
-                          ? cn("w-3.5", styles.cta)
-                          : "w-1.5 bg-gray-400/60 hover:bg-gray-600 dark:bg-gray-600/60 dark:hover:bg-gray-400"
-                      )}
-                    />
-                  ))}
-                </div>
-
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onNext?.();
-                  }}
-                  aria-label="Next announcement"
-                  className={cn(
-                    "rounded-full p-1 transition-all hover:scale-110 active:scale-95 hover:bg-black/10 dark:hover:bg-white/10",
-                    styles.accentText
-                  )}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </button>
-              </div>
-            )}
-
             {dismissible && (
               <button
                 onClick={handleDismiss}
@@ -374,10 +313,9 @@ export default function Announcement({
         <button
           onClick={handleDismiss}
           aria-label="Hide announcement"
-          className="absolute right-2.5 top-2.5 z-20 flex items-center gap-1 rounded-full bg-black/60 px-2.5 py-1 text-[11px] font-bold text-white shadow-md backdrop-blur-md transition-all hover:bg-black/80 hover:scale-105 active:scale-95"
+          className="absolute right-2.5 top-2.5 z-20 flex items-center justify-center rounded-full bg-black/60 p-1.5 text-white shadow-md backdrop-blur-md transition-all hover:bg-black/80 hover:scale-110 active:scale-95"
         >
-          <span>Hide</span>
-          <X className="h-3 w-3" />
+          <X className="h-4 w-4" />
         </button>
       )}
 

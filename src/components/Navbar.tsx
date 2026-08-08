@@ -31,7 +31,18 @@ function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
   const [currentBannerIndex, setCurrentBannerIndex] = useState<number>(0);
   const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isTopBannerDismissed, setIsTopBannerDismissed] = useState<boolean>(false);
   const { courses } = useCourses();
+
+  useEffect(() => {
+    try {
+      setIsTopBannerDismissed(
+        window.sessionStorage.getItem("announcement:global-top-banner:dismissed") === "true",
+      );
+    } catch {
+      setIsTopBannerDismissed(false);
+    }
+  }, []);
 
   useEffect(() => {
     if (isPaused || EVENTS.length <= 1) return;
@@ -43,12 +54,15 @@ function Navbar() {
     return () => clearInterval(interval);
   }, [isPaused]);
 
-  const handlePrevBanner = () => {
-    setCurrentBannerIndex((prevIndex) => (prevIndex - 1 + EVENTS.length) % EVENTS.length);
-  };
-
-  const handleNextBanner = () => {
-    setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % EVENTS.length);
+  const handleDismissTopBanner = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIsTopBannerDismissed(true);
+    try {
+      window.sessionStorage.setItem(
+        "announcement:global-top-banner:dismissed",
+        "true",
+      );
+    } catch {}
   };
 
   const renderHomePageButtons = () => (
@@ -74,11 +88,9 @@ function Navbar() {
     </>
   );
 
-  const currentEvent = EVENTS[currentBannerIndex] ?? EVENTS[0]!;
-
   return (
     <div className="sticky top-0 z-[50] w-full bg-[#B2B8FF] dark:bg-[#130E1F]">
-      {EVENTS.length > 0 && (
+      {EVENTS.length > 0 && !isTopBannerDismissed && (
         <div
           className="relative w-full overflow-hidden"
           onMouseEnter={() => setIsPaused(true)}
@@ -91,7 +103,7 @@ function Navbar() {
             {EVENTS.map((event) => (
               <div key={event.id} className="w-full min-w-full flex-shrink-0">
                 <Announcement
-                  id={`top-announcement-banner-2026-${event.id}`}
+                  id={`top-banner-${event.id}`}
                   variant="banner"
                   title="Registrations are Live at Gravitas!"
                   message={event.tagline}
@@ -104,11 +116,7 @@ function Navbar() {
                   secondaryCtaLabel="Event Details"
                   secondaryHref={event.landingPageUrl}
                   dismissible={true}
-                  onPrev={handlePrevBanner}
-                  onNext={handleNextBanner}
-                  currentSlide={currentBannerIndex}
-                  totalSlides={EVENTS.length}
-                  onSlideSelect={(idx) => setCurrentBannerIndex(idx)}
+                  onDismiss={handleDismissTopBanner}
                 />
               </div>
             ))}
