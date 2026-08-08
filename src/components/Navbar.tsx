@@ -22,17 +22,48 @@ import {
 import { useCourses } from "@/context/courseContext";
 import PinnedModal from "./ui/PinnedModal";
 import RequestModal from "./ui/RequestModal";
-//import CookoffBanner from "./CookoffBanner";
+import Announcement from "./ui/announcement/Announcement";
+import { EVENTS } from "@/config/events";
 
 function Navbar() {
   const pathname: string = usePathname() ?? "/";
 
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+  const [currentBannerIndex, setCurrentBannerIndex] = useState<number>(0);
+  const [isPaused, setIsPaused] = useState<boolean>(false);
+  const [isTopBannerDismissed, setIsTopBannerDismissed] = useState<boolean>(false);
   const { courses } = useCourses();
 
   useEffect(() => {
-    if (pathname !== "/catalogue") return;
-  }, [pathname]);
+    try {
+      setIsTopBannerDismissed(
+        window.sessionStorage.getItem("announcement:global-top-banner:dismissed") === "true",
+      );
+    } catch {
+      setIsTopBannerDismissed(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (isPaused || EVENTS.length <= 1) return;
+
+    const interval = setInterval(() => {
+      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % EVENTS.length);
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [isPaused]);
+
+  const handleDismissTopBanner = (e?: React.MouseEvent) => {
+    e?.stopPropagation();
+    setIsTopBannerDismissed(true);
+    try {
+      window.sessionStorage.setItem(
+        "announcement:global-top-banner:dismissed",
+        "true",
+      );
+    } catch {}
+  };
 
   const renderHomePageButtons = () => (
     <>
@@ -59,16 +90,39 @@ function Navbar() {
 
   return (
     <div className="sticky top-0 z-[50] w-full bg-[#B2B8FF] dark:bg-[#130E1F]">
-      {/*<Banner
-        bannerId="freshers"
-        bgColor="#fef3c7"
-        textColor="#5a3000"
-        iconColor="#d97706"
-        accentColor="#78350f"
-        title="Attention Freshers!"
-        message="If papers for your subject are not yet available, click on your subject and explore related subjects until papers become available, as these are newly introduced courses."
-      />*/}
-      {/* <CookoffBanner /> */}
+      {EVENTS.length > 0 && !isTopBannerDismissed && (
+        <div
+          className="relative w-full overflow-hidden"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
+          <div
+            className="flex w-full transition-transform duration-700 ease-in-out"
+            style={{ transform: `translateX(-${currentBannerIndex * 100}%)` }}
+          >
+            {EVENTS.map((event) => (
+              <div key={event.id} className="w-full min-w-full flex-shrink-0">
+                <Announcement
+                  id={`top-banner-${event.id}`}
+                  variant="banner"
+                  title="Registrations are Live at Gravitas!"
+                  message={event.tagline}
+                  badge={event.badge}
+                  logoType={event.logoType}
+                  imageUrl={event.imageUrl}
+                  accent={event.accent}
+                  ctaLabel="Register Now"
+                  href={event.registrationUrl}
+                  secondaryCtaLabel="Event Details"
+                  secondaryHref={event.landingPageUrl}
+                  dismissible={true}
+                  onDismiss={handleDismissTopBanner}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center justify-between bg-inherit px-4 py-4 md:px-8 md:py-5">
         {}

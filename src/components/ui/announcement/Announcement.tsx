@@ -3,38 +3,29 @@
 import * as React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { X, Megaphone, ArrowUpRight, type LucideIcon } from "lucide-react";
+import { X, ArrowUpRight, ExternalLink } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { EventLogo } from "./EventLogo";
 
 export type AnnouncementAccent = "purple" | "amber" | "green" | "rose";
 export type AnnouncementVariant = "banner" | "card";
 
 export interface AnnouncementProps {
-  /**
-   * Stable, unique id for this announcement (e.g. "cookoff-2026").
-   * Used as the localStorage key so a dismissal is remembered per-campaign,
-   * not globally — dismissing one promo doesn't hide future ones.
-   */
   id: string;
   title: string;
   message: string;
   variant?: AnnouncementVariant;
-  /** Call-to-action label, e.g. "Register now". Omit to render without a CTA. */
   ctaLabel?: string;
-  /** Where the CTA (and, for banners, the whole strip) links to. External links open in a new tab automatically. */
   href?: string;
-  /** Card-variant only: image shown above the copy (16:9). Ignored for banners. */
+  secondaryCtaLabel?: string;
+  secondaryHref?: string;
   imageUrl?: string;
   imageAlt?: string;
-  /** Custom lucide icon; defaults to a megaphone. */
-  icon?: LucideIcon;
-  /** Color preset. Pick based on urgency/category, not vibes: purple = general promo, amber = time-sensitive, green = opportunity/open, rose = urgent/closing soon. */
+  logoType?: "clueminati" | "cookoff" | "default";
+  badge?: string;
   accent?: AnnouncementAccent;
-  /** Whether the person can dismiss it. Defaults to true. */
   dismissible?: boolean;
-  /** ISO date string. Past this date the announcement stops rendering, dismissed or not — no stale promos. */
   expiresAt?: string;
-  /** Shows a small "Sponsored" tag for transparency. Defaults to true — this is an ad, say so. */
   sponsored?: boolean;
   onDismiss?: () => void;
   className?: string;
@@ -50,48 +41,58 @@ const accentStyles: Record<
     chipIcon: string;
     accentText: string;
     cta: string;
+    secondaryCta: string;
     tagText: string;
+    badgeBg: string;
   }
 > = {
   purple: {
-    cardBorder: "border-[#734DFF] dark:border-[#36266D]",
-    cardSurface: "bg-white dark:bg-[#171720]",
-    bannerSurface: "bg-[#EFEAFF] dark:bg-[#171720]",
-    chip: "bg-[#EFEAFF] dark:bg-[#262635]",
-    chipIcon: "text-[#562EE7] dark:text-[#A79DFF]",
-    accentText: "text-[#562EE7] dark:text-[#A79DFF]",
-    cta: "bg-[#734DFF] text-white hover:bg-[#5F3FE0]",
-    tagText: "text-[#734DFF] dark:text-[#A79DFF]",
+    cardBorder: "border-[#734DFF] dark:border-[#562EE7]",
+    cardSurface: "bg-white dark:bg-[#120B24] hover:bg-[#EFEAFF] hover:dark:bg-[#1D1438]",
+    bannerSurface: "bg-[#EFEAFF] dark:bg-[#1A1133]",
+    chip: "bg-[#EFEAFF] dark:bg-[#231845]",
+    chipIcon: "text-[#562EE7] dark:text-[#C4B5FD]",
+    accentText: "text-[#562EE7] dark:text-[#A78BFA]",
+    cta: "bg-[#734DFF] text-white hover:bg-[#5F3FE0] dark:bg-[#6D28D9] dark:hover:bg-[#5B21B6]",
+    secondaryCta: "border border-[#734DFF] text-[#562EE7] hover:bg-[#EFEAFF] dark:border-[#7C3AED] dark:text-[#C4B5FD] dark:hover:bg-[#2E1A47]",
+    tagText: "text-[#734DFF] dark:text-[#C4B5FD]",
+    badgeBg: "bg-[#EFEAFF] text-[#562EE7] dark:bg-[#2E1A47] dark:text-[#C4B5FD]",
   },
   amber: {
-    cardBorder: "border-[#d97706] dark:border-[#7c4a08]",
-    cardSurface: "bg-white dark:bg-[#171720]",
-    bannerSurface: "bg-[#fef3c7] dark:bg-[#3a2a05]",
-    chip: "bg-[#fde8b8] dark:bg-[#4a3608]",
-    chipIcon: "text-[#92600b] dark:text-[#f5c451]",
-    accentText: "text-[#92600b] dark:text-[#f5c451]",
-    cta: "bg-[#d97706] text-white hover:bg-[#b8630a]",
-    tagText: "text-[#92600b] dark:text-[#f5c451]",
+    cardBorder: "border-[#D97706] dark:border-[#B45309]",
+    cardSurface: "bg-white dark:bg-[#1C1305] hover:bg-[#FEF3C7] hover:dark:bg-[#2B1B07]",
+    bannerSurface: "bg-[#FEF3C7] dark:bg-[#2A1C07]",
+    chip: "bg-[#FDE8B8] dark:bg-[#3D290A]",
+    chipIcon: "text-[#92600B] dark:text-[#FCD34D]",
+    accentText: "text-[#92600B] dark:text-[#FBBF24]",
+    cta: "bg-[#D97706] text-white hover:bg-[#B8630A] dark:bg-[#D97706] dark:hover:bg-[#B45309]",
+    secondaryCta: "border border-[#D97706] text-[#92600B] hover:bg-[#FEF3C7] dark:border-[#F59E0B] dark:text-[#FCD34D] dark:hover:bg-[#3D290A]",
+    tagText: "text-[#92600B] dark:text-[#FCD34D]",
+    badgeBg: "bg-[#FEF3C7] text-[#92600B] dark:bg-[#3D290A] dark:text-[#FCD34D]",
   },
   green: {
-    cardBorder: "border-[#16a34a] dark:border-[#0f6b32]",
-    cardSurface: "bg-white dark:bg-[#171720]",
-    bannerSurface: "bg-[#dcfce7] dark:bg-[#052e13]",
-    chip: "bg-[#c7f7d4] dark:bg-[#0b3d1c]",
-    chipIcon: "text-[#15803d] dark:text-[#6ee7a0]",
-    accentText: "text-[#15803d] dark:text-[#6ee7a0]",
-    cta: "bg-[#16a34a] text-white hover:bg-[#128a3e]",
-    tagText: "text-[#15803d] dark:text-[#6ee7a0]",
+    cardBorder: "border-[#16A34A] dark:border-[#15803D]",
+    cardSurface: "bg-white dark:bg-[#071C0F] hover:bg-[#DCFCE7] hover:dark:bg-[#0E2918]",
+    bannerSurface: "bg-[#DCFCE7] dark:bg-[#0B331A]",
+    chip: "bg-[#C7F7D4] dark:bg-[#124D28]",
+    chipIcon: "text-[#15803D] dark:text-[#86EFAC]",
+    accentText: "text-[#15803D] dark:text-[#4ADE80]",
+    cta: "bg-[#16A34A] text-white hover:bg-[#128A3E]",
+    secondaryCta: "border border-[#16A34A] text-[#15803D] hover:bg-[#DCFCE7] dark:border-[#22C55E] dark:text-[#86EFAC] dark:hover:bg-[#124D28]",
+    tagText: "text-[#15803D] dark:text-[#86EFAC]",
+    badgeBg: "bg-[#DCFCE7] text-[#15803D] dark:bg-[#124D28] dark:text-[#86EFAC]",
   },
   rose: {
-    cardBorder: "border-[#e11d48] dark:border-[#8a0f2c]",
-    cardSurface: "bg-white dark:bg-[#171720]",
-    bannerSurface: "bg-[#ffe4e6] dark:bg-[#3f0d16]",
-    chip: "bg-[#ffd2d6] dark:bg-[#521022]",
-    chipIcon: "text-[#be123c] dark:text-[#fda4b0]",
-    accentText: "text-[#be123c] dark:text-[#fda4b0]",
-    cta: "bg-[#e11d48] text-white hover:bg-[#c11640]",
-    tagText: "text-[#be123c] dark:text-[#fda4b0]",
+    cardBorder: "border-[#E11D48] dark:border-[#BE123C]",
+    cardSurface: "bg-white dark:bg-[#1F070C] hover:bg-[#FFE4E6] hover:dark:bg-[#2F0B13]",
+    bannerSurface: "bg-[#FFE4E6] dark:bg-[#380D17]",
+    chip: "bg-[#FFD2D6] dark:bg-[#521323]",
+    chipIcon: "text-[#BE123C] dark:text-[#FDA4AF]",
+    accentText: "text-[#BE123C] dark:text-[#FB7185]",
+    cta: "bg-[#E11D48] text-white hover:bg-[#C11640]",
+    secondaryCta: "border border-[#E11D48] text-[#BE123C] hover:bg-[#FFE4E6] dark:border-[#F43F5E] dark:text-[#FDA4AF] dark:hover:bg-[#521323]",
+    tagText: "text-[#BE123C] dark:text-[#FDA4AF]",
+    badgeBg: "bg-[#FFE4E6] text-[#BE123C] dark:bg-[#521323] dark:text-[#FDA4AF]",
   },
 };
 
@@ -130,19 +131,6 @@ function SmartLink({
   );
 }
 
-/**
- * Reusable promo/announcement unit for advertising events, deadlines, or
- * sponsors on the papers site. Two variants:
- *
- *  - "banner": a thin dismissible strip, meant for the top of a page.
- *  - "card": a promo card sized to match `Card.tsx`, meant to sit inside
- *     the same paper grid (`grid-cols-1 md:grid-cols-2 lg:grid-cols-4`) as
- *     a native-feeling in-feed ad.
- *
- * Dismissal is remembered per `id` in localStorage, and an optional
- * `expiresAt` retires the announcement automatically so stale promos never
- * linger after an event has passed.
- */
 export default function Announcement({
   id,
   title,
@@ -150,9 +138,12 @@ export default function Announcement({
   variant = "banner",
   ctaLabel,
   href,
+  secondaryCtaLabel,
+  secondaryHref,
   imageUrl,
   imageAlt,
-  icon: Icon = Megaphone,
+  logoType = "default",
+  badge,
   accent = "purple",
   dismissible = true,
   expiresAt,
@@ -176,18 +167,20 @@ export default function Announcement({
     setMounted(true);
     if (dismissible) {
       try {
-        setDismissed(window.localStorage.getItem(storageKey) === "true");
+        setDismissed(window.sessionStorage.getItem(storageKey) === "true");
       } catch {
         setDismissed(false);
       }
     }
   }, [storageKey, dismissible]);
 
-  const handleDismiss = () => {
+  const handleDismiss = (e: React.MouseEvent) => {
+    e.stopPropagation();
     setDismissed(true);
     try {
-      window.localStorage.setItem(storageKey, "true");
+      window.sessionStorage.setItem(storageKey, "true");
     } catch {
+      // ignore quota / security error
     }
     onDismiss?.();
   };
@@ -196,43 +189,64 @@ export default function Announcement({
 
   const styles = accentStyles[accent];
 
+  const handleBannerClick = (e: React.MouseEvent) => {
+    if (!href) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button, a, input, svg")) return;
+
+    if (isExternal(href)) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.href = href;
+    }
+  };
+
   if (variant === "banner") {
     return (
       <div
         role="region"
         aria-label={sponsored ? `Sponsored announcement: ${title}` : `Announcement: ${title}`}
+        onClick={handleBannerClick}
         className={cn(
-          "relative w-full font-play",
+          "relative w-full font-play border-b border-purple-200/40 dark:border-purple-900/40 shadow-sm transition-all duration-200",
+          href && "cursor-pointer",
           styles.bannerSurface,
           className,
         )}
       >
-        <div className="mx-auto flex max-w-screen-2xl flex-col items-start gap-3 px-4 py-3 sm:flex-row sm:items-center sm:gap-4 md:px-8">
-          <div className={cn("flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full", styles.chip)}>
-            <Icon className={cn("h-5 w-5", styles.chipIcon)} />
-          </div>
+        <div className="mx-auto flex max-w-screen-2xl flex-col items-start gap-3 px-4 py-2.5 sm:flex-row sm:items-center sm:gap-4 md:px-8">
+          {imageUrl ? (
+            <Image
+              src={imageUrl}
+              alt={imageAlt ?? title}
+              width={36}
+              height={36}
+              className="h-8 w-8 flex-shrink-0 rounded-lg object-cover shadow-xs ring-1 ring-purple-500/20"
+            />
+          ) : (
+            <EventLogo type={logoType} size="sm" className="flex-shrink-0" />
+          )}
 
-          <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-2">
-            <span className={cn("whitespace-nowrap text-sm font-semibold", styles.accentText)}>
+          <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-3">
+            {badge && (
+              <span className={cn("inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-bold tracking-wide uppercase shadow-xs", styles.badgeBg)}>
+                {badge}
+              </span>
+            )}
+            <span className={cn("whitespace-nowrap text-sm font-bold", styles.accentText)}>
               {title}
             </span>
-            <span className="text-sm text-gray-700 dark:text-gray-300 sm:truncate">
+            <span className="text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-200 sm:truncate">
               {message}
             </span>
           </div>
 
-          <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-end">
-            {sponsored && (
-              <span className={cn("text-[10px] font-semibold uppercase tracking-wide opacity-70", styles.tagText)}>
-                Sponsored
-              </span>
-            )}
-
+          <div className="flex w-full items-center justify-between gap-2 sm:w-auto sm:justify-end">
             {ctaLabel && href && (
               <SmartLink
                 href={href}
                 className={cn(
-                  "inline-flex flex-shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-semibold transition-colors",
+                  "inline-flex flex-shrink-0 items-center gap-1.5 rounded-full px-3.5 py-1.5 text-xs font-bold shadow-sm transition-all duration-200 hover:scale-105 active:scale-95",
                   styles.cta,
                 )}
               >
@@ -241,11 +255,24 @@ export default function Announcement({
               </SmartLink>
             )}
 
+            {secondaryCtaLabel && secondaryHref && (
+              <SmartLink
+                href={secondaryHref}
+                className={cn(
+                  "inline-flex flex-shrink-0 items-center gap-1 rounded-full px-3 py-1.5 text-xs font-bold transition-all duration-200 hover:scale-105 active:scale-95 hidden lg:inline-flex",
+                  styles.secondaryCta,
+                )}
+              >
+                {secondaryCtaLabel}
+                <ExternalLink className="h-3 w-3" />
+              </SmartLink>
+            )}
+
             {dismissible && (
               <button
                 onClick={handleDismiss}
                 aria-label="Dismiss announcement"
-                className={cn("flex-shrink-0 rounded-full p-1 transition hover:opacity-70", styles.accentText)}
+                className={cn("flex-shrink-0 rounded-full p-1.5 transition-transform hover:scale-110 hover:opacity-80 active:scale-90", styles.accentText)}
               >
                 <X className="h-4 w-4" />
               </button>
@@ -256,13 +283,27 @@ export default function Announcement({
     );
   }
 
-  // Card variant — sized to sit inside the same grid as paper Cards.
+  const handleCardClick = (e: React.MouseEvent) => {
+    if (!href) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button, a, input, svg")) return;
+
+    if (isExternal(href)) {
+      window.open(href, "_blank", "noopener,noreferrer");
+    } else {
+      window.location.href = href;
+    }
+  };
+
+  // Card variant — sized to sit inside the same grid as paper Cards in Catalogue.
   return (
     <div
       role="region"
-      aria-label={sponsored ? `Sponsored announcement: ${title}` : `Announcement: ${title}`}
+      aria-label={sponsored ? `Sponsored event: ${title}` : `Event: ${title}`}
+      onClick={handleCardClick}
       className={cn(
-        "relative flex flex-col overflow-hidden rounded-sm border-2 font-play transition-all duration-150",
+        "group relative flex flex-col justify-between overflow-hidden rounded-sm border-2 font-play shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl dark:shadow-purple-950/20",
+        href && "cursor-pointer",
         styles.cardBorder,
         styles.cardSurface,
         className,
@@ -271,50 +312,85 @@ export default function Announcement({
       {dismissible && (
         <button
           onClick={handleDismiss}
-          aria-label="Dismiss announcement"
-          className="absolute right-2 top-2 z-10 rounded-full bg-black/40 p-1 text-white transition hover:bg-black/60"
+          aria-label="Hide announcement"
+          className="absolute right-2.5 top-2.5 z-20 flex items-center justify-center rounded-full bg-black/60 p-1.5 text-white shadow-md backdrop-blur-md transition-all hover:bg-black/80 hover:scale-110 active:scale-95"
         >
-          <X className="h-3.5 w-3.5" />
+          <X className="h-4 w-4" />
         </button>
       )}
 
-      {imageUrl ? (
-        <Image
-          src={imageUrl}
-          alt={imageAlt ?? title}
-          width={320}
-          height={180}
-          className="w-full object-cover p-4 pb-3 md:h-[250px]"
-        />
-      ) : (
-        <div className={cn("m-4 mb-0 flex h-[150px] items-center justify-center rounded-sm md:h-[218px]", styles.chip)}>
-          <Icon className={cn("h-10 w-10", styles.chipIcon)} />
-        </div>
-      )}
-
-      <div className="flex flex-1 flex-col justify-between space-y-3 p-4">
-        <div className="space-y-1.5">
-          {sponsored && (
-            <span className={cn("text-[10px] font-semibold uppercase tracking-wide opacity-70", styles.tagText)}>
-              Sponsored
-            </span>
-          )}
-          <div className="font-play text-lg font-semibold leading-snug">{title}</div>
-          <p className="text-sm text-gray-600 dark:text-gray-400">{message}</p>
-        </div>
-
-        {ctaLabel && href && (
-          <SmartLink
-            href={href}
-            className={cn(
-              "inline-flex w-fit items-center gap-1.5 rounded-full px-4 py-2 text-sm font-semibold transition-colors",
-              styles.cta,
+      {/* Header Banner Graphic / Image */}
+      <div className="relative flex w-full flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-950 p-6 md:h-[220px]">
+        {imageUrl ? (
+          <Image
+            src={imageUrl}
+            alt={imageAlt ?? title}
+            width={320}
+            height={180}
+            className="w-full object-cover p-2 transition-transform duration-300 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex flex-col items-center justify-center gap-3 transition-transform duration-300 group-hover:scale-105">
+            <EventLogo type={logoType} size="lg" />
+            {badge && (
+              <span className={cn("inline-flex items-center rounded-full px-3 py-1 text-xs font-bold uppercase tracking-wider shadow-md", styles.badgeBg)}>
+                {badge}
+              </span>
             )}
-          >
-            {ctaLabel}
-            <ArrowUpRight className="h-4 w-4" />
-          </SmartLink>
+          </div>
         )}
+      </div>
+
+      <div className="h-[1px] w-full bg-[#734DFF] dark:bg-[#562EE7]" />
+
+      {/* Details & Copy */}
+      <div className="flex flex-1 flex-col justify-between space-y-4 p-5">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <span className={cn("text-[11px] font-extrabold uppercase tracking-wider", styles.tagText)}>
+              CodeChef-VIT Event
+            </span>
+            <span className="text-[10px] font-semibold text-gray-500 dark:text-gray-400">
+              Gravitas &apos;26
+            </span>
+          </div>
+
+          <h3 className="font-play text-xl font-bold leading-tight text-gray-900 dark:text-white transition-colors duration-200 group-hover:text-[#562EE7] dark:group-hover:text-[#A78BFA]">
+            {title}
+          </h3>
+          <p className="text-xs md:text-sm font-medium leading-relaxed text-gray-600 dark:text-gray-300">
+            {message}
+          </p>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex flex-wrap items-center gap-2 pt-2">
+          {ctaLabel && href && (
+            <SmartLink
+              href={href}
+              className={cn(
+                "inline-flex flex-1 items-center justify-center gap-1.5 rounded-md px-4 py-2.5 text-xs font-extrabold shadow-md transition-all duration-200 hover:scale-[1.02] active:scale-98",
+                styles.cta,
+              )}
+            >
+              {ctaLabel}
+              <ArrowUpRight className="h-4 w-4" />
+            </SmartLink>
+          )}
+
+          {secondaryCtaLabel && secondaryHref && (
+            <SmartLink
+              href={secondaryHref}
+              className={cn(
+                "inline-flex items-center justify-center gap-1 rounded-md px-3 py-2.5 text-xs font-bold transition-all duration-200 hover:scale-[1.02] active:scale-98",
+                styles.secondaryCta,
+              )}
+            >
+              {secondaryCtaLabel}
+              <ExternalLink className="h-3.5 w-3.5" />
+            </SmartLink>
+          )}
+        </div>
       </div>
     </div>
   );
