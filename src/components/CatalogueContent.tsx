@@ -19,8 +19,6 @@ import { FilterProvider, useFilters } from "@/context/filterContext";
 import EmptyState from "./ui/EmptyState";
 import SidebarButton from "./SidebarButton";
 import SortComponent from "./ui/sorting";
-import Announcement from "./ui/announcement/Announcement";
-import { getSubjectEvent, EVENTS, type EventData } from "@/config/events";
 
 const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -237,60 +235,11 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
     setAppliedFilters,
   ]);
 
-  const [activeEvent, setActiveEvent] = useState<EventData | null>(null);
-  const [isGridEventsDismissed, setIsGridEventsDismissed] = useState<boolean>(false);
-
-  useEffect(() => {
-    try {
-      setIsGridEventsDismissed(
-        window.sessionStorage.getItem("announcement:global-grid-card:dismissed") === "true",
-      );
-    } catch {
-      setIsGridEventsDismissed(false);
-    }
-  }, []);
-
-  const handleDismissGridEvents = () => {
-    setIsGridEventsDismissed(true);
-    try {
-      window.sessionStorage.setItem(
-        "announcement:global-grid-card:dismissed",
-        "true",
-      );
-    } catch {}
-  };
-
-  useEffect(() => {
-    setActiveEvent(getSubjectEvent(subject));
-  }, [subject]);
-
   const renderGridItems = (paperList: IPaper[]) => {
     if (paperList.length === 0) return null;
-    const currentEvent = activeEvent ?? EVENTS[0]!;
 
     const items: React.ReactNode[] = [];
-    paperList.forEach((paper, index) => {
-      if (index === 2 && !isGridEventsDismissed) {
-        items.push(
-          <Announcement
-            key={`grid-event-${subject ?? "all"}`}
-            id={`grid-card-${currentEvent.id}`}
-            variant="card"
-            title={currentEvent.title}
-            message={currentEvent.description}
-            badge={currentEvent.badge}
-            logoType={currentEvent.logoType}
-            imageUrl={currentEvent.imageUrl}
-            accent={currentEvent.accent}
-            ctaLabel="Register Now"
-            href={currentEvent.registrationUrl}
-            secondaryCtaLabel="Learn More"
-            secondaryHref={currentEvent.landingPageUrl}
-            dismissible={true}
-            onDismiss={handleDismissGridEvents}
-          />,
-        );
-      }
+    paperList.forEach((paper) => {
       items.push(
         <Card
           key={paper._id}
@@ -300,28 +249,6 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
         />,
       );
     });
-
-    if (paperList.length > 0 && paperList.length < 2 && !isGridEventsDismissed) {
-      items.push(
-        <Announcement
-          key={`grid-event-${subject ?? "all"}`}
-          id={`grid-card-${currentEvent.id}`}
-          variant="card"
-          title={currentEvent.title}
-          message={currentEvent.description}
-          badge={currentEvent.badge}
-          logoType={currentEvent.logoType}
-          imageUrl={currentEvent.imageUrl}
-          accent={currentEvent.accent}
-          ctaLabel="Register Now"
-          href={currentEvent.registrationUrl}
-          secondaryCtaLabel="Learn More"
-          secondaryHref={currentEvent.landingPageUrl}
-          dismissible={true}
-          onDismiss={handleDismissGridEvents}
-        />,
-      );
-    }
 
     return items;
   };
