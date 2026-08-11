@@ -9,7 +9,7 @@ import { useZoom, ZoomPluginPackage, ZoomMode }          from '@embedpdf/plugin-
 import { RenderLayer, RenderPluginPackage }              from '@embedpdf/plugin-render/react';
 import { ExportPluginPackage }                           from '@embedpdf/plugin-export/react';
 
-import { Download, ZoomIn, ZoomOut, Maximize2, Minimize2 } from "lucide-react";
+import { Download, ZoomIn, ZoomOut, Maximize2, Minimize2, Focus } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { downloadFile } from "../lib/utils/download";
 import { Button } from "./ui/button";
@@ -21,6 +21,8 @@ interface ControlProps {
   documentId: string;
   toggleFullscreen: () => void;
   isFullscreen: boolean;
+  toggleZenMode: () => void;
+  isZenMode: boolean;
   onDownload: () => Promise<void>;
   forceMobile?: boolean;
   isMobile: boolean;
@@ -57,8 +59,8 @@ function useBreakpoint() {
   return {isMobile: width !== null && width < 768, isSmall: width !== null && width < 640};
 }
 
-const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, onDownload,
-  forceMobile, isMobile, isSmall, viewerRef}: ControlProps) {
+const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, toggleZenMode,
+  isZenMode, onDownload, forceMobile, isMobile, isSmall, viewerRef}: ControlProps) {
 
   const { provides: zoomProv, state: zoomState } = useZoom(documentId);
   const { provides: scrollProv, state: scrollState } = useScroll(documentId);
@@ -79,6 +81,9 @@ const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscr
       setTotalPages(0);
     };
   }, [scrollCapability, documentId]);
+  // Zen mode isn't real browser fullscreen, but it hides everything around the
+  // paper the same way, so it gets the same "immersive" control layout.
+  const immersive = isFullscreen || isZenMode;
 
   useEffect(() => {
     if (!scrollProv) return;
@@ -120,7 +125,7 @@ const pageChange = useCallback(
   }
 
   const pageInput = (
-    <div className={(!isFullscreen && !isMobile) ? "flex flex-col items-center gap-2" : "flex flex-row items-center gap-2"}>
+    <div className={(!immersive && !isMobile) ? "flex flex-col items-center gap-2" : "flex flex-row items-center gap-2"}>
         <input
           type="text"
           value={pageNo}
@@ -152,6 +157,16 @@ const pageChange = useCallback(
       title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
       >
       {isFullscreen ? <Minimize2 size={24} /> : <Maximize2 size={24} />}
+      </Button>
+
+      <Button
+        onClick={toggleZenMode}
+        className={`h-10 w-10 rounded p-0 text-white transition ${
+          isZenMode ? "bg-[#7d4fc7] ring-2 ring-white/50" : "bg-[#6536c1] hover:bg-[#7d4fc7]"
+        }`}
+        title={isZenMode ? "Exit zen mode (Esc)" : "Zen mode — hide everything but the paper"}
+      >
+        <Focus size={24} />
       </Button>
 
       <Button
@@ -198,7 +213,7 @@ const pageChange = useCallback(
         <div
           style={{
             position: "absolute",
-            ...(isFullscreen ? {...fullScreenStyle, flexDirection: "row"} : {
+            ...(immersive ? {...fullScreenStyle, flexDirection: "row"} : {
               top: "40%",
               right: 20,
               transform: "translateY(-50%)",
@@ -210,7 +225,7 @@ const pageChange = useCallback(
             gap: 16,
             alignItems: "center",
             alignSelf: "center",
-            width: isFullscreen ? "auto" : "96px",
+            width: immersive ? "auto" : "96px",
             background: "#262635",
             borderRadius: 8,
             backdropFilter: "blur(6px)",
@@ -223,7 +238,7 @@ const pageChange = useCallback(
         <div
           style={{
             position: "absolute",
-            ...(isFullscreen ? fullScreenStyle : {
+            ...(immersive ? fullScreenStyle : {
               top: "40%",
               right: 20,
               transform: "translateY(-50%)",
@@ -235,7 +250,7 @@ const pageChange = useCallback(
             gap: 16,
             alignItems: "center",
             alignSelf: "center",
-            width: isFullscreen ? "auto" : "96px",
+            width: immersive ? "auto" : "96px",
             background: "#262635",
             borderRadius: 8,
             backdropFilter: "blur(6px)",
@@ -245,7 +260,7 @@ const pageChange = useCallback(
           <div
             style={{
               display: "flex",
-              flexDirection: isFullscreen ? "row" as const : "column" as const,
+              flexDirection: immersive ? "row" as const : "column" as const,
               gap: 16,
               alignItems: "center",
             }}
@@ -411,6 +426,7 @@ export default function PDFViewer({
   const { isMobile, isSmall } = useBreakpoint();
   const { resolvedTheme } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isZenMode, setIsZenMode] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
   const effectiveBackgroundColor =
     backgroundColor ?? (resolvedTheme === "light" ? "#F3F5FF" : "#070114");
@@ -440,6 +456,27 @@ export default function PDFViewer({
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+
+  const toggleZenMode = useCallback(() => {
+    setIsZenMode((z) => !z);
+  }, []);
+
+  // Zen mode is a page-level "just the paper" view — no real Fullscreen API
+  // call (which iOS Safari barely supports), just an overlay that covers the
+  // navbar/title/related-papers behind it. Esc backs out of it like fullscreen does.
+  useEffect(() => {
+    if (!isZenMode) return;
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsZenMode(false);
+    };
+    document.addEventListener("keydown", handleKeyDown);
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isZenMode]);
 
   const plugins = useMemo(() => [
     createPluginRegistration(DocumentManagerPluginPackage, {
@@ -503,9 +540,12 @@ if (isLoading || !engine) {
         data-pdf-viewer-scrollbars={hideScrollbar ? "hidden" : "visible"}
         className={className}
         style={{
-          height,
-          width: "100%",
-          position: "relative",
+          height: isZenMode ? "100dvh" : height,
+          width: isZenMode ? "100vw" : "100%",
+          position: isZenMode ? "fixed" : "relative",
+          top: isZenMode ? 0 : undefined,
+          left: isZenMode ? 0 : undefined,
+          zIndex: isZenMode ? 9999 : undefined,
           backgroundColor: effectiveBackgroundColor,
           display: "flex",
           flexDirection: "column",
@@ -518,11 +558,13 @@ if (isLoading || !engine) {
           activeDocumentId && (
             <>
               <WheelZoom documentId={activeDocumentId} viewerRef={viewerRef} />
-              {!hideControls && (isMobile && !isFullscreen) && 
+              {!hideControls && (isMobile && !isFullscreen && !isZenMode) && 
               <Controls
                 documentId={activeDocumentId}
                 toggleFullscreen={toggleFullscreen}
                 isFullscreen={isFullscreen}
+                toggleZenMode={toggleZenMode}
+                isZenMode={isZenMode}
                 onDownload={handleDownload}
                 forceMobile={true}
                 isMobile={isMobile}
@@ -569,11 +611,13 @@ if (isLoading || !engine) {
                 )}
               </DocumentContent>
                   
-              {!hideControls && (!isMobile || isFullscreen) && (
+              {!hideControls && (!isMobile || isFullscreen || isZenMode) && (
                 <Controls
                   documentId={activeDocumentId}
                   toggleFullscreen={toggleFullscreen}
                   isFullscreen={isFullscreen}
+                  toggleZenMode={toggleZenMode}
+                  isZenMode={isZenMode}
                   onDownload={handleDownload}
                   forceMobile={false}
                   isMobile={isMobile}
