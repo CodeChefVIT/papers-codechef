@@ -59,16 +59,16 @@ const accentStyles: Record<
     badgeBg: "bg-[#EFEAFF] text-[#562EE7] dark:bg-[#2E1A47] dark:text-[#C4B5FD]",
   },
   amber: {
-    cardBorder: "border-[#D97706] dark:border-[#B45309]",
-    cardSurface: "bg-white dark:bg-[#1C1305] hover:bg-[#FEF3C7] hover:dark:bg-[#2B1B07]",
-    bannerSurface: "bg-[#FEF3C7] dark:bg-[#2A1C07]",
-    chip: "bg-[#FDE8B8] dark:bg-[#3D290A]",
-    chipIcon: "text-[#92600B] dark:text-[#FCD34D]",
-    accentText: "text-[#92600B] dark:text-[#FBBF24]",
-    cta: "bg-[#D97706] text-white hover:bg-[#B8630A] dark:bg-[#D97706] dark:hover:bg-[#B45309]",
-    secondaryCta: "border border-[#D97706] text-[#92600B] hover:bg-[#FEF3C7] dark:border-[#F59E0B] dark:text-[#FCD34D] dark:hover:bg-[#3D290A]",
-    tagText: "text-[#92600B] dark:text-[#FCD34D]",
-    badgeBg: "bg-[#FEF3C7] text-[#92600B] dark:bg-[#3D290A] dark:text-[#FCD34D]",
+    cardBorder: "border-[#734DFF] dark:border-[#562EE7]",
+    cardSurface: "bg-white dark:bg-[#120B24] hover:bg-[#EFEAFF] hover:dark:bg-[#1D1438]",
+    bannerSurface: "bg-[#EFEAFF] dark:bg-[#1A1133]",
+    chip: "bg-[#EFEAFF] dark:bg-[#231845]",
+    chipIcon: "text-[#562EE7] dark:text-[#C4B5FD]",
+    accentText: "text-[#562EE7] dark:text-[#A78BFA]",
+    cta: "bg-[#734DFF] text-white hover:bg-[#5F3FE0] dark:bg-[#6D28D9] dark:hover:bg-[#5B21B6]",
+    secondaryCta: "border border-[#734DFF] text-[#562EE7] hover:bg-[#EFEAFF] dark:border-[#7C3AED] dark:text-[#C4B5FD] dark:hover:bg-[#2E1A47]",
+    tagText: "text-[#734DFF] dark:text-[#C4B5FD]",
+    badgeBg: "bg-[#EFEAFF] text-[#562EE7] dark:bg-[#2E1A47] dark:text-[#C4B5FD]",
   },
   green: {
     cardBorder: "border-[#16A34A] dark:border-[#15803D]",
@@ -167,7 +167,25 @@ export default function Announcement({
     setMounted(true);
     if (dismissible) {
       try {
-        setDismissed(window.sessionStorage.getItem(storageKey) === "true");
+        const timestampKey = `${storageKey}:time`;
+        const isDismissed = window.localStorage.getItem(storageKey) === "true";
+        const dismissedAt = window.localStorage.getItem(timestampKey);
+        const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+
+        if (isDismissed && dismissedAt) {
+          const timePassed = Date.now() - parseInt(dismissedAt, 10);
+          if (timePassed < FORTY_EIGHT_HOURS) {
+            setDismissed(true);
+          } else {
+            window.localStorage.removeItem(storageKey);
+            window.localStorage.removeItem(timestampKey);
+            setDismissed(false);
+          }
+        } else if (isDismissed) {
+          setDismissed(true);
+        } else {
+          setDismissed(false);
+        }
       } catch {
         setDismissed(false);
       }
@@ -178,7 +196,8 @@ export default function Announcement({
     e.stopPropagation();
     setDismissed(true);
     try {
-      window.sessionStorage.setItem(storageKey, "true");
+      window.localStorage.setItem(storageKey, "true");
+      window.localStorage.setItem(`${storageKey}:time`, Date.now().toString());
     } catch {
       // ignore quota / security error
     }
@@ -214,7 +233,7 @@ export default function Announcement({
           className,
         )}
       >
-        <div className="relative mx-auto flex max-w-screen-2xl items-center justify-between gap-1.5 px-2 py-1.5 sm:gap-3 sm:px-4 sm:py-2.5 md:px-8">
+        <div className="relative flex w-full items-center justify-between gap-3 px-4 py-2.5 md:px-8">
           {/* Info section - grouped neatly right next to the logo */}
           <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
             {imageUrl ? (

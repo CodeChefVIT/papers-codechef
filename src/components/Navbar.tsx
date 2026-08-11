@@ -23,47 +23,57 @@ import { useCourses } from "@/context/courseContext";
 import PinnedModal from "./ui/PinnedModal";
 import RequestModal from "./ui/RequestModal";
 import Announcement from "./ui/announcement/Announcement";
-import { EVENTS } from "@/config/events";
+import { getSubjectEvent, type EventData } from "@/config/events";
 
 function Navbar() {
   const pathname: string = usePathname() ?? "/";
 
   const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
-  const [currentBannerIndex, setCurrentBannerIndex] = useState<number>(0);
-  const [isPaused, setIsPaused] = useState<boolean>(false);
   const [isTopBannerDismissed, setIsTopBannerDismissed] = useState<boolean>(false);
   const { courses } = useCourses();
 
   useEffect(() => {
     try {
-      setIsTopBannerDismissed(
-        window.sessionStorage.getItem("announcement:global-top-banner:dismissed") === "true",
-      );
+      const storageKey = "announcement:global-top-banner:dismissed";
+      const timestampKey = `${storageKey}:time`;
+      const isDismissed = window.localStorage.getItem(storageKey) === "true";
+      const dismissedAt = window.localStorage.getItem(timestampKey);
+      const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+
+      if (isDismissed && dismissedAt) {
+        const timePassed = Date.now() - parseInt(dismissedAt, 10);
+        if (timePassed < FORTY_EIGHT_HOURS) {
+          setIsTopBannerDismissed(true);
+        } else {
+          window.localStorage.removeItem(storageKey);
+          window.localStorage.removeItem(timestampKey);
+          setIsTopBannerDismissed(false);
+        }
+      } else if (isDismissed) {
+        setIsTopBannerDismissed(true);
+      } else {
+        setIsTopBannerDismissed(false);
+      }
     } catch {
       setIsTopBannerDismissed(false);
     }
   }, []);
 
-  useEffect(() => {
-    if (isPaused || EVENTS.length <= 1) return;
-
-    const interval = setInterval(() => {
-      setCurrentBannerIndex((prevIndex) => (prevIndex + 1) % EVENTS.length);
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isPaused]);
-
   const handleDismissTopBanner = (e?: React.MouseEvent) => {
     e?.stopPropagation();
     setIsTopBannerDismissed(true);
     try {
-      window.sessionStorage.setItem(
-        "announcement:global-top-banner:dismissed",
-        "true",
-      );
+      const storageKey = "announcement:global-top-banner:dismissed";
+      window.localStorage.setItem(storageKey, "true");
+      window.localStorage.setItem(`${storageKey}:time`, Date.now().toString());
     } catch {}
   };
+
+  const [currentEvent, setCurrentEvent] = useState<EventData | null>(null);
+
+  useEffect(() => {
+    setCurrentEvent(getSubjectEvent());
+  }, []);
 
   const renderHomePageButtons = () => (
     <>
@@ -90,38 +100,23 @@ function Navbar() {
 
   return (
     <div className="sticky top-0 z-[50] w-full bg-[#B2B8FF] dark:bg-[#130E1F]">
-      {EVENTS.length > 0 && !isTopBannerDismissed && (
-        <div
-          className="relative w-full overflow-hidden"
-          onMouseEnter={() => setIsPaused(true)}
-          onMouseLeave={() => setIsPaused(false)}
-        >
-          <div
-            className="flex w-full transition-transform duration-700 ease-in-out"
-            style={{ transform: `translateX(-${currentBannerIndex * 100}%)` }}
-          >
-            {EVENTS.map((event) => (
-              <div key={event.id} className="w-full min-w-full flex-shrink-0">
-                <Announcement
-                  id={`top-banner-${event.id}`}
-                  variant="banner"
-                  title="Registrations are Live at Gravitas!"
-                  message={event.tagline}
-                  badge={event.badge}
-                  logoType={event.logoType}
-                  imageUrl={event.imageUrl}
-                  accent={event.accent}
-                  ctaLabel="Register Now"
-                  href={event.registrationUrl}
-                  secondaryCtaLabel="Event Details"
-                  secondaryHref={event.landingPageUrl}
-                  dismissible={true}
-                  onDismiss={handleDismissTopBanner}
-                />
-              </div>
-            ))}
-          </div>
-        </div>
+      {currentEvent && !isTopBannerDismissed && (
+        <Announcement
+          id={`top-banner-${currentEvent.id}`}
+          variant="banner"
+          title="Registrations are Live at Gravitas!"
+          message={currentEvent.tagline}
+          badge={currentEvent.badge}
+          logoType={currentEvent.logoType}
+          imageUrl={currentEvent.imageUrl}
+          accent={currentEvent.accent}
+          ctaLabel="Register Now"
+          href={currentEvent.registrationUrl}
+          secondaryCtaLabel="Event Details"
+          secondaryHref={currentEvent.landingPageUrl}
+          dismissible={true}
+          onDismiss={handleDismissTopBanner}
+        />
       )}
 
       <div className="flex items-center justify-between bg-inherit px-4 py-4 md:px-8 md:py-5">

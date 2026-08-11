@@ -66,7 +66,7 @@ export function EventLogo({ type = "default", className, size = "md" }: EventLog
     return (
       <div
         className={cn(
-          "relative flex items-center justify-center rounded-2xl bg-gradient-to-br from-amber-950 via-orange-900 to-slate-900 p-2 shadow-lg shadow-orange-900/30 ring-1 ring-orange-500/30 transition-transform duration-300 hover:scale-105",
+          "relative flex items-center justify-center rounded-2xl bg-gradient-to-br from-indigo-950 via-purple-900 to-slate-900 p-2 shadow-lg shadow-purple-900/30 ring-1 ring-purple-500/30 transition-transform duration-300 hover:scale-105",
           sizeClasses[size],
           className
         )}
@@ -75,13 +75,13 @@ export function EventLogo({ type = "default", className, size = "md" }: EventLog
           viewBox="0 0 100 100"
           fill="none"
           xmlns="http://www.w3.org/2000/svg"
-          className="h-full w-full drop-shadow-[0_0_8px_rgba(249,115,22,0.6)]"
+          className="h-full w-full drop-shadow-[0_0_8px_rgba(168,85,247,0.6)]"
         >
           <defs>
             <linearGradient id="cookFlame" x1="0%" y1="100%" x2="0%" y2="0%">
-              <stop offset="0%" stopColor="#EA580C" />
-              <stop offset="50%" stopColor="#F97316" />
-              <stop offset="100%" stopColor="#FBBF24" />
+              <stop offset="0%" stopColor="#734DFF" />
+              <stop offset="50%" stopColor="#A855F7" />
+              <stop offset="100%" stopColor="#C4B5FD" />
             </linearGradient>
             <linearGradient id="hatGrad" x1="0%" y1="0%" x2="100%" y2="100%">
               <stop offset="0%" stopColor="#FFFFFF" />
@@ -95,7 +95,7 @@ export function EventLogo({ type = "default", className, size = "md" }: EventLog
             fill="url(#hatGrad)"
           />
           {/* Hat Ribbon / Code Bar */}
-          <rect x="30" y="66" width="40" height="12" rx="4" fill="#EA580C" />
+          <rect x="30" y="66" width="40" height="12" rx="4" fill="#734DFF" />
           <path d="M38 72 L43 72 M48 72 L58 72" stroke="#FFFFFF" strokeWidth="3" strokeLinecap="round" />
 
           {/* Central Coding Flame */}
@@ -105,8 +105,8 @@ export function EventLogo({ type = "default", className, size = "md" }: EventLog
           />
 
           {/* Sparkles */}
-          <path d="M18 40 L20 43 L23 45 L20 47 L18 50 L16 47 L13 45 L16 43 Z" fill="#FBBF24" />
-          <path d="M80 34 L81.5 36.5 L84 38 L81.5 39.5 L80 42 L78.5 39.5 L76 38 L78.5 36.5 Z" fill="#F97316" />
+          <path d="M18 40 L20 43 L23 45 L20 47 L18 50 L16 47 L13 45 L16 43 Z" fill="#C4B5FD" />
+          <path d="M80 34 L81.5 36.5 L84 38 L81.5 39.5 L80 42 L78.5 39.5 L76 38 L78.5 36.5 Z" fill="#A855F7" />
         </svg>
       </div>
     );

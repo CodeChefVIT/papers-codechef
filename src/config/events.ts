@@ -34,7 +34,7 @@ export const EVENTS: EventData[] = [
     tagline: "Largest Competitive Coding Contest",
     description: "Test your algorithmic problem solving skills against top coders. Win prizes, certificates, and glory at Gravitas !",
     badge: "CookOff 11",
-    accent: "amber",
+    accent: "purple",
     registrationUrl: "https://gravitas.vit.ac.in/events/0629102b-cc5f-4992-8921-2e55df1cb2f8",
     landingPageUrl: "https://gravitas.codechefvit.com/",
     dates: "Gravitas '26",
