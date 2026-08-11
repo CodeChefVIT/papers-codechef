@@ -170,11 +170,11 @@ export default function Announcement({
         const timestampKey = `${storageKey}:time`;
         const isDismissed = window.localStorage.getItem(storageKey) === "true";
         const dismissedAt = window.localStorage.getItem(timestampKey);
-        const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+        const TWELVE_HOURS = 12 * 60 * 60 * 1000;
 
         if (isDismissed && dismissedAt) {
           const timePassed = Date.now() - parseInt(dismissedAt, 10);
-          if (timePassed < FORTY_EIGHT_HOURS) {
+          if (timePassed < TWELVE_HOURS) {
             setDismissed(true);
           } else {
             window.localStorage.removeItem(storageKey);
