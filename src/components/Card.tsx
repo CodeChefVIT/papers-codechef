@@ -71,8 +71,8 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   window.open(paperLink, "_blank");
 }}
         className={cn(
-          "cursor-pointer overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
-          isSelected && "ring-2 ring-[#7480FF] bg-[#EFEAFF]"
+          "cursor-pointer overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-[#EFEAFF] hover:shadow-md dark:border-[#36266D] dark:bg-[#171720] dark:shadow-none hover:dark:bg-[#262635]",
+          isSelected && "-translate-y-0.5 bg-[#EFEAFF] shadow-md ring-2 ring-[#7480FF]"
         )}
       >
           <Image
@@ -171,7 +171,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
                   name={generateFileName(paper).replace(/\.[^.]+$/, "")}
                   className="h-full overflow-hidden"
                   height="100%"
-                  hideControls={true}
+                  hideControls={false}
                   backgroundColor="transparent"
                   hideScrollbar={true}
                 />

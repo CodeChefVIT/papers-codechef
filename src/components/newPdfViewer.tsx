@@ -9,7 +9,7 @@ import { useZoom, ZoomPluginPackage, ZoomMode }          from '@embedpdf/plugin-
 import { RenderLayer, RenderPluginPackage }              from '@embedpdf/plugin-render/react';
 import { ExportPluginPackage }                           from '@embedpdf/plugin-export/react';
 
-import { Download, ZoomIn, ZoomOut, Maximize2, Minimize2 } from "lucide-react";
+import { Download, ZoomIn, ZoomOut, Maximize2, Minimize2, BookOpenText, X } from "lucide-react";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { downloadFile } from "../lib/utils/download";
 import { Button } from "./ui/button";
@@ -26,6 +26,10 @@ interface ControlProps {
   isMobile: boolean;
   isSmall: boolean;
   viewerRef: React.RefObject<HTMLDivElement>;
+  isReadingMode: boolean;
+  toggleReadingMode: () => void;
+  showReadingCoachmark: boolean;
+  dismissReadingCoachmark: () => void;
 }
 
 interface PdfViewerProps {
@@ -37,6 +41,7 @@ interface PdfViewerProps {
   backgroundColor?: string;
   hideScrollbar?: boolean;
   isolateFromTheme?: boolean;
+  onReadingModeChange?: (isReadingMode: boolean) => void;
 }
 
 interface WheelZoomProps {
@@ -58,7 +63,8 @@ function useBreakpoint() {
 }
 
 const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, onDownload,
-  forceMobile, isMobile, isSmall, viewerRef}: ControlProps) {
+  forceMobile, isMobile, isSmall, viewerRef, isReadingMode, toggleReadingMode,
+  showReadingCoachmark, dismissReadingCoachmark}: ControlProps) {
 
   const { provides: zoomProv, state: zoomState } = useZoom(documentId);
   const { provides: scrollProv, state: scrollState } = useScroll(documentId);
@@ -110,6 +116,23 @@ const pageChange = useCallback(
 
   if (!zoomProv || !scrollProv) return null;
 
+  if (isReadingMode) {
+    return (
+      <button
+        onClick={toggleReadingMode}
+        title="Exit Reading Mode (R)"
+        className="group fixed bottom-5 left-1/2 z-[2] flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#262635]/70 py-1.5 pl-3.5 pr-2 text-xs font-medium text-white/70 shadow-lg backdrop-blur transition-all hover:bg-[#262635] hover:text-white hover:opacity-100"
+        style={{ opacity: 0.55 }}
+      >
+        <BookOpenText size={13} />
+        Reading Mode
+        <span className="ml-1 flex h-5 w-5 items-center justify-center rounded-full bg-white/10 group-hover:bg-[#6536c1]">
+          <X size={11} />
+        </span>
+      </button>
+    );
+  }
+
   const zoomIn = () => zoomProv.zoomIn();
   const zoomOut = () => zoomProv.zoomOut();
   const { zoomLevel } = zoomState;
@@ -146,6 +169,35 @@ const pageChange = useCallback(
   
   const toolSet = (
     <>
+      <div className="relative">
+        {showReadingCoachmark && (
+          <div className="absolute bottom-full right-0 z-[2] mb-3 w-52 animate-in fade-in slide-in-from-bottom-1 duration-300">
+            <div className="rounded-lg bg-[#6536c1] px-3 py-2.5 text-[11px] leading-snug text-white shadow-xl">
+              <span className="font-semibold">New: Reading Mode.</span> Hides
+              everything but the paper — lighter than Fullscreen, your tabs
+              stay put.
+              <button
+                onClick={dismissReadingCoachmark}
+                className="mt-1.5 block text-[10px] font-semibold underline underline-offset-2"
+              >
+                Got it
+              </button>
+            </div>
+            <div className="ml-auto mr-3.5 h-2 w-2 -translate-y-1 rotate-45 bg-[#6536c1]" />
+          </div>
+        )}
+        {showReadingCoachmark && (
+          <span className="absolute inset-0 animate-ping rounded bg-[#6536c1] opacity-40" />
+        )}
+        <Button
+          onClick={toggleReadingMode}
+          className="relative h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]"
+          title="Reading Mode (R) — show just the paper"
+        >
+          <BookOpenText size={24} />
+        </Button>
+      </div>
+
       <Button
       onClick={toggleFullscreen}
       className="h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]"
@@ -406,11 +458,14 @@ export default function PDFViewer({
   backgroundColor,
   hideScrollbar = false,
   isolateFromTheme = true,
+  onReadingModeChange,
 }: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
   const { isMobile, isSmall } = useBreakpoint();
   const { resolvedTheme } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isReadingMode, setIsReadingMode] = useState(false);
+  const [showReadingCoachmark, setShowReadingCoachmark] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
   const effectiveBackgroundColor =
     backgroundColor ?? (resolvedTheme === "light" ? "#F3F5FF" : "#070114");
@@ -440,6 +495,59 @@ export default function PDFViewer({
     document.addEventListener("fullscreenchange", handleFullscreenChange);
     return () => document.removeEventListener("fullscreenchange", handleFullscreenChange);
   }, []);
+
+  const dismissReadingCoachmark = useCallback(() => {
+    setShowReadingCoachmark(false);
+    try {
+      window.localStorage.setItem("pdfReadingModeSeen", "1");
+    } catch {
+      // localStorage unavailable (private mode, etc) — coachmark just won't persist
+    }
+  }, []);
+
+  const toggleReadingMode = useCallback(() => {
+    setIsReadingMode((r) => {
+      const next = !r;
+      onReadingModeChange?.(next);
+      return next;
+    });
+    dismissReadingCoachmark();
+  }, [dismissReadingCoachmark, onReadingModeChange]);
+
+  useEffect(() => {
+    try {
+      if (!window.localStorage.getItem("pdfReadingModeSeen")) {
+        setShowReadingCoachmark(true);
+      }
+    } catch {
+      // ignore
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!isReadingMode) return;
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [isReadingMode]);
+
+  useEffect(() => {
+    const handleKeydown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement | null;
+      if (target && ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
+
+      if (e.key === "r" || e.key === "R") {
+        toggleReadingMode();
+      } else if (e.key === "Escape" && isReadingMode) {
+        setIsReadingMode(false);
+        onReadingModeChange?.(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeydown);
+    return () => window.removeEventListener("keydown", handleKeydown);
+  }, [isReadingMode, toggleReadingMode, onReadingModeChange]);
 
   const plugins = useMemo(() => [
     createPluginRegistration(DocumentManagerPluginPackage, {
@@ -503,14 +611,20 @@ if (isLoading || !engine) {
         data-pdf-viewer-scrollbars={hideScrollbar ? "hidden" : "visible"}
         className={className}
         style={{
-          height,
+          height: isReadingMode ? "100dvh" : height,
           width: "100%",
-          position: "relative",
+          position: isReadingMode ? "fixed" : "relative",
+          top: isReadingMode ? 0 : undefined,
+          left: isReadingMode ? 0 : undefined,
+          right: isReadingMode ? 0 : undefined,
+          bottom: isReadingMode ? 0 : undefined,
+          zIndex: isReadingMode ? 999 : undefined,
           backgroundColor: effectiveBackgroundColor,
           display: "flex",
           flexDirection: "column",
           colorScheme: isolateFromTheme ? "light" : undefined,
           forcedColorAdjust: isolateFromTheme ? "none" : undefined,
+          transition: "height 0.2s ease",
         }}
       >
         <EmbedPDF engine={engine} plugins={plugins}>
@@ -528,6 +642,10 @@ if (isLoading || !engine) {
                 isMobile={isMobile}
                 isSmall={isSmall}
                 viewerRef={viewerRef}
+                isReadingMode={isReadingMode}
+                toggleReadingMode={toggleReadingMode}
+                showReadingCoachmark={showReadingCoachmark}
+                dismissReadingCoachmark={dismissReadingCoachmark}
               />}
               <DocumentContent documentId={activeDocumentId}>
                 {({ isLoaded }) => (
@@ -579,6 +697,10 @@ if (isLoading || !engine) {
                   isMobile={isMobile}
                   isSmall={isSmall}
                   viewerRef={viewerRef}
+                  isReadingMode={isReadingMode}
+                  toggleReadingMode={toggleReadingMode}
+                  showReadingCoachmark={showReadingCoachmark}
+                  dismissReadingCoachmark={dismissReadingCoachmark}
                 />
               )}
             </>
