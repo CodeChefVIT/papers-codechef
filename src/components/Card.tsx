@@ -100,6 +100,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
                 <Capsule>{paper.slot}</Capsule>
                 <Capsule>{paper.year}</Capsule>
                 <Capsule>{paper.semester}</Capsule>
+                {paper.school && <Capsule>{paper.school}</Capsule>}
               </div>
             </div>
           </div>

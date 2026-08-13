@@ -2,8 +2,6 @@ import { type mongo } from "mongoose";
 
 export interface IUpcomingSlot {
   slot: string;
-  lastSyncedDate?: string;
-  syncMode?: "CAT" | "FAT";
 }
 
 export interface IUpcomingSubject {
@@ -17,6 +15,7 @@ export interface PaperResponse {
   year: string;
   slot: string;
   exam: string;
+  school?: string;
 }
 
 export interface IAdminPaper {
@@ -39,6 +38,18 @@ export interface IAdminPaper {
     | "Bhopal"
     | "Bangalore"
     | "Mauritius"
+    | null;
+  school?:
+    | "SCOPE"
+    | "SITE"
+    | "SENSE"
+    | "SMEC"
+    | "SCE"
+    | "SELECT"
+    | "SAS"
+    | "SSL"
+    | "VITBS"
+    | "SBST"
     | null;
   answer_key_included?: boolean | null;
   is_selected?: boolean;
@@ -94,6 +105,17 @@ export interface IPaper {
     | "Bhopal"
     | "Bangalore"
     | "Mauritius";
+  school?:
+    | "SCOPE"
+    | "SITE"
+    | "SENSE"
+    | "SMEC"
+    | "SCE"
+    | "SELECT"
+    | "SAS"
+    | "SSL"
+    | "VITBS"
+    | "SBST";
   slot: string;
   subject: string;
   year: string;

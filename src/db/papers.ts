@@ -31,6 +31,10 @@ const adminSchema = new Schema<IAdminPaper>({
       "Mauritius",
     ],
   },
+  school: {
+    type: String || null,
+    enum: ["SCOPE", "SITE", "SENSE", "SMEC", "SCE", "SELECT", "SAS", "SSL", "VITBS", "SBST","SCORE"],
+  },
   answer_key_included: { type: Boolean || null, default: false },
   is_selected: { type: Boolean, default: false },
   ambiguous_tags: { type: [String], default: [] },
@@ -68,6 +72,10 @@ const paperSchema = new Schema<IPaper>({
       "Mauritius",
     ],
     required: true,
+  },
+  school: {
+    type: String,
+    enum: ["SCOPE", "SITE", "SENSE", "SMEC", "SCE", "SELECT", "SAS", "SSL", "VITBS", "SBST"],
   },
   answer_key_included: { type: Boolean, default: false },
 });
