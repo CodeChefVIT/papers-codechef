@@ -5,6 +5,7 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import {
@@ -232,56 +233,93 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     ],
   );
 
-  const paginatedPapers = filteredPapers.slice(
-    (currentPage - 1) * papersPerPage,
-    currentPage * papersPerPage,
+  const paginatedPapers = useMemo(
+    () =>
+      filteredPapers.slice(
+        (currentPage - 1) * papersPerPage,
+        currentPage * papersPerPage,
+      ),
+    [filteredPapers, currentPage, papersPerPage],
   );
 
-  const totalPages = Math.ceil(
-    (appliedFilters ? filteredPapers.length : papers.length) / papersPerPage,
+  const totalPages = useMemo(
+    () =>
+      Math.ceil(
+        (appliedFilters ? filteredPapers.length : papers.length) /
+          papersPerPage,
+      ),
+    [appliedFilters, filteredPapers.length, papers.length, papersPerPage],
   );
 
-  const value: FilterContextType = {
-    selectedExams,
-    selectedSlots,
-    selectedYears,
-    selectedSemesters,
-    selectedCampuses,
-    selectedAnswerKeyIncluded,
-    papers,
-    filteredPapers,
-    selectedPapers,
-    filterOptions,
-    appliedFilters,
-    filtersPulled,
-    currentPage,
-    papersPerPage,
+  const value: FilterContextType = useMemo(
+    () => ({
+      selectedExams,
+      selectedSlots,
+      selectedYears,
+      selectedSemesters,
+      selectedCampuses,
+      selectedAnswerKeyIncluded,
+      papers,
+      filteredPapers,
+      selectedPapers,
+      filterOptions,
+      appliedFilters,
+      filtersPulled,
+      currentPage,
+      papersPerPage,
 
-    setSelectedExams,
-    setSelectedSlots,
-    setSelectedYears,
-    setSelectedSemesters,
-    setSelectedCampuses,
-    setSelectedAnswerKeyIncluded,
-    setPapers,
-    setFilteredPapers,
-    setFilterOptions,
-    setFiltersPulled,
-    setAppliedFilters,
-    setCurrentPage,
+      setSelectedExams,
+      setSelectedSlots,
+      setSelectedYears,
+      setSelectedSemesters,
+      setSelectedCampuses,
+      setSelectedAnswerKeyIncluded,
+      setPapers,
+      setFilteredPapers,
+      setFilterOptions,
+      setFiltersPulled,
+      setAppliedFilters,
+      setCurrentPage,
 
-    handleApplyFilters,
-    handleSelectPaper,
-    handleSelectAll,
-    handleDeselectAll,
-    handleDownloadSelected,
-    filtersNotPulled,
-    noAppliedFilters,
-    closeFilters,
+      handleApplyFilters,
+      handleSelectPaper,
+      handleSelectAll,
+      handleDeselectAll,
+      handleDownloadSelected,
+      filtersNotPulled,
+      noAppliedFilters,
+      closeFilters,
 
-    paginatedPapers,
-    totalPages,
-  };
+      paginatedPapers,
+      totalPages,
+    }),
+    [
+      selectedExams,
+      selectedSlots,
+      selectedYears,
+      selectedSemesters,
+      selectedCampuses,
+      selectedAnswerKeyIncluded,
+      papers,
+      filteredPapers,
+      selectedPapers,
+      filterOptions,
+      appliedFilters,
+      filtersPulled,
+      currentPage,
+      papersPerPage,
+      handleApplyFilters,
+      handleSelectPaper,
+      handleSelectAll,
+      handleDeselectAll,
+      handleDownloadSelected,
+      filtersNotPulled,
+      noAppliedFilters,
+      closeFilters,
+      paginatedPapers,
+      totalPages,
+    ],
+  );
 
   return (
     <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
