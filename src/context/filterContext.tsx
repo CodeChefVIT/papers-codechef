@@ -147,6 +147,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       new Set(selectedPapers.map((paper) => paper._id)),
     ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
 
+    let successCount = 0;
     await Promise.all(
        uniquePapers.map(async (paper) => {
         try {
@@ -157,11 +158,17 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
           const blob = await response.blob();
           const filename = generateFileName(paper);
           zip.file(filename, blob);
+          successCount++;
           } catch (err) {
             console.error(`Failed to fetch ${paper.file_url}`, err);
           }
         }),
-    );   
+    );
+
+    if (successCount === 0) {
+      toast.error("Failed to download any papers. Please try again.");
+      return;
+    }
 
     function getDownloadName(
       params: ReadonlyURLSearchParams,
@@ -177,13 +184,13 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     const a = document.createElement("a");
     a.href = url;
 
-    a.download = getDownloadName(searchParams, "subject");
+    a.download = `${getDownloadName(searchParams, "subject")}.zip`;
 
     document.body.appendChild(a);
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
-    toast.success("Download Initiated");
+    toast.success(`Downloaded ${successCount} of ${uniquePapers.length} papers`);
   }, [searchParams, selectedPapers]);
 
   const handleApplyFilters = useCallback(
