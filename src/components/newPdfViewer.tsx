@@ -192,7 +192,7 @@
           <Button
             onClick={toggleReadingMode}
             className="relative h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]"
-            title="Reading Mode (R) — show just the paper"
+            title="Reading Mode (R): show just the paper"
           >
             <BookOpenText size={24} />
           </Button>

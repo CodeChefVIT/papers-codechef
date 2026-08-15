@@ -171,7 +171,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
                   name={generateFileName(paper).replace(/\.[^.]+$/, "")}
                   className="h-full overflow-hidden"
                   height="100%"
-                  hideControls={false}
+                  hideControls={true}
                   backgroundColor="transparent"
                   hideScrollbar={true}
                 />
