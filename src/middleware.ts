@@ -3,11 +3,12 @@ import {
   aiUploadRatelimit,
   paperRequestRatelimit,
   subscribeRatelimit,
+  feedbackRatelimit,
 } from "./lib/utils/ratelimit";
 import { failure } from "@/lib/utils/response"
 
 export const config = {
-  matcher: ["/api/upload", "/api/request", "/api/subscribe"],
+  matcher: ["/api/upload", "/api/request", "/api/subscribe", "/api/feedback"],
 };
 
 export default async function middleware(request: NextRequest) {
@@ -32,6 +33,13 @@ export default async function middleware(request: NextRequest) {
     const { success } = await subscribeRatelimit.limit(ip);
     if (!success) {
       return failure("Maximum of 3 newsletter subscriptions per hour", 429);
+    }
+  }
+
+  if (pathname === "/api/feedback") {
+    const { success } = await feedbackRatelimit.limit(ip);
+    if (!success) {
+      return failure("You can submit a maximum of 5 feedback messages every 15 minutes", 429);
     }
   }
 
