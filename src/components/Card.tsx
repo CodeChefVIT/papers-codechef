@@ -28,6 +28,17 @@ interface CardProps {
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
 
+  const paperContextValue = React.useMemo(
+    () => ({
+      paperId: paper._id,
+      subject: paper.subject,
+      exam: paper.exam,
+      slot: paper.slot,
+      year: paper.year,
+    }),
+    [paper._id, paper.subject, paper.exam, paper.slot, paper.year],
+  );
+
   React.useEffect(() => {
     if (!previewOpen) return;
 
@@ -147,15 +158,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
             <div
               className="relative mx-auto h-full max-w-[760px]"
             >
-              <PaperProvider
-                value={{
-                  paperId: paper._id,
-                  subject: paper.subject,
-                  exam: paper.exam,
-                  slot: paper.slot,
-                  year: paper.year,
-                }}
-              >
+              <PaperProvider value={paperContextValue}>
               <button
                 className="fixed right-4 top-4 z-[60] rounded-full border border-black/10 bg-white/95 p-2 text-black shadow-md transition hover:bg-white"
                 onClick={() => setPreviewOpen(false)}

@@ -5,6 +5,7 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import {
@@ -34,6 +35,9 @@ interface FilterState {
   filtersPulled: boolean;
   currentPage: number;
   papersPerPage: number;
+
+  paginatedPapers: IPaper[];
+  totalPages: number;
 }
 
 interface FilterActions {
@@ -67,14 +71,14 @@ interface FilterActions {
   filtersNotPulled: () => void;
   noAppliedFilters: () => void;
   closeFilters: () => void;
-
-  paginatedPapers: IPaper[];
-  totalPages: number;
 }
 
 type FilterContextType = FilterState & FilterActions;
 
-const FilterContext = createContext<FilterContextType | undefined>(undefined);
+const FilterStateContext = createContext<FilterState | undefined>(undefined);
+const FilterActionsContext = createContext<FilterActions | undefined>(
+  undefined,
+);
 
 interface FilterProviderProps {
   children: ReactNode;
@@ -161,7 +165,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
             console.error(`Failed to fetch ${paper.file_url}`, err);
           }
         }),
-    );   
+    );
 
     function getDownloadName(
       params: ReadonlyURLSearchParams,
@@ -232,66 +236,125 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     ],
   );
 
-  const paginatedPapers = filteredPapers.slice(
-    (currentPage - 1) * papersPerPage,
-    currentPage * papersPerPage,
+  const paginatedPapers = useMemo(
+    () =>
+      filteredPapers.slice(
+        (currentPage - 1) * papersPerPage,
+        currentPage * papersPerPage,
+      ),
+    [filteredPapers, currentPage, papersPerPage],
   );
 
-  const totalPages = Math.ceil(
-    (appliedFilters ? filteredPapers.length : papers.length) / papersPerPage,
+  const totalPages = useMemo(
+    () =>
+      Math.ceil(
+        (appliedFilters ? filteredPapers.length : papers.length) /
+          papersPerPage,
+      ),
+    [appliedFilters, filteredPapers.length, papers.length, papersPerPage],
   );
 
-  const value: FilterContextType = {
-    selectedExams,
-    selectedSlots,
-    selectedYears,
-    selectedSemesters,
-    selectedCampuses,
-    selectedAnswerKeyIncluded,
-    papers,
-    filteredPapers,
-    selectedPapers,
-    filterOptions,
-    appliedFilters,
-    filtersPulled,
-    currentPage,
-    papersPerPage,
+  const stateValue: FilterState = useMemo(
+    () => ({
+      selectedExams,
+      selectedSlots,
+      selectedYears,
+      selectedSemesters,
+      selectedCampuses,
+      selectedAnswerKeyIncluded,
+      papers,
+      filteredPapers,
+      selectedPapers,
+      filterOptions,
+      appliedFilters,
+      filtersPulled,
+      currentPage,
+      papersPerPage,
+      paginatedPapers,
+      totalPages,
+    }),
+    [
+      selectedExams,
+      selectedSlots,
+      selectedYears,
+      selectedSemesters,
+      selectedCampuses,
+      selectedAnswerKeyIncluded,
+      papers,
+      filteredPapers,
+      selectedPapers,
+      filterOptions,
+      appliedFilters,
+      filtersPulled,
+      currentPage,
+      papersPerPage,
+      paginatedPapers,
+      totalPages,
+    ],
+  );
 
-    setSelectedExams,
-    setSelectedSlots,
-    setSelectedYears,
-    setSelectedSemesters,
-    setSelectedCampuses,
-    setSelectedAnswerKeyIncluded,
-    setPapers,
-    setFilteredPapers,
-    setFilterOptions,
-    setFiltersPulled,
-    setAppliedFilters,
-    setCurrentPage,
-
-    handleApplyFilters,
-    handleSelectPaper,
-    handleSelectAll,
-    handleDeselectAll,
-    handleDownloadSelected,
-    filtersNotPulled,
-    noAppliedFilters,
-    closeFilters,
-
-    paginatedPapers,
-    totalPages,
-  };
+  const actionsValue: FilterActions = useMemo(
+    () => ({
+      setSelectedExams,
+      setSelectedSlots,
+      setSelectedYears,
+      setSelectedSemesters,
+      setSelectedCampuses,
+      setSelectedAnswerKeyIncluded,
+      setPapers,
+      setFilteredPapers,
+      setFilterOptions,
+      setFiltersPulled,
+      setAppliedFilters,
+      setCurrentPage,
+      handleApplyFilters,
+      handleSelectPaper,
+      handleSelectAll,
+      handleDeselectAll,
+      handleDownloadSelected,
+      filtersNotPulled,
+      noAppliedFilters,
+      closeFilters,
+    }),
+    [
+      handleApplyFilters,
+      handleSelectPaper,
+      handleSelectAll,
+      handleDeselectAll,
+      handleDownloadSelected,
+      filtersNotPulled,
+      noAppliedFilters,
+      closeFilters,
+    ],
+  );
 
   return (
-    <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
+    <FilterActionsContext.Provider value={actionsValue}>
+      <FilterStateContext.Provider value={stateValue}>
+        {children}
+      </FilterStateContext.Provider>
+    </FilterActionsContext.Provider>
   );
 };
 
-export const useFilters = (): FilterContextType => {
-  const context = useContext(FilterContext);
+export const useFilterState = (): FilterState => {
+  const context = useContext(FilterStateContext);
   if (!context) {
-    throw new Error("useFilters must be used within a FilterProvider");
+    throw new Error("useFilterState must be used within a FilterProvider");
   }
   return context;
+};
+
+export const useFilterActions = (): FilterActions => {
+  const context = useContext(FilterActionsContext);
+  if (!context) {
+    throw new Error("useFilterActions must be used within a FilterProvider");
+  }
+  return context;
+};
+
+export const useFilters = (): FilterContextType => {
+  const state = useFilterState();
+  const actions = useFilterActions();
+  return useMemo(() => ({ ...state, ...actions }), [state, actions]);
 };

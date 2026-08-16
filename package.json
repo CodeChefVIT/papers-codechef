@@ -64,7 +64,7 @@
     "prettier": "^3.5.3",
     "prettier-plugin-tailwindcss": "^0.6.11",
     "raw-loader": "^4.0.2",
-    "react": "link:@embedpdf/plugin-viewport/react",
+    "react": "^18.3.1",
     "react-beautiful-dnd": "^13.1.1",
     "react-dom": "^18.3.1",
     "react-dropzone": "^14.3.8",
