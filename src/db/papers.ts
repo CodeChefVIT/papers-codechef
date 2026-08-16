@@ -75,7 +75,7 @@ const paperSchema = new Schema<IPaper>({
   },
   school: {
     type: String,
-    enum: ["SCOPE", "SITE", "SENSE", "SMEC", "SCE", "SELECT", "SAS", "SSL", "VITBS", "SBST"],
+    enum: ["SCOPE","SITE","SENSE","SMEC","SCE","SELECT","SAS","SSL","VITBS","SBST","SCORE","SCHEME","SHINE","V-SIGN","V-SMART","V-SPARC","VAIAL","HOT"],
   },
   answer_key_included: { type: Boolean, default: false },
 });
