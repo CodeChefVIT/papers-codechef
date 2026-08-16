@@ -308,6 +308,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       papersPerPage,
       paginatedPapers,
       totalPages,
+      isDownloading,
     }),
     [
       selectedExams,
@@ -326,9 +327,9 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       papersPerPage,
       paginatedPapers,
       totalPages,
+      isDownloading,
     ],
   );
-    isDownloading,
 
   const actionsValue: FilterActions = useMemo(
     () => ({
