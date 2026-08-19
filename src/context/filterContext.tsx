@@ -38,6 +38,7 @@ interface FilterState {
 
   paginatedPapers: IPaper[];
   totalPages: number;
+  isDownloading: boolean;
 }
 
 interface FilterActions {
@@ -108,6 +109,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
   const [appliedFilters, setAppliedFilters] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [papersPerPage] = useState(12);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const filtersNotPulled = useCallback(() => {
     setFiltersPulled(false);
@@ -145,50 +147,84 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       toast.error("No papers selected for download.");
       return;
     }
+    if (isDownloading) return;
 
-    const zip = new JSZip();
-    const uniquePapers = Array.from(
-      new Set(selectedPapers.map((paper) => paper._id)),
-    ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
+    setIsDownloading(true);
+    const toastId = toast.loading(
+      `Preparing ${selectedPapers.length} paper${selectedPapers.length > 1 ? "s" : ""} for download…`,
+    );
 
-    await Promise.all(
-       uniquePapers.map(async (paper) => {
-        try {
-          const response = await fetch(getSecureUrl(paper.file_url));
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          const blob = await response.blob();
-          const filename = generateFileName(paper);
-          zip.file(filename, blob);
+    try {
+      const zip = new JSZip();
+      const uniquePapers = Array.from(
+        new Set(selectedPapers.map((paper) => paper._id)),
+      ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
+
+      let failedCount = 0;
+
+      await Promise.all(
+        uniquePapers.map(async (paper) => {
+          try {
+            const response = await fetch(getSecureUrl(paper.file_url));
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            const blob = await response.blob();
+            const filename = generateFileName(paper);
+            zip.file(filename, blob);
           } catch (err) {
+            failedCount += 1;
             console.error(`Failed to fetch ${paper.file_url}`, err);
           }
         }),
-    );
+      );
 
-    function getDownloadName(
-      params: ReadonlyURLSearchParams,
-      key: string,
-      fallback = "download",
-    ): string {
-      const value = params.get(key);
-      if (!value) return fallback;
-      return value.split(" [")[0]?.trim() ?? fallback;
+      if (failedCount === uniquePapers.length) {
+        toast.error("Couldn't prepare the download. Please try again.", {
+          id: toastId,
+        });
+        return;
+      }
+
+      function getDownloadName(
+        params: ReadonlyURLSearchParams,
+        key: string,
+        fallback = "download",
+      ): string {
+        const value = params.get(key);
+        if (!value) return fallback;
+        return value.split(" [")[0]?.trim() ?? fallback;
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+
+      a.download = getDownloadName(searchParams, "subject");
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      if (failedCount > 0) {
+        toast.success(
+          `Downloaded ${uniquePapers.length - failedCount} of ${uniquePapers.length} papers (${failedCount} failed).`,
+          { id: toastId },
+        );
+      } else {
+        toast.success("Download ready!", { id: toastId });
+      }
+    } catch (err) {
+      console.error("Failed to prepare zip", err);
+      toast.error("Something went wrong while zipping your files.", {
+        id: toastId,
+      });
+    } finally {
+      setIsDownloading(false);
     }
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(zipBlob);
-    const a = document.createElement("a");
-    a.href = url;
-
-    a.download = getDownloadName(searchParams, "subject");
-
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    toast.success("Download Initiated");
-  }, [searchParams, selectedPapers]);
+  }, [searchParams, selectedPapers, isDownloading]);
 
   const handleApplyFilters = useCallback(
     (
@@ -272,6 +308,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       papersPerPage,
       paginatedPapers,
       totalPages,
+      isDownloading,
     }),
     [
       selectedExams,
@@ -290,6 +327,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       papersPerPage,
       paginatedPapers,
       totalPages,
+      isDownloading,
     ],
   );
 
