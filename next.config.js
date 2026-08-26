@@ -6,8 +6,6 @@ await import("./src/env.js");
 
 /** @type {import("next").NextConfig} */
 const config = {
-  // Required to support PostHog trailing slash API requests
-  skipTrailingSlashRedirect: true,
   swcMinify: false,
   images: {
     remotePatterns: [
@@ -16,22 +14,6 @@ const config = {
         hostname: "storage.googleapis.com",
       },
     ],
-  },
-  async rewrites() {
-    return [
-      {
-        source: "/ingest/static/:path*",
-        destination: "https://us-assets.i.posthog.com/static/:path*",
-      },
-      {
-        source: "/ingest/array/:path*",
-        destination: "https://us-assets.i.posthog.com/array/:path*",
-      },
-      {
-        source: "/ingest/:path*",
-        destination: "https://us.i.posthog.com/:path*",
-      },
-    ];
   },
   async headers() {
     return [
