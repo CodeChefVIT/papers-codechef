@@ -15,6 +15,7 @@ import { FaShare } from "react-icons/fa";
 import QR from "./qr";
 import { Button } from "./ui/button";
 import { usePathname } from "next/navigation";
+import posthog from "posthog-js";
 
 interface ShareButtonProps {
   isFullscreen: boolean;
@@ -63,6 +64,7 @@ export default function ShareButton({ isFullscreen, viewerRef }: ShareButtonProp
                 loading: "Copying link...",
                 error: "Error copying link",
               });
+              posthog.capture("paper_shared", { method: "link_copied" });
             }}
           >
             <p>Copy Link To Clipboard</p>
