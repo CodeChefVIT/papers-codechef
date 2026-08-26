@@ -1,5 +1,7 @@
 import { success, failure } from "@/lib/utils/response";
 import { uploadPaper } from "@/lib/services/upload";
+import { getPostHogClient } from "@/lib/posthog-server";
+import { randomUUID } from "crypto";
 
 export const runtime = "nodejs";
 
@@ -19,6 +21,20 @@ export async function POST(req: Request) {
 
     if (!result.success) {
       return failure(result.message, result.status);
+    }
+
+    const posthog = getPostHogClient();
+    if (posthog) {
+      posthog.capture({
+        distinctId: randomUUID(),
+        event: "paper_upload_completed",
+        properties: {
+          file_count: files.length,
+          is_pdf: isPdf,
+          campus: campus ?? "unknown",
+        },
+      });
+      await posthog.flush();
     }
 
     return success(

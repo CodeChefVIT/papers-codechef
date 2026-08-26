@@ -24,6 +24,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 import Dropzone from "react-dropzone";
 import { Upload, XIcon } from "lucide-react";
+import posthog from "posthog-js";
 import { GlobalWorkerOptions } from "pdfjs-dist";
 import type { ApiResponse } from "@/interface";
 
@@ -274,6 +275,9 @@ export default function Page() {
 
     setIsUploading(true);
 
+    const fileTypes = [...new Set(files.map((f) => f.type))];
+    const fileCount = files.length;
+
     try {
       await toast.promise(
         async () => {
@@ -299,6 +303,12 @@ export default function Page() {
           error: (err: Error) => err.message,
         },
       );
+
+      posthog.capture("paper_upload_submitted", {
+        file_count: fileCount,
+        file_types: fileTypes,
+        is_pdf: isPdf,
+      });
 
       clearAllFiles();
     } finally {

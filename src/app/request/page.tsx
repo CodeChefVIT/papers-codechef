@@ -12,6 +12,7 @@ import {
 import { exams, slots, years } from "@/components/select_options";
 import { Input } from "@/components/ui/input";
 import axios from "axios";
+import posthog from "posthog-js";
 import Fuse from "fuse.js";
 import { type IUpcomingPaper } from "@/interface";
 import UpcomingPaper from "../../components/UpcomingPaper";
@@ -117,6 +118,12 @@ export default function PaperRequest() {
           error: "Failed to submit your request. Please try again later.",
         },
       );
+
+      posthog.capture("paper_request_submitted", {
+        exam: selectedExam,
+        slot: selectedSlot,
+        year: selectedYear,
+      });
 
       setSearchText("");
       setSelectedSubject(null);

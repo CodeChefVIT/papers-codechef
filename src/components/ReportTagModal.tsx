@@ -15,7 +15,8 @@ import { MultiSelect } from "@/components/multi-select";
 import LabeledInput from "@/components/ui/LabeledInput";
 import LabeledSelect from "@/components/ui/LabeledSelect";
 import axios from "axios";
-import toast from "react-hot-toast";  
+import toast from "react-hot-toast";
+import posthog from "posthog-js";
 import { type ApiResponse } from '@/interface'
 
 type ReportResponse = ApiResponse<{ error?: string; message?: string }>;
@@ -236,6 +237,11 @@ if (reportedFields.length === 0 && comment.trim().length === 0) {
     }
   )
   .then(() => {
+      posthog.capture("paper_reported", {
+        fields_reported: reportedFields.map((f) => f.field),
+        fields_reported_count: reportedFields.length,
+        has_comment: comment.trim().length > 0,
+      });
       modalSetOpen(false);
       setComment("");
       setEmail("");
