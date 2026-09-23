@@ -19,6 +19,7 @@ import { FilterProvider, useFilters } from "@/context/filterContext";
 import EmptyState from "./ui/EmptyState";
 import SelectionToolbar from "./SelectionToolbar";
 import SortComponent from "./ui/sorting";
+import SyllabusDock from "./SyllabusDock";
 
 const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -414,6 +415,7 @@ const CatalogueContent = () => {
   return (
     <FilterProvider subject={subject}>
       <CatalogueContentInner subject={subject} />
+      <SyllabusDock subject={subject} />
     </FilterProvider>
   );
 };
