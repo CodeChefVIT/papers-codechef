@@ -14,6 +14,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 import { type IPaper, type Filters } from "@/interface";
+import posthog from "posthog-js";
 import JSZip from "jszip";
 import { toast } from "react-hot-toast";
 import { getSecureUrl, generateFileName } from "@/lib/utils/download";
@@ -207,6 +208,12 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+
+      posthog.capture("papers_bulk_downloaded", {
+        download_count: uniquePapers.length - failedCount,
+        total_selected: uniquePapers.length,
+        failed_count: failedCount,
+      });
 
       if (failedCount > 0) {
         toast.success(

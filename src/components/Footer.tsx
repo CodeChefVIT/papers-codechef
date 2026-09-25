@@ -15,6 +15,7 @@ import {
 import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import type { ApiResponse } from '@/interface'
+import posthog from "posthog-js";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -41,6 +42,8 @@ export default function Footer() {
         error: (err: Error) => err.message || "Subscription Failed.",
       },
     );
+
+    posthog.capture("newsletter_subscribed");
 
     setEmail("");
   };

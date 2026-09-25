@@ -16,6 +16,7 @@ import SearchBarChild from "./Searchbar/searchbar-child";
 import Link from "next/link";
 import { useCourses } from "@/context/courseContext";
 import { FilterProvider, useFilters } from "@/context/filterContext";
+import posthog from "posthog-js";
 import EmptyState from "./ui/EmptyState";
 import SelectionToolbar from "./SelectionToolbar";
 import SortComponent from "./ui/sorting";
@@ -143,6 +144,10 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
       : saved.filter((s) => s !== subject);
 
     localStorage.setItem("userSubjects", JSON.stringify(updated));
+
+    posthog.capture(current ? "subject_pinned" : "subject_unpinned", {
+      subject: subject?.split(" [")[0]?.trim() ?? subject,
+    });
   };
 
   // Fetch papers ONLY when subject changes (not when filters change!)
