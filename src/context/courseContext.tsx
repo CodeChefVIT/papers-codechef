@@ -1,6 +1,13 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import axios from "axios";
 import {
   type ICourse,
@@ -24,7 +31,7 @@ export function CoursesProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchCourses = async () => {
+  const fetchCourses = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
@@ -56,16 +63,19 @@ export function CoursesProvider({ children }: { children: React.ReactNode }) {
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   useEffect(() => {
     void fetchCourses();
-  }, []);
+  }, [fetchCourses]);
+
+  const value = useMemo(
+    () => ({ courses, loading, error, refetch: fetchCourses }),
+    [courses, loading, error, fetchCourses],
+  );
 
   return (
-    <CoursesContext.Provider
-      value={{ courses, loading, error, refetch: fetchCourses }}
-    >
+    <CoursesContext.Provider value={value}>
       {children}
     </CoursesContext.Provider>
   );

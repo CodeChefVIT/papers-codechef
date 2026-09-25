@@ -5,6 +5,7 @@ import React, {
   useContext,
   useState,
   useCallback,
+  useMemo,
   type ReactNode,
 } from "react";
 import {
@@ -13,6 +14,7 @@ import {
   useSearchParams,
 } from "next/navigation";
 import { type IPaper, type Filters } from "@/interface";
+import posthog from "posthog-js";
 import JSZip from "jszip";
 import { toast } from "react-hot-toast";
 import { getSecureUrl, generateFileName } from "@/lib/utils/download";
@@ -34,6 +36,10 @@ interface FilterState {
   filtersPulled: boolean;
   currentPage: number;
   papersPerPage: number;
+
+  paginatedPapers: IPaper[];
+  totalPages: number;
+  isDownloading: boolean;
 }
 
 interface FilterActions {
@@ -67,14 +73,14 @@ interface FilterActions {
   filtersNotPulled: () => void;
   noAppliedFilters: () => void;
   closeFilters: () => void;
-
-  paginatedPapers: IPaper[];
-  totalPages: number;
 }
 
 type FilterContextType = FilterState & FilterActions;
 
-const FilterContext = createContext<FilterContextType | undefined>(undefined);
+const FilterStateContext = createContext<FilterState | undefined>(undefined);
+const FilterActionsContext = createContext<FilterActions | undefined>(
+  undefined,
+);
 
 interface FilterProviderProps {
   children: ReactNode;
@@ -104,6 +110,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
   const [appliedFilters, setAppliedFilters] = useState<boolean>(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [papersPerPage] = useState(12);
+  const [isDownloading, setIsDownloading] = useState<boolean>(false);
 
   const filtersNotPulled = useCallback(() => {
     setFiltersPulled(false);
@@ -141,50 +148,90 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       toast.error("No papers selected for download.");
       return;
     }
+    if (isDownloading) return;
 
-    const zip = new JSZip();
-    const uniquePapers = Array.from(
-      new Set(selectedPapers.map((paper) => paper._id)),
-    ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
+    setIsDownloading(true);
+    const toastId = toast.loading(
+      `Preparing ${selectedPapers.length} paper${selectedPapers.length > 1 ? "s" : ""} for download…`,
+    );
 
-    await Promise.all(
-       uniquePapers.map(async (paper) => {
-        try {
-          const response = await fetch(getSecureUrl(paper.file_url));
-          if (!response.ok) {
-            throw new Error(`HTTP ${response.status}`);
-          }
-          const blob = await response.blob();
-          const filename = generateFileName(paper);
-          zip.file(filename, blob);
+    try {
+      const zip = new JSZip();
+      const uniquePapers = Array.from(
+        new Set(selectedPapers.map((paper) => paper._id)),
+      ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
+
+      let failedCount = 0;
+
+      await Promise.all(
+        uniquePapers.map(async (paper) => {
+          try {
+            const response = await fetch(getSecureUrl(paper.file_url));
+            if (!response.ok) {
+              throw new Error(`HTTP ${response.status}`);
+            }
+            const blob = await response.blob();
+            const filename = generateFileName(paper);
+            zip.file(filename, blob);
           } catch (err) {
+            failedCount += 1;
             console.error(`Failed to fetch ${paper.file_url}`, err);
           }
         }),
-    );   
+      );
 
-    function getDownloadName(
-      params: ReadonlyURLSearchParams,
-      key: string,
-      fallback = "download",
-    ): string {
-      const value = params.get(key);
-      if (!value) return fallback;
-      return value.split(" [")[0]?.trim() ?? fallback;
+      if (failedCount === uniquePapers.length) {
+        toast.error("Couldn't prepare the download. Please try again.", {
+          id: toastId,
+        });
+        return;
+      }
+
+      function getDownloadName(
+        params: ReadonlyURLSearchParams,
+        key: string,
+        fallback = "download",
+      ): string {
+        const value = params.get(key);
+        if (!value) return fallback;
+        return value.split(" [")[0]?.trim() ?? fallback;
+      }
+
+      const zipBlob = await zip.generateAsync({ type: "blob" });
+      const url = URL.createObjectURL(zipBlob);
+      const a = document.createElement("a");
+      a.href = url;
+
+      a.download = getDownloadName(searchParams, "subject");
+
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+
+      posthog.capture("papers_bulk_downloaded", {
+        download_count: uniquePapers.length - failedCount,
+        total_selected: uniquePapers.length,
+        failed_count: failedCount,
+      });
+
+      if (failedCount > 0) {
+        toast.success(
+          `Downloaded ${uniquePapers.length - failedCount} of ${uniquePapers.length} papers (${failedCount} failed).`,
+          { id: toastId },
+        );
+      } else {
+        toast.success("Download ready!", { id: toastId });
+      }
+    } catch (err) {
+      console.error("Failed to prepare zip", err);
+      toast.error("Something went wrong while zipping your files.", {
+        id: toastId,
+      });
+    } finally {
+      setIsDownloading(false);
     }
-    const zipBlob = await zip.generateAsync({ type: "blob" });
-    const url = URL.createObjectURL(zipBlob);
-    const a = document.createElement("a");
-    a.href = url;
-
-    a.download = getDownloadName(searchParams, "subject");
-
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-    URL.revokeObjectURL(url);
-    toast.success("Download Initiated");
-  }, [searchParams, selectedPapers]);
+  }, [searchParams, selectedPapers, isDownloading]);
 
   const handleApplyFilters = useCallback(
     (
@@ -232,66 +279,127 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     ],
   );
 
-  const paginatedPapers = filteredPapers.slice(
-    (currentPage - 1) * papersPerPage,
-    currentPage * papersPerPage,
+  const paginatedPapers = useMemo(
+    () =>
+      filteredPapers.slice(
+        (currentPage - 1) * papersPerPage,
+        currentPage * papersPerPage,
+      ),
+    [filteredPapers, currentPage, papersPerPage],
   );
 
-  const totalPages = Math.ceil(
-    (appliedFilters ? filteredPapers.length : papers.length) / papersPerPage,
+  const totalPages = useMemo(
+    () =>
+      Math.ceil(
+        (appliedFilters ? filteredPapers.length : papers.length) /
+          papersPerPage,
+      ),
+    [appliedFilters, filteredPapers.length, papers.length, papersPerPage],
   );
 
-  const value: FilterContextType = {
-    selectedExams,
-    selectedSlots,
-    selectedYears,
-    selectedSemesters,
-    selectedCampuses,
-    selectedAnswerKeyIncluded,
-    papers,
-    filteredPapers,
-    selectedPapers,
-    filterOptions,
-    appliedFilters,
-    filtersPulled,
-    currentPage,
-    papersPerPage,
+  const stateValue: FilterState = useMemo(
+    () => ({
+      selectedExams,
+      selectedSlots,
+      selectedYears,
+      selectedSemesters,
+      selectedCampuses,
+      selectedAnswerKeyIncluded,
+      papers,
+      filteredPapers,
+      selectedPapers,
+      filterOptions,
+      appliedFilters,
+      filtersPulled,
+      currentPage,
+      papersPerPage,
+      paginatedPapers,
+      totalPages,
+      isDownloading,
+    }),
+    [
+      selectedExams,
+      selectedSlots,
+      selectedYears,
+      selectedSemesters,
+      selectedCampuses,
+      selectedAnswerKeyIncluded,
+      papers,
+      filteredPapers,
+      selectedPapers,
+      filterOptions,
+      appliedFilters,
+      filtersPulled,
+      currentPage,
+      papersPerPage,
+      paginatedPapers,
+      totalPages,
+      isDownloading,
+    ],
+  );
 
-    setSelectedExams,
-    setSelectedSlots,
-    setSelectedYears,
-    setSelectedSemesters,
-    setSelectedCampuses,
-    setSelectedAnswerKeyIncluded,
-    setPapers,
-    setFilteredPapers,
-    setFilterOptions,
-    setFiltersPulled,
-    setAppliedFilters,
-    setCurrentPage,
-
-    handleApplyFilters,
-    handleSelectPaper,
-    handleSelectAll,
-    handleDeselectAll,
-    handleDownloadSelected,
-    filtersNotPulled,
-    noAppliedFilters,
-    closeFilters,
-
-    paginatedPapers,
-    totalPages,
-  };
+  const actionsValue: FilterActions = useMemo(
+    () => ({
+      setSelectedExams,
+      setSelectedSlots,
+      setSelectedYears,
+      setSelectedSemesters,
+      setSelectedCampuses,
+      setSelectedAnswerKeyIncluded,
+      setPapers,
+      setFilteredPapers,
+      setFilterOptions,
+      setFiltersPulled,
+      setAppliedFilters,
+      setCurrentPage,
+      handleApplyFilters,
+      handleSelectPaper,
+      handleSelectAll,
+      handleDeselectAll,
+      handleDownloadSelected,
+      filtersNotPulled,
+      noAppliedFilters,
+      closeFilters,
+    }),
+    [
+      handleApplyFilters,
+      handleSelectPaper,
+      handleSelectAll,
+      handleDeselectAll,
+      handleDownloadSelected,
+      filtersNotPulled,
+      noAppliedFilters,
+      closeFilters,
+    ],
+  );
 
   return (
-    <FilterContext.Provider value={value}>{children}</FilterContext.Provider>
+    <FilterActionsContext.Provider value={actionsValue}>
+      <FilterStateContext.Provider value={stateValue}>
+        {children}
+      </FilterStateContext.Provider>
+    </FilterActionsContext.Provider>
   );
 };
 
-export const useFilters = (): FilterContextType => {
-  const context = useContext(FilterContext);
+export const useFilterState = (): FilterState => {
+  const context = useContext(FilterStateContext);
   if (!context) {
-    throw new Error("useFilters must be used within a FilterProvider");
+    throw new Error("useFilterState must be used within a FilterProvider");
   }
   return context;
+};
+
+export const useFilterActions = (): FilterActions => {
+  const context = useContext(FilterActionsContext);
+  if (!context) {
+    throw new Error("useFilterActions must be used within a FilterProvider");
+  }
+  return context;
+};
+
+export const useFilters = (): FilterContextType => {
+  const state = useFilterState();
+  const actions = useFilterActions();
+  return useMemo(() => ({ ...state, ...actions }), [state, actions]);
 };

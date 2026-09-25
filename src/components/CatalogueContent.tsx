@@ -16,8 +16,9 @@ import SearchBarChild from "./Searchbar/searchbar-child";
 import Link from "next/link";
 import { useCourses } from "@/context/courseContext";
 import { FilterProvider, useFilters } from "@/context/filterContext";
+import posthog from "posthog-js";
 import EmptyState from "./ui/EmptyState";
-import SidebarButton from "./SidebarButton";
+import SelectionToolbar from "./SelectionToolbar";
 import SortComponent from "./ui/sorting";
 
 const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
@@ -39,6 +40,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
     selectedCampuses,
     selectedAnswerKeyIncluded,
     papers,
+    filteredPapers,
     appliedFilters,
     filtersPulled,
     currentPage,
@@ -60,6 +62,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
     handleSelectAll,
     handleDeselectAll,
     handleDownloadSelected,
+    isDownloading,
   } = useFilters();
 
   useEffect(() => {
@@ -141,6 +144,10 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
       : saved.filter((s) => s !== subject);
 
     localStorage.setItem("userSubjects", JSON.stringify(updated));
+
+    posthog.capture(current ? "subject_pinned" : "subject_unpinned", {
+      subject: subject?.split(" [")[0]?.trim() ?? subject,
+    });
   };
 
   // Fetch papers ONLY when subject changes (not when filters change!)
@@ -316,17 +323,14 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
               currentSort={sortOption}
             />
 
-            <SidebarButton onClick={handleSelectAll} className="order-2">
-              Select All
-            </SidebarButton>
-
-            <SidebarButton onClick={handleDeselectAll} className="order-2">
-              Deselect All
-            </SidebarButton>
-
-            <SidebarButton onClick={handleDownloadSelected} className="order-2">
-              Download Selected
-            </SidebarButton>
+            <SelectionToolbar
+              selectedCount={selectedPapers.length}
+              totalCount={(appliedFilters ? filteredPapers : papers).length}
+              onSelectAll={handleSelectAll}
+              onDeselectAll={handleDeselectAll}
+              onDownload={() => void handleDownloadSelected()}
+              isDownloading={isDownloading}
+            />
           </div>
 
           {relatedSubjects.length > 0 && (

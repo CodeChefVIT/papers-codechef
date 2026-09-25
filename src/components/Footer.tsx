@@ -15,6 +15,7 @@ import {
 import { Mail } from "lucide-react";
 import toast from "react-hot-toast";
 import type { ApiResponse } from '@/interface'
+import posthog from "posthog-js";
 
 export default function Footer() {
   const [email, setEmail] = useState("");
@@ -41,6 +42,8 @@ export default function Footer() {
         error: (err: Error) => err.message || "Subscription Failed.",
       },
     );
+
+    posthog.capture("newsletter_subscribed");
 
     setEmail("");
   };
@@ -93,8 +96,6 @@ export default function Footer() {
         <div className="flex w-full flex-col gap-2 text-black dark:text-white  lg:w-[15%]">
           <h3 className="font-jost text-xl font-semibold">Events</h3>
           <Link href="https://devsoc26.codechefvit.com" target="_blank">DevSOC</Link>
-          <Link href="https://gravitas.codechefvit.com" target="_blank">CookOff</Link>
-          <Link href="https://gravitas.codechefvit.com" target="_blank">Clueminati</Link>
         </div>
         {/* Projects */}
         <div className="flex w-full flex-col gap-2 text-black dark:text-white  lg:w-[20%]">

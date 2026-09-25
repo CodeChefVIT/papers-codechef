@@ -40,7 +40,7 @@ const SortComponent: React.FC<SortComponentProps> = ({
       <DropdownMenuTrigger asChild>
         <Button
           variant="outline"
-          className="flex gap-2 border-2 border-black bg-white font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:bg-[#070114] dark:text-white dark:hover:border-white dark:hover:bg-slate-900"
+         className="flex h-10 gap-2 rounded-full border-2 border-black bg-white font-sans font-semibold text-black transition-colors hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:bg-[#070114] dark:text-white dark:hover:border-white dark:hover:bg-slate-900"
         >
           {getSortIcon()}
           <span className="hidden sm:inline">{getSortLabel()}</span>

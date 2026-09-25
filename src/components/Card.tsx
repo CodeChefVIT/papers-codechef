@@ -28,6 +28,17 @@ interface CardProps {
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
 
+  const paperContextValue = React.useMemo(
+    () => ({
+      paperId: paper._id,
+      subject: paper.subject,
+      exam: paper.exam,
+      slot: paper.slot,
+      year: paper.year,
+    }),
+    [paper._id, paper.subject, paper.exam, paper.slot, paper.year],
+  );
+
   React.useEffect(() => {
     if (!previewOpen) return;
 
@@ -60,8 +71,8 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   window.open(paperLink, "_blank");
 }}
         className={cn(
-          "cursor-pointer overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
-          isSelected && "ring-2 ring-[#7480FF] bg-[#EFEAFF]"
+          "cursor-pointer overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play shadow-sm transition-all duration-150 hover:-translate-y-0.5 hover:bg-[#EFEAFF] hover:shadow-md dark:border-[#36266D] dark:bg-[#171720] dark:shadow-none hover:dark:bg-[#262635]",
+          isSelected && "-translate-y-0.5 bg-[#EFEAFF] shadow-md ring-2 ring-[#7480FF]"
         )}
       >
           <Image
@@ -89,6 +100,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
                 <Capsule>{paper.slot}</Capsule>
                 <Capsule>{paper.year}</Capsule>
                 <Capsule>{paper.semester}</Capsule>
+                {paper.school && <Capsule>{paper.school}</Capsule>}
               </div>
             </div>
           </div>
@@ -147,15 +159,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
             <div
               className="relative mx-auto h-full max-w-[760px]"
             >
-              <PaperProvider
-                value={{
-                  paperId: paper._id,
-                  subject: paper.subject,
-                  exam: paper.exam,
-                  slot: paper.slot,
-                  year: paper.year,
-                }}
-              >
+              <PaperProvider value={paperContextValue}>
               <button
                 className="fixed right-4 top-4 z-[60] rounded-full border border-black/10 bg-white/95 p-2 text-black shadow-md transition hover:bg-white"
                 onClick={() => setPreviewOpen(false)}
