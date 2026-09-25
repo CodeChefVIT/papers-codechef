@@ -8,6 +8,7 @@ import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PaperProvider } from "@/context/PaperContext";
 import PDFViewer from "@/components/newPdfViewer";
+import SyllabusDock from "@/components/SyllabusDock";
 
 export async function generateMetadata({
   params,
@@ -187,6 +188,7 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
             </PaperProvider>
           </center>
           <RelatedPapers />
+          <SyllabusDock subject={paper.subject} />
         </>
       )}
     </div>
