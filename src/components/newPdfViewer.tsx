@@ -175,7 +175,7 @@
             <div className="absolute bottom-full right-0 z-[2] mb-3 w-52 animate-in fade-in slide-in-from-bottom-1 duration-300">
               <div className="rounded-lg bg-[#6536c1] px-3 py-2.5 text-[11px] leading-snug text-white shadow-xl">
                 <span className="font-semibold">New: Reading Mode.</span> Hides
-                everything but the paper — lighter than Fullscreen, your tabs
+                everything but the paper. Lighter than Fullscreen, your tabs
                 stay put.
                 <button
                   onClick={dismissReadingCoachmark}
