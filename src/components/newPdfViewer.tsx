@@ -542,7 +542,8 @@
       const handleKeydown = (e: KeyboardEvent) => {
         const target = e.target as HTMLElement | null;
         if (target && ["INPUT", "TEXTAREA"].includes(target.tagName)) return;
-
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        
         if (e.key === "r" || e.key === "R") {
           toggleReadingMode();
         } else if (e.key === 'f' || e.key === 'F') {
