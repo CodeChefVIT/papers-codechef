@@ -202,7 +202,7 @@
         <Button
         onClick={toggleFullscreen}
         className="h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]"
-        title={isFullscreen ? "Exit fullscreen" : "Enter fullscreen"}
+        title={isFullscreen ? "Exit fullscreen (F)" : "Enter fullscreen (F)"}
         >
         {isFullscreen ? <Minimize2 size={24} /> : <Maximize2 size={24} />}
         </Button>
@@ -545,6 +545,8 @@
 
         if (e.key === "r" || e.key === "R") {
           toggleReadingMode();
+        } else if (e.key === 'f' || e.key === 'F') {
+          toggleFullscreen();
         } else if (e.key === "Escape" && isReadingMode) {
           setIsReadingMode(false);
           onReadingModeChange?.(false);
