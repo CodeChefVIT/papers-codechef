@@ -123,7 +123,6 @@
           onClick={toggleReadingMode}
           title="Exit Reading Mode (R)"
           className="group fixed bottom-5 left-1/2 z-[2] flex -translate-x-1/2 items-center gap-2 rounded-full bg-[#262635]/70 py-1.5 pl-3.5 pr-2 text-xs font-medium text-white/70 shadow-lg backdrop-blur transition-all hover:bg-[#262635] hover:text-white hover:opacity-100"
-          style={{ opacity: 0.55 }}
         >
           <BookOpenText size={13} />
           Reading Mode
