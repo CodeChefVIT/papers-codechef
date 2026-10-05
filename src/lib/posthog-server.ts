@@ -1,8 +1,8 @@
-import { PostHog } from "posthog-node";
+import * as posthogModule from "posthog-node";
 
-let posthogClient: PostHog | null = null;
+let posthogClient: any = null;
 
-export function getPostHogClient(): PostHog | null {
+export function getPostHogClient(): any {
   const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   if (!token) {
     if (process.env.NODE_ENV !== "production") {
@@ -12,7 +12,10 @@ export function getPostHogClient(): PostHog | null {
     }
     return null;
   }
-  posthogClient ??= new PostHog(token, {
+
+  const PHClass = (posthogModule as any).PostHog || (posthogModule as any).default?.PostHog || posthogModule.default;
+
+  posthogClient ??= new PHClass(token, {
     host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
     flushAt: 1,
     flushInterval: 0,
