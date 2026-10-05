@@ -1,6 +1,7 @@
 import { type IPaper } from "../../interface";
 import { extractBracketContent } from "./string";
 import axios from "axios";
+import toast from "react-hot-toast";
 
 export const getSecureUrl = (url: string): string =>
   url.startsWith("http://") ? url.replace("http://", "https://") : url;
@@ -23,6 +24,7 @@ export const downloadFile = async (
     link.click();
     window.URL.revokeObjectURL(link.href);
   } catch (error) {
-    console.error("Download failed:", error);
+    console.error("Download failed (File missing or network error):", error);
+    toast.error("This paper is no longer available on the server.");
   }
 };

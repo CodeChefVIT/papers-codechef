@@ -1,8 +1,15 @@
-import * as posthogModule from "posthog-node";
+/* eslint-disable @typescript-eslint/no-require-imports */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
+/* eslint-disable @typescript-eslint/no-unsafe-call */
+/* eslint-disable @typescript-eslint/prefer-nullish-coalescing */
 
-let posthogClient: any = null;
+import type { PostHog } from "posthog-node";
 
-export function getPostHogClient(): any {
+let posthogClient: PostHog | null = null;
+
+export function getPostHogClient(): PostHog | null {
   const token = process.env.NEXT_PUBLIC_POSTHOG_PROJECT_TOKEN;
   if (!token) {
     if (process.env.NODE_ENV !== "production") {
@@ -13,7 +20,8 @@ export function getPostHogClient(): any {
     return null;
   }
 
-  const PHClass = (posthogModule as any).PostHog || (posthogModule as any).default?.PostHog || posthogModule.default;
+  const phModule = require("posthog-node");
+  const PHClass = phModule.PostHog || phModule.default?.PostHog || phModule.default || phModule;
 
   posthogClient ??= new PHClass(token, {
     host: process.env.NEXT_PUBLIC_POSTHOG_HOST,
