@@ -86,7 +86,7 @@ export default function SyllabusDock({ subject }: SyllabusDockProps) {
   const isDraggingRef = useRef(false);
 
   const handleMouseDownDrag = (e: React.MouseEvent) => {
-    if (isFullscreen) return;
+    if (isFullscreen && dockState !== "collapsed") return;
     
     const target = e.target as HTMLElement;
     if (target.closest("button")) {
@@ -199,6 +199,7 @@ export default function SyllabusDock({ subject }: SyllabusDockProps) {
 
   const handleClose = () => {
     setDockState("collapsed");
+    setIsFullscreen(false);
     sessionStorage.setItem("syllabus-dock-state", "collapsed");
     
     setPosition({ right: 24, bottom: 24 });
