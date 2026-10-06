@@ -25,6 +25,10 @@ export const downloadFile = async (
     window.URL.revokeObjectURL(link.href);
   } catch (error) {
     console.error("Download failed (File missing or network error):", error);
-    toast.error("This paper is no longer available on the server.");
+    if (typeof navigator !== "undefined" && !navigator.onLine) {
+      toast.error("You are offline. Please check your internet connection.");
+    } else {
+      toast.error("This paper is no longer available on the server.");
+    }
   }
 };
