@@ -8,6 +8,7 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import ChildrenWrapper from "@/components/ChildrenWrapper";
 import { CoursesProvider } from "@/context/courseContext";
+import { PostHogProvider } from "@/components/PostHogProvider";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://papers.codechefvit.com/"),
@@ -113,21 +114,23 @@ export default function RootLayout({
         </Script>
       </head>
       <body>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <Toaster position="top-right" reverseOrder={false} />
-          <div className="bg-[#F3F5FF] dark:bg-[#070114]">
-            <CoursesProvider>
-              <Navbar />
-              <ChildrenWrapper>{children}</ChildrenWrapper>
-              <Footer />
-            </CoursesProvider>
-          </div>
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="dark"
+            enableSystem
+            disableTransitionOnChange
+          >
+            <Toaster position="top-right" reverseOrder={false} />
+            <div className="bg-[#F3F5FF] dark:bg-[#070114]">
+              <CoursesProvider>
+                <Navbar />
+                <ChildrenWrapper>{children}</ChildrenWrapper>
+                <Footer />
+              </CoursesProvider>
+            </div>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   );

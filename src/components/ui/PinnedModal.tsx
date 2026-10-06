@@ -63,7 +63,7 @@ const SortableItem = ({
       ref={setNodeRef}
       style={style}
       {...attributes}
-      className={`mb-2 flex items-center justify-between rounded-2xl border border-[#3A3745] px-2 py-1 pl-2 shadow-sm ${
+      className={`mb-2 flex items-center justify-between rounded-md border border-[#3A3745] px-4 py-2 pl-2 shadow-sm ${
         isDragging ? "scale-[1.02] cursor-grabbing opacity-90" : "cursor-grab"
       }`}
     >

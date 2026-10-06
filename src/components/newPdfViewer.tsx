@@ -10,6 +10,7 @@
   import { ExportPluginPackage }                           from '@embedpdf/plugin-export/react';
 
   import { Download, ZoomIn, ZoomOut, Maximize2, Minimize2, BookOpenText, X } from "lucide-react";
+  import posthog from "posthog-js";
   import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
   import { downloadFile } from "../lib/utils/download";
   import { Button } from "./ui/button";
@@ -174,7 +175,7 @@
             <div className="absolute bottom-full right-0 z-[2] mb-3 w-52 animate-in fade-in slide-in-from-bottom-1 duration-300">
               <div className="rounded-lg bg-[#6536c1] px-3 py-2.5 text-[11px] leading-snug text-white shadow-xl">
                 <span className="font-semibold">New: Reading Mode.</span> Hides
-                everything but the paper — lighter than Fullscreen, your tabs
+                everything but the paper. Lighter than Fullscreen, your tabs
                 stay put.
                 <button
                   onClick={dismissReadingCoachmark}
@@ -478,6 +479,9 @@
         paper_title: name,
         paper_url: url,
       });
+      posthog.capture("paper_downloaded", {
+        paper_name: name,
+      });
       await downloadFile(url, `${name}.pdf`);
     }, [url, name]);
 
@@ -508,6 +512,7 @@
     const toggleReadingMode = useCallback(() => {
       setIsReadingMode((r) => {
         const next = !r;
+        posthog.capture("reading_mode_toggled", { enabled: next });
         onReadingModeChange?.(next);
         return next;
       });
