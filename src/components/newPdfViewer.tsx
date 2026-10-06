@@ -467,6 +467,20 @@ export default function PDFViewer({
   const [isReadingMode, setIsReadingMode] = useState(false);
   const [showReadingCoachmark, setShowReadingCoachmark] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
+  const [urlStatus, setUrlStatus] = useState<"checking" | "ok" | "error">("checking");
+
+  useEffect(() => {
+    let isMounted = true;
+    fetch(url, { method: "HEAD" })
+      .then(res => {
+        if (isMounted) setUrlStatus(res.ok ? "ok" : "error");
+      })
+      .catch(() => {
+        if (isMounted) setUrlStatus("error");
+      });
+    return () => { isMounted = false; };
+  }, [url]);
+
   const effectiveBackgroundColor =
     backgroundColor ?? (resolvedTheme === "light" ? "#F3F5FF" : "#070114");
   const loaderTextColor =
@@ -571,7 +585,19 @@ export default function PDFViewer({
     }),
   ], [url, name]);
 
-if (isLoading || !engine) {
+  if (urlStatus === "error") {
+    return (
+      <div className="flex h-dvh w-full flex-col items-center justify-center gap-2" style={{ backgroundColor: effectiveBackgroundColor, color: loaderTextColor }}>
+        <BookOpenText size={48} className="opacity-50 mb-2" />
+        <span className="text-lg font-medium">Paper Not Found</span>
+        <span className="text-sm opacity-70 text-center max-w-[250px]">
+          This paper has been deleted or is missing from the server.
+        </span>
+      </div>
+    );
+  }
+
+  if (isLoading || !engine || urlStatus === "checking") {
   return (
 <Loader
   backgroundColor={effectiveBackgroundColor}
@@ -655,7 +681,7 @@ if (isLoading || !engine) {
                 dismissReadingCoachmark={dismissReadingCoachmark}
               />}
               <DocumentContent documentId={activeDocumentId}>
-                {({ isLoaded }) => (
+                {({ isLoaded, isError }) => (
                   <>
                     <div
                       className="absolute inset-0 z-50 flex items-center justify-center bg-[#070114]"
@@ -666,10 +692,20 @@ if (isLoading || !engine) {
                       backgroundColor: effectiveBackgroundColor,
                       }}
                     >
-                      <Loader
-                        backgroundColor={effectiveBackgroundColor}
-                        textColor={loaderTextColor}
-                      />
+                      {isError ? (
+                        <div className="flex flex-col items-center gap-2" style={{ color: loaderTextColor }}>
+                          <BookOpenText size={48} className="opacity-50 mb-2" />
+                          <span className="text-lg font-medium">Paper Not Found</span>
+                          <span className="text-sm opacity-70 text-center max-w-[250px]">
+                            This paper has been deleted or is missing from the server.
+                          </span>
+                        </div>
+                      ) : (
+                        <Loader
+                          backgroundColor={effectiveBackgroundColor}
+                          textColor={loaderTextColor}
+                        />
+                      )}
                     </div>
                     <Viewport
                       documentId={activeDocumentId}
