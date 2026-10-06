@@ -60,6 +60,7 @@ export interface IAdminPaper {
 
 export interface ICourses {
   name: string;
+  syllabus?: string;
 }
 
 export interface APIResponse {
@@ -153,10 +154,12 @@ export interface ICourseCount {
 export interface ICourse {
   _id: string;
   name: string;
+  syllabus?: string;
 }
 
 export interface ICourseWithCount {
   _id: string;
   name: string;
   count: number;
+  syllabus?: string;
 }
