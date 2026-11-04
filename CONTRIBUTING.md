@@ -15,7 +15,7 @@ We appreciate your interest in contributing to the `papers-codechef` repository!
 
 To get the project running, you need to set up your local environment:
 
-- **Create a `.env` file:** Create a new file named `.env` and use the .env.example file to create your own .env file and put in your your own environment variables to make the project functional.
+- **Create a `.env` file:** Create a new file named `.env` and use the `.env.example` file to create your own .env file and put in your your own environment variables to make the project functional.
 - **Install dependencies:** Run `pnpm i` in your terminal to install all necessary dependencies.
 - **Checkout staging branch**: Run `git checkout staging` to switch branches.
 - **Run the project:** Run `pnpm dev` to start the project.
