@@ -18,3 +18,9 @@ export const subscribeRatelimit = new Ratelimit({
   redis: redis,
   limiter: Ratelimit.slidingWindow(3, "1 h"),
 });
+
+// Rate limiter for Feedback (5 requests per 15 minutes)
+export const feedbackRatelimit = new Ratelimit({
+  redis: redis,
+  limiter: Ratelimit.slidingWindow(5, "900 s"),
+});
