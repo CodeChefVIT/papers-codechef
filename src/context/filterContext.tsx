@@ -202,7 +202,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       const a = document.createElement("a");
       a.href = url;
 
-      a.download = getDownloadName(searchParams, "subject");
+      a.download = `${getDownloadName(searchParams, "subject")}.zip`;
 
       document.body.appendChild(a);
       a.click();
@@ -292,7 +292,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     () =>
       Math.ceil(
         (appliedFilters ? filteredPapers.length : papers.length) /
-          papersPerPage,
+        papersPerPage,
       ),
     [appliedFilters, filteredPapers.length, papers.length, papersPerPage],
   );
