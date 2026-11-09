@@ -162,6 +162,19 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
 
       let failedCount = 0;
+      // Different papers can share a generated name (e.g. same subject/exam/slot/year
+      // from different campuses). JSZip overwrites entries with the same path, so
+      // append " (1)", " (2)", ... to keep every paper in the zip.
+      const usedNames = new Map<string, number>();
+      const getUniqueName = (name: string): string => {
+        const count = usedNames.get(name) ?? 0;
+        usedNames.set(name, count + 1);
+        if (count === 0) return name;
+        const dot = name.lastIndexOf(".");
+        return dot > 0
+          ? `${name.slice(0, dot)} (${count})${name.slice(dot)}`
+          : `${name} (${count})`;
+      };
 
       await Promise.all(
         uniquePapers.map(async (paper) => {
@@ -171,7 +184,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
               throw new Error(`HTTP ${response.status}`);
             }
             const blob = await response.blob();
-            const filename = generateFileName(paper);
+            const filename = getUniqueName(generateFileName(paper));
             zip.file(filename, blob);
           } catch (err) {
             failedCount += 1;
@@ -202,7 +215,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       const a = document.createElement("a");
       a.href = url;
 
-      a.download = getDownloadName(searchParams, "subject");
+      a.download = `${getDownloadName(searchParams, "subject")}.zip`;
 
       document.body.appendChild(a);
       a.click();
@@ -292,7 +305,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
     () =>
       Math.ceil(
         (appliedFilters ? filteredPapers.length : papers.length) /
-          papersPerPage,
+        papersPerPage,
       ),
     [appliedFilters, filteredPapers.length, papers.length, papersPerPage],
   );
