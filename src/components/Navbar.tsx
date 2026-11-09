@@ -22,6 +22,7 @@ import {
 import { useCourses } from "@/context/courseContext";
 import PinnedModal from "./ui/PinnedModal";
 import RequestModal from "./ui/RequestModal";
+import FeedbackModal from "./ui/FeedbackModal";
 import Announcement from "./ui/announcement/Announcement";
 import { getSubjectEvent, type EventData } from "@/config/events";
 
@@ -93,6 +94,12 @@ function Navbar() {
       <div className="flex h-8 items-center gap-1 rounded-full border border-[#3A3745] bg-[#e8e9ff] px-2.5 py-1 text-xs font-semibold text-gray-700 transition hover:bg-slate-50 dark:bg-black dark:text-white dark:hover:bg-[#1A1823] sm:h-9 sm:gap-2 sm:px-3.5 sm:py-1.5 sm:text-sm md:h-10 md:px-4 md:py-2 md:text-base">
         <span className="truncate">
           <RequestModal />
+        </span>
+      </div>
+
+      <div className="flex h-8 items-center gap-1 rounded-full border border-[#3A3745] bg-[#e8e9ff] px-2.5 py-1 text-xs font-semibold text-gray-700 transition hover:bg-slate-50 dark:bg-black dark:text-white dark:hover:bg-[#1A1823] sm:h-9 sm:gap-2 sm:px-3.5 sm:py-1.5 sm:text-sm md:h-10 md:px-4 md:py-2 md:text-base">
+        <span className="truncate">
+          <FeedbackModal />
         </span>
       </div>
     </>
@@ -173,6 +180,15 @@ function Navbar() {
                       <RequestModal />
                     </div>
                   </DropdownMenuItem>
+
+                  <DropdownMenuItem
+                    asChild
+                    onSelect={(e) => e.preventDefault()}
+                  >
+                    <div className="flex w-full items-center gap-3 rounded-lg px-3 py-1 transition hover:bg-[#1A1823] hover:text-white">
+                      <FeedbackModal />
+                    </div>
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
@@ -209,6 +225,12 @@ function Navbar() {
                       onSelect={(e) => e.preventDefault()}
                     >
                       <RequestModal />
+                    </DropdownMenuItem>
+                    <DropdownMenuItem
+                      asChild
+                      onSelect={(e) => e.preventDefault()}
+                    >
+                      <FeedbackModal />
                     </DropdownMenuItem>
                   </DropdownMenuContent>
                 </DropdownMenu>
