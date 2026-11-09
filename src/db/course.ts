@@ -3,6 +3,7 @@ import { type ICourseCount, type ICourses } from "@/interface";
 
 const courseSchema = new Schema<ICourses>({
   name: { type: String, required: true },
+  syllabus: { type: String, required: false },
 });
 
 const courseCountSchema = new Schema<ICourseCount>({
