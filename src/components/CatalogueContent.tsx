@@ -4,7 +4,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Button } from "@/components/ui/button";
-import { type IPaper, type Filters, type StoredSubjects, type ApiResponse } from "@/interface";
+import { type IPaper, type Filters, type ApiResponse } from "@/interface";
 import Card from "./Card";
 import Loader from "./ui/loader";
 import SideBar from "../components/SideBar";
@@ -20,6 +20,7 @@ import posthog from "posthog-js";
 import EmptyState from "./ui/EmptyState";
 import SelectionToolbar from "./SelectionToolbar";
 import SortComponent from "./ui/sorting";
+import { readPinnedSubjects } from "@/lib/utils/pinned-subjects";
 
 const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   const [isMounted, setIsMounted] = useState(false);
@@ -94,9 +95,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
   useEffect(() => {
     setIsMounted(true);
     if (searchParams) {
-      const currentPinnedSubjects = JSON.parse(
-        localStorage.getItem("userSubjects") ?? "[]",
-      ) as StoredSubjects;
+      const currentPinnedSubjects = readPinnedSubjects();
       const subjectName = searchParams.get("subject");
       setSelectedExams(
         searchParams.get("exams")?.split(",").filter(Boolean) ?? [],
@@ -136,9 +135,7 @@ const CatalogueContentInner = ({ subject }: { subject: string | null }) => {
     const current = !pinned;
     setPinned(current);
 
-    const saved = JSON.parse(
-      localStorage.getItem("userSubjects") ?? "[]",
-    ) as string[];
+    const saved = readPinnedSubjects();
     const updated = current
       ? [...new Set([...saved, subject])]
       : saved.filter((s) => s !== subject);
