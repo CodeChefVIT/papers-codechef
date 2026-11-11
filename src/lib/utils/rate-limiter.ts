@@ -15,6 +15,13 @@ function getClientIp(req: Request & { ip?: string}): string {
 }
 
 export async function rateLimitCheck(req: Request & { ip?: string }, paperId: string) {
+  if (!redis) {
+    if (process.env.NODE_ENV === "production") {
+      throw new CustomError("rate limiting is not configured", 503);
+    }
+    return;
+  }
+
   const ratelimit = new Ratelimit({
     redis,
     limiter: Ratelimit.slidingWindow(3, "1 h"),//per id - 3 request - per hour
