@@ -5,7 +5,8 @@ import { Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import PinButton from "../PinButton";
 import Fuse from "fuse.js";
-import { type StoredSubjects, type ICourseWithCount, type IUpcomingPaper } from "@/interface";
+import { type ICourseWithCount, type IUpcomingPaper } from "@/interface";
+import { readPinnedSubjects } from "@/lib/utils/pinned-subjects";
 
 function PinnedSearchBar({
   initialSubjects,
@@ -53,9 +54,7 @@ function PinnedSearchBar({
   const handleSelectSuggestion = (suggestion: string) => {
     setSearchText(suggestion);
 
-    const currentPinnedSubjects = JSON.parse(
-      localStorage.getItem("userSubjects") ?? "[]",
-    ) as StoredSubjects;
+    const currentPinnedSubjects = readPinnedSubjects();
 
     if (suggestion && Array.isArray(currentPinnedSubjects)) {
       setPinned(currentPinnedSubjects.includes(suggestion));
@@ -94,9 +93,7 @@ function PinnedSearchBar({
       return;
     }
 
-    const saved = JSON.parse(
-      localStorage.getItem("userSubjects") ?? "[]",
-    ) as string[];
+    const saved = readPinnedSubjects();
 
     let updated: string[] = [];
 
@@ -133,9 +130,7 @@ function PinnedSearchBar({
 
   useEffect(() => {
     const handlePinsChange = () => {
-      const saved = JSON.parse(
-        localStorage.getItem("userSubjects") ?? "[]",
-      ) as string[];
+      const saved = readPinnedSubjects();
 
       if (saved.length === 0) {
         setShowControls(false);
@@ -152,9 +147,7 @@ function PinnedSearchBar({
   }, []);
 
   useEffect(() => {
-    const storedSubjects = JSON.parse(
-      localStorage.getItem("userSubjects") ?? "[]",
-    ) as string[];
+    const storedSubjects = readPinnedSubjects();
 
     if (storedSubjects.length > 0) {
       setShowControls(true);
