@@ -86,19 +86,28 @@ export async function checkAndSyncUpcomingSlots(): Promise<void> {
     .sort((a, b) => b.count - a.count)
     .slice(0, targetUniqueCount);
 
-  await UpcomingSlot.findOneAndUpdate(
-    {},
-    { $set: { slot: scheduledSlot, lastSyncedDate: today } },
-    { upsert: true, new: true, setDefaultsOnInsert: true },
+  const todaysSlot = { $set: { slot: scheduledSlot, lastSyncedDate: today } };
+  const wonTheSync = currentSlotDoc
+    ? await UpcomingSlot.findOneAndUpdate(
+        { _id: currentSlotDoc._id, lastSyncedDate: { $ne: today } },
+        todaysSlot,
+      )
+    : await UpcomingSlot.findOneAndUpdate({}, todaysSlot, {
+        upsert: true,
+        new: true,
+        setDefaultsOnInsert: true,
+      });
+
+  if (!wonTheSync) return;
+
+  const freshSubjects = await UpcomingSubject.insertMany(
+    ranked.map((item) => ({
+      subject: item.subject,
+      slots: item.slots,
+    })),
   );
 
-  await UpcomingSubject.deleteMany({});
-  if (ranked.length > 0) {
-    await UpcomingSubject.insertMany(
-      ranked.map((item) => ({
-        subject: item.subject,
-        slots: item.slots,
-      })),
-    );
-  }
+  await UpcomingSubject.deleteMany({
+    _id: { $nin: freshSubjects.map((subject) => subject._id) },
+  });
 }
