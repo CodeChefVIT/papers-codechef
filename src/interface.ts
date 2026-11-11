@@ -18,6 +18,8 @@ export interface PaperResponse {
   slot: string;
   exam: string;
   school?: string;
+  views?: number;
+  downloads?: number;
 }
 
 export interface IAdminPaper {
@@ -122,6 +124,13 @@ export interface IPaper {
   subject: string;
   year: string;
   answer_key_included?: boolean;
+  views?: number;
+  downloads?: number;
+}
+
+export interface PaperCounts {
+  views: number;
+  downloads: number;
 }
 
 export interface Filters {

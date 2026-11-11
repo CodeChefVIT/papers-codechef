@@ -8,6 +8,7 @@ import { type Metadata } from "next";
 import { redirect } from "next/navigation";
 import { PaperProvider } from "@/context/PaperContext";
 import PDFViewer from "@/components/newPdfViewer";
+import PaperCountsLine from "@/components/PaperCountsLine";
 
 export async function generateMetadata({
   params,
@@ -159,11 +160,19 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
         </div>
       ) : (
         <>
-          <h1 className="my-6 flex justify-center gap-4 text-center font-play text-2xl font-semibold md:mb-10 md:text-3xl">
+          <h1 className="mt-6 flex justify-center gap-4 text-center font-play text-2xl font-semibold md:text-3xl">
             <div>
               {paper.subject} {paper.exam} {paper.slot} {paper.year}
             </div>
           </h1>
+          <div className="mb-6 mt-2 text-center md:mb-10">
+            <PaperCountsLine
+              paperId={params.id}
+              views={paper.views}
+              downloads={paper.downloads}
+              countView
+            />
+          </div>
           <center>
               <PaperProvider
                 value={{

@@ -78,6 +78,8 @@ const paperSchema = new Schema<IPaper>({
     enum: ["SCOPE","SITE","SENSE","SMEC","SCE","SELECT","SAS","SSL","VITBS","SBST","SCORE","SCHEME","SHINE","V-SIGN","V-SMART","V-SPARC","VAIAL","HOT"],
   },
   answer_key_included: { type: Boolean, default: false },
+  views: { type: Number, default: 0 },
+  downloads: { type: Number, default: 0 },
 });
 
 export const PaperAdmin: Model<IAdminPaper> =

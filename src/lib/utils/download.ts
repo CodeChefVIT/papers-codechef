@@ -14,7 +14,7 @@ export const generateFileName = (paper: IPaper): string => {
 export const downloadFile = async (
   url: string,
   filename: string,
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     const response = await axios.get(url, { responseType: "blob" });
     const blob = new Blob([response.data]);
@@ -23,6 +23,7 @@ export const downloadFile = async (
     link.download = filename;
     link.click();
     window.URL.revokeObjectURL(link.href);
+    return true;
   } catch (error) {
     console.error("Download failed (File missing or network error):", error);
     if (typeof navigator !== "undefined" && !navigator.onLine) {
@@ -30,5 +31,6 @@ export const downloadFile = async (
     } else {
       toast.error("This paper is no longer available on the server.");
     }
+    return false;
   }
 };

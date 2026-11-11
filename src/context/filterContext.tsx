@@ -18,6 +18,7 @@ import posthog from "posthog-js";
 import JSZip from "jszip";
 import { toast } from "react-hot-toast";
 import { getSecureUrl, generateFileName } from "@/lib/utils/download";
+import { sendPaperActivity } from "@/lib/utils/paper-counts";
 
 interface FilterState {
   selectedExams: string[];
@@ -162,6 +163,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       ).map((id) => selectedPapers.find((paper) => paper._id === id)) as IPaper[];
 
       let failedCount = 0;
+      const zippedPaperIds: string[] = [];
       // Different papers can share a generated name (e.g. same subject/exam/slot/year
       // from different campuses). JSZip overwrites entries with the same path, so
       // append " (1)", " (2)", ... to keep every paper in the zip.
@@ -186,6 +188,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
             const blob = await response.blob();
             const filename = getUniqueName(generateFileName(paper));
             zip.file(filename, blob);
+            zippedPaperIds.push(paper._id);
           } catch (err) {
             failedCount += 1;
             console.error(`Failed to fetch ${paper.file_url}`, err);
@@ -221,6 +224,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       a.click();
       a.remove();
       URL.revokeObjectURL(url);
+      void sendPaperActivity("download", zippedPaperIds);
 
       posthog.capture("papers_bulk_downloaded", {
         download_count: uniquePapers.length - failedCount,

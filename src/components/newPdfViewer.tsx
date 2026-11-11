@@ -17,6 +17,8 @@ import { Button } from "./ui/button";
 import ShareButton from "./ShareButton";
 import ReportButton from "./ReportButton";
 import { useTheme } from "next-themes";
+import { sendPaperActivity } from "@/lib/utils/paper-counts";
+import { usePaper } from "@/context/PaperContext";
 
 interface ControlProps {
   documentId: string;
@@ -461,6 +463,7 @@ export default function PDFViewer({
   onReadingModeChange,
 }: PdfViewerProps) {
   const { engine, isLoading } = usePdfiumEngine();
+  const { paperId } = usePaper();
   const { isMobile, isSmall } = useBreakpoint();
   const { resolvedTheme } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
@@ -495,8 +498,9 @@ export default function PDFViewer({
     posthog.capture("paper_downloaded", {
       paper_name: name,
     });
-    await downloadFile(url, `${name}.pdf`);
-  }, [url, name]);
+    const downloaded = await downloadFile(url, `${name}.pdf`);
+    if (downloaded) void sendPaperActivity("download", [paperId]);
+  }, [url, name, paperId]);
 
   const toggleFullscreen = useCallback(() => {
     if (!document.fullscreenElement) {

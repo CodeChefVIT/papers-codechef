@@ -17,6 +17,8 @@ import { Capsule } from "@/components/ui/capsule";
 import { cn } from "@/lib/utils";
 import PDFViewer from "@/components/newPdfViewer";
 import { PaperProvider } from "@/context/PaperContext";
+import PaperCountsLine from "@/components/PaperCountsLine";
+import { sendPaperActivity } from "@/lib/utils/paper-counts";
 
 interface CardProps {
   paper: IPaper;
@@ -51,7 +53,8 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   }, [previewOpen]);
 
   const handleDownload = async (paper: IPaper) => {
-    await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
+    const downloaded = await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
+    if (downloaded) void sendPaperActivity("download", [paper._id]);
   };
 
   const handleCheckboxChange = () => {
@@ -102,6 +105,12 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
                 <Capsule>{paper.semester}</Capsule>
                 {paper.school && <Capsule>{paper.school}</Capsule>}
               </div>
+              <PaperCountsLine
+                paperId={paper._id}
+                views={paper.views}
+                downloads={paper.downloads}
+                className="block"
+              />
             </div>
           </div>
 
@@ -111,6 +120,7 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
               onClick={(e) => {
                 e.stopPropagation();
                 setPreviewOpen(true);
+                void sendPaperActivity("view", [paper._id]);
               }}
             />
 
