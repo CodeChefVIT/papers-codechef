@@ -8,10 +8,19 @@ export const runtime = "nodejs";
 export async function POST(req: Request) {
   try {
     const formData = await req.formData();
-    const files = formData.getAll("files").filter(Boolean) as File[];
+    const uploads = formData.getAll("files");
+    const files = uploads.filter((upload): upload is File => typeof upload !== "string");
     const isPdf = formData.get("isPdf") === "true";
     const thumbnail = formData.get("thumbnail") as File | null;
     const campus = formData.get("campus") as string | null;
+
+    if (files.length !== uploads.length) {
+      return failure("every entry in files has to be a file", 400);
+    }
+
+    if (isPdf && files.length > 1) {
+      return failure("upload one pdf at a time", 400);
+    }
 
     if (files.length === 0) {
       return failure("No files received.", 400);
