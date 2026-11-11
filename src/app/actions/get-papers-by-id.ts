@@ -15,6 +15,10 @@ export const fetchPaperID = async (id: string): Promise<PaperResponse> => {
     return response.data.data;
   } catch (err: unknown) {
     if (axios.isAxiosError<ApiResponse<unknown>>(err)) {
+      const status = err.response?.status;
+      if (status === 400 || status === 404) {
+        throw err;
+      }
       const errorMessage = err.response?.data?.message ?? err.message;
       console.error("Axios error:", errorMessage);
       throw new Error(errorMessage);

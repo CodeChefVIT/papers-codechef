@@ -7,6 +7,7 @@ import CourseCount from "@/db/course";
 import PaperRequest from "@/db/paperRequest";
 import { type StoredSubjects } from "@/interface";
 import { transformPapersToSubjectSlots } from "@/lib/services/paper-transform";
+import { CustomError } from "@/lib/utils/error";
 
 export interface CreatePaperInputType {
   subject: string;
@@ -40,7 +41,7 @@ export async function getPaperById(id: string) {
 	const paper = await Paper.findById(id);
 
 	if (!paper) {
-		throw new Error("Paper not found"); // 404
+		throw new CustomError("paper not found", 404);
 	}
 
 	return paper;
