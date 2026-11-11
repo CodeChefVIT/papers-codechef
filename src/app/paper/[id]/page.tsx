@@ -2,7 +2,7 @@ import { fetchPaperID } from "@/app/actions/get-papers-by-id";
 import RelatedPapers from "@/components/RelatedPaper";
 import Loader from "@/components/ui/loader";
 import { type ErrorResponse, type PaperResponse } from "@/interface";
-import { extractBracketContent } from "@/lib/utils/string";
+import { courseCodeOrName } from "@/lib/utils/string";
 import axios, { type AxiosResponse } from "axios";
 import { type Metadata } from "next";
 import { redirect } from "next/navigation";
@@ -177,7 +177,7 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
 
             <PDFViewer
               url={paper.file_url}
-              name={`${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}/>
+              name={`${courseCodeOrName(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}/>
             
             {/* <PdfViewer
               url={paper.file_url}
