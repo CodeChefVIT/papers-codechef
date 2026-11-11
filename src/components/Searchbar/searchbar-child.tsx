@@ -38,7 +38,6 @@ function SearchBarChild({
         }),
       );
     }
-    console.log(initialSubjects);
   }, [initialSubjects]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +47,6 @@ function SearchBarChild({
     if (text.length > 1 && initialSubjects.length > 0) {
       const filteredSuggestions = fuzzy
         .search(text)
-        .sort((a, b) => (a.score ?? Infinity) - (b.score ?? Infinity))
         .map((res) => res.item)
         .slice(0, 10);
 
