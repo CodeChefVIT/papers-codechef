@@ -32,7 +32,6 @@ GlobalWorkerOptions.workerSrc =
 
 interface uploadResponse {
   file_url: string;
-  thumbnail_url: string;
 }
 export default function Page() {
   const campus = "Vellore";
