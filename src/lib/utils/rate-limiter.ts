@@ -2,7 +2,7 @@ import { redis } from "@/lib/utils/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 import { CustomError } from "./error";
 
-function getClientIp(req: Request & { ip?: string}): string {
+export function getClientIp(req: Request & { ip?: string}): string {
   const xff = req.headers.get("x-forwarded-for");
   if (typeof xff === "string" && xff.length > 0) {
     return xff.split(",")[0]?.trim()??"";
