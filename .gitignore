@@ -45,3 +45,6 @@ yarn-error.log*
 
 # vscode
 ./vscode
+
+# backups written by scripts/remove-ghost-papers.mjs
+ghost-papers-*.json
