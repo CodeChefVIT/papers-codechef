@@ -3,7 +3,7 @@
 import React from "react";
 import { type IPaper } from "@/interface";
 import Image from "next/image";
-import { X, Eye, Download, Check } from "lucide-react";
+import { X, Eye, Download, Check, Loader2 } from "lucide-react";
 import {
   extractBracketContent,
   extractWithoutBracketContent,
@@ -27,6 +27,8 @@ interface CardProps {
 
 const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   const [previewOpen, setPreviewOpen] = React.useState(false);
+  const [isDownloading, setIsDownloading] = React.useState(false);
+  const downloadInProgress = React.useRef(false);
 
   const paperContextValue = React.useMemo(
     () => ({
@@ -51,7 +53,15 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
   }, [previewOpen]);
 
   const handleDownload = async (paper: IPaper) => {
-    await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
+    if (downloadInProgress.current) return;
+    downloadInProgress.current = true;
+    setIsDownloading(true);
+    try {
+      await downloadFile(getSecureUrl(paper.file_url), generateFileName(paper));
+    } finally {
+      downloadInProgress.current = false;
+      setIsDownloading(false);
+    }
   };
 
   const handleCheckboxChange = () => {
@@ -114,14 +124,20 @@ const Card = ({ paper, onSelect, isSelected, isShow=true }: CardProps) => {
               }}
             />
 
-          <Download
-            size={20}
+          <button
+            type="button"
+            disabled={isDownloading}
+            aria-busy={isDownloading}
+            aria-label={isDownloading ? "Downloading paper" : "Download paper"}
+            title={isDownloading ? "Downloading paper…" : "Download paper"}
             onClick={(e) => {
               e.stopPropagation();
               void handleDownload(paper);
             }}
-            className="cursor-pointer"
-          />
+            className="cursor-pointer disabled:cursor-wait disabled:opacity-50"
+          >
+            {isDownloading ? <Loader2 size={20} className="animate-spin" /> : <Download size={20} />}
+          </button>
         </div>
          
         <div className="flex items-center justify-between gap-2 px-4 pb-4 font-play">
