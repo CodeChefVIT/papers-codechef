@@ -6,6 +6,7 @@ import React, {
   useState,
   useCallback,
   useMemo,
+  useRef,
   type ReactNode,
 } from "react";
 import {
@@ -111,6 +112,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
   const [currentPage, setCurrentPage] = useState(1);
   const [papersPerPage] = useState(12);
   const [isDownloading, setIsDownloading] = useState<boolean>(false);
+  const downloadInProgress = useRef(false);
 
   const filtersNotPulled = useCallback(() => {
     setFiltersPulled(false);
@@ -144,12 +146,12 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
 
   const searchParams = useSearchParams();
   const handleDownloadSelected = useCallback(async () => {
+    if (downloadInProgress.current) return;
     if (selectedPapers.length === 0) {
       toast.error("No papers selected for download.");
       return;
     }
-    if (isDownloading) return;
-
+    downloadInProgress.current = true;
     setIsDownloading(true);
     const toastId = toast.loading(
       `Preparing ${selectedPapers.length} paper${selectedPapers.length > 1 ? "s" : ""} for download…`,
@@ -242,9 +244,10 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
         id: toastId,
       });
     } finally {
+      downloadInProgress.current = false;
       setIsDownloading(false);
     }
-  }, [searchParams, selectedPapers, isDownloading]);
+  }, [searchParams, selectedPapers]);
 
   const handleApplyFilters = useCallback(
     (
