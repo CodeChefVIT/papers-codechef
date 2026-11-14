@@ -279,17 +279,7 @@ export const FilterProvider: React.FC<FilterProviderProps> = ({
       setSelectedAnswerKeyIncluded(anskey);
       setCurrentPage(1);
     },
-    [
-      router,
-      subject,
-      setSelectedExams,
-      setSelectedSlots,
-      setSelectedYears,
-      setSelectedCampuses,
-      setSelectedSemesters,
-      setSelectedAnswerKeyIncluded,
-      setCurrentPage,
-    ],
+    [router, subject],
   );
 
   const paginatedPapers = useMemo(
