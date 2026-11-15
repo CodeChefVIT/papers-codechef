@@ -12,18 +12,25 @@
 
 ## ⚙️ Tech Stack:
 
-- Next.js : Framework for React applications with server-side rendering.
-- Tailwind CSS : Utility-first CSS framework for rapid UI development.
-- MongoDB & Mongoose : Database and object data modeling (ODM) for Node.js.
-- Google Cloud Storage: Media storage and optimization service.
-- Shadcn : Collection of pre-built components using Radix UI and Tailwind CSS.
+- **Next.js** - Framework for React applications with server-side rendering.
+- **Tailwind CSS** - Utility-first CSS framework for rapid UI development.
+- **MongoDB & Mongoose** - Database and ODM for Node.js.
+- **Google Cloud Storage** - Media storage for papers and thumbnails.
+- **Shadcn/UI** - Pre-built components using Radix UI and Tailwind CSS.
+- **Upstash Redis** - Rate limiting for API routes.
+- **Fuse.js** - Fuzzy search for papers and subjects.
+- **JSZip** - Client-side bulk download as a ZIP.
+- **PostHog** - Anonymous usage analytics.
+
 ## 💡 Features:
 
-- Access a vast collection of past CAT and FAT papers
-- Review papers sorted by subject, year, and difficulty
-- Download papers for offline use
-- Familiarize yourself with exam patterns and types of questions
-- Stay updated with any new additions to the repository
+- Access a large collection of past CAT and FAT papers from VIT
+- Search papers by subject, slot, or course code
+- Download individual papers or bulk-download as a ZIP
+- Pin frequently used subjects for quick access
+- In-browser PDF viewer — no need to download just to read
+- Upload papers directly (pending admin approval)
+- Stay updated with new additions to the repository
 
 ## 🏁 Get Started
 Note: To get started with contributing to the repo visit [CONTRIBUTE.md](CONTRIBUTING.md)
@@ -146,6 +153,10 @@ Our top maintainers, making sure the database of papers is maintained and upto-d
   </tr>
 </table>
 
+
+## Security
+
+If you find a security vulnerability, please do NOT open a public issue. See [SECURITY.md](SECURITY.md) for the responsible disclosure process.
 
 ## License
 

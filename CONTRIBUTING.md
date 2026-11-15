@@ -6,7 +6,8 @@ We appreciate your interest in contributing to the `papers-codechef` repository!
 ## Getting started
 
 - If you're looking for ideas about what to work on, check out our [issues](https://github.com/CodeChefVIT/papers-codechef/issues) 
-- If you have a bugfix to report ensure that you are on the latest pkull and no similar issue exists. You can then [create an bug report](https://github.com/CodeChefVIT/papers-codechef/issues/new?template=bug_report.md)
+- If you have a bugfix to report ensure that you are on the latest pull and no similar issue exists. You can then [create a bug report](https://github.com/CodeChefVIT/papers-codechef/issues/new?template=bug_report.md)
+- **Found a security issue?** Please do NOT open a public GitHub issue. See [SECURITY.md](SECURITY.md) for how to report it privately.
 - You can also propose a [feature request](https://github.com/CodeChefVIT/papers-codechef/issues/new?template=feature_request.md). Begin by filling out the template, write a brief problem statement that clearly explains the issue you want to address, without tying it to any specific solution. It doesn’t need to be long or formal; just provide enough context to clearly understand the problem before discussing possible solutions. 
 
 ## Setting up
@@ -47,7 +48,7 @@ Please ensure that any Pull Request you make contains these things -
 - List of the major changes made in this PR.
 - Mention of any bug fixes, known issues or follow-ups needed.
 
-**Important:** Ensure no merge conflicts exist before making a PR and run `pnpm build` to check for build errors.
+**Important:** Ensure no merge conflicts exist before making a PR. Run `pnpm build` to check for build errors and `npx tsc --noEmit` to catch any TypeScript type errors.
 
 
 ### Tips to improve the chances of your PR getting reviewed and merged

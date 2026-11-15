@@ -7,6 +7,10 @@ assignees: ''
 
 ---
 
+> [!CAUTION]
+> If this is a **security vulnerability**, do NOT use this form.
+> Report it privately via [SECURITY.md](../../SECURITY.md) instead.
+
 **Describe the bug**
 A clear and concise description of what the bug is.
 
