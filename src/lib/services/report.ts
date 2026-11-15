@@ -21,9 +21,9 @@ interface ReportedFieldInput {
 
 export async function reportTag(paperId: string, body: ReportTagBody) {
   await connectToDatabase(); 
-  const count = await TagReport.countDocuments({ paperId });
+  const openReports = await TagReport.countDocuments({ paperId, resolved: { $ne: true } });
 
-  if (count >= MAX_REPORTS_PER_PAPER) {
+  if (openReports >= MAX_REPORTS_PER_PAPER) {
     throw new CustomError("Received many reports; we are currently working on it.", 429)
   }
     const reportedFields: ReportedFieldInput[] = Array.isArray(body.reportedFields)
