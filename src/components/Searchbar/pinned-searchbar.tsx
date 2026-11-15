@@ -40,7 +40,6 @@ function PinnedSearchBar({
     if (text.length > 1 && initialSubjects.length > 0) {
       const filteredSuggestions = fuzzy
         .search(text)
-        .sort((a, b) => (a.score ?? Infinity) - (b.score ?? Infinity))
         .map((res) => res.item.name)
         .slice(0, 10);
 
