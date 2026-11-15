@@ -1,5 +1,5 @@
 import { type IPaper } from "../../interface";
-import { extractBracketContent } from "./string";
+import { courseCodeOrName } from "./string";
 import axios from "axios";
 import toast from "react-hot-toast";
 
@@ -8,7 +8,7 @@ export const getSecureUrl = (url: string): string =>
 
 export const generateFileName = (paper: IPaper): string => {
   const extension = paper.file_url.split(".").pop();
-  return `${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}.${extension}`;
+  return `${courseCodeOrName(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}.${extension}`;
 };
 
 export const downloadFile = async (

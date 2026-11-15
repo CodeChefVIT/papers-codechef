@@ -16,9 +16,13 @@ export function toSentenceCase(input: string): string {
 export function extractBracketContent(subject: string): string | null {
   const regex = /\[(.*?)\]/;
   const match = regex.exec(subject);
-  return match?.[1] ?? "BMAT102L";
+  return match?.[1] ?? null;
 }
 
 export function extractWithoutBracketContent(subject: string): string {
   return subject.replace(/\s*\[.*?\]\s*/g, "").trim();
+}
+
+export function courseCodeOrName(subject: string): string {
+  return extractBracketContent(subject) ?? extractWithoutBracketContent(subject);
 }
