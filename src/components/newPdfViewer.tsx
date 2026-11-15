@@ -9,7 +9,7 @@ import { useZoom, ZoomPluginPackage, ZoomMode }          from '@embedpdf/plugin-
 import { RenderLayer, RenderPluginPackage }              from '@embedpdf/plugin-render/react';
 import { ExportPluginPackage }                           from '@embedpdf/plugin-export/react';
 
-import { Download, ZoomIn, ZoomOut, Maximize2, Minimize2, BookOpenText, X } from "lucide-react";
+import { Download, Loader2, ZoomIn, ZoomOut, Maximize2, Minimize2, BookOpenText, X } from "lucide-react";
 import posthog from "posthog-js";
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { downloadFile } from "../lib/utils/download";
@@ -23,6 +23,7 @@ interface ControlProps {
   toggleFullscreen: () => void;
   isFullscreen: boolean;
   onDownload: () => Promise<void>;
+  isDownloading: boolean;
   forceMobile?: boolean;
   isMobile: boolean;
   isSmall: boolean;
@@ -63,7 +64,7 @@ function useBreakpoint() {
   return {isMobile: width !== null && width < 768, isSmall: width !== null && width < 640};
 }
 
-const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, onDownload,
+const Controls = memo(function Controls({documentId, toggleFullscreen, isFullscreen, onDownload, isDownloading,
   forceMobile, isMobile, isSmall, viewerRef, isReadingMode, toggleReadingMode,
   showReadingCoachmark, dismissReadingCoachmark}: ControlProps) {
 
@@ -208,10 +209,13 @@ const pageChange = useCallback(
 
       <Button
         onClick={onDownload}
+        disabled={isDownloading}
+        aria-busy={isDownloading}
+        aria-label={isDownloading ? "Downloading PDF" : "Download PDF"}
         className="h-10 w-10 rounded p-0 text-white bg-[#6536c1] transition hover:bg-[#7d4fc7]"
-        title="Download PDF"
+        title={isDownloading ? "Downloading PDF…" : "Download PDF"}
       >
-        <Download size={24} />
+        {isDownloading ? <Loader2 size={24} className="animate-spin" /> : <Download size={24} />}
       </Button>
 
       <ShareButton isFullscreen={isFullscreen} viewerRef={viewerRef} />
@@ -464,6 +468,8 @@ export default function PDFViewer({
   const { isMobile, isSmall } = useBreakpoint();
   const { resolvedTheme } = useTheme();
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const downloadInProgress = useRef(false);
   const [isReadingMode, setIsReadingMode] = useState(false);
   const [showReadingCoachmark, setShowReadingCoachmark] = useState(false);
   const viewerRef = useRef<HTMLDivElement>(null);
@@ -487,15 +493,23 @@ export default function PDFViewer({
     resolvedTheme === "light" ? "rgba(17,24,39,0.6)" : "rgba(255,255,255,0.5)";
 
   const handleDownload = useCallback(async () => {
-    window.dataLayer?.push({
-      event: "pdf_download_start",
-      paper_title: name,
-      paper_url: url,
-    });
-    posthog.capture("paper_downloaded", {
-      paper_name: name,
-    });
-    await downloadFile(url, `${name}.pdf`);
+    if (downloadInProgress.current) return;
+    downloadInProgress.current = true;
+    setIsDownloading(true);
+    try {
+      window.dataLayer?.push({
+        event: "pdf_download_start",
+        paper_title: name,
+        paper_url: url,
+      });
+      posthog.capture("paper_downloaded", {
+        paper_name: name,
+      });
+      await downloadFile(url, `${name}.pdf`);
+    } finally {
+      downloadInProgress.current = false;
+      setIsDownloading(false);
+    }
   }, [url, name]);
 
   const toggleFullscreen = useCallback(() => {
@@ -671,6 +685,7 @@ export default function PDFViewer({
                 toggleFullscreen={toggleFullscreen}
                 isFullscreen={isFullscreen}
                 onDownload={handleDownload}
+                isDownloading={isDownloading}
                 forceMobile={true}
                 isMobile={isMobile}
                 isSmall={isSmall}
@@ -736,6 +751,7 @@ export default function PDFViewer({
                   toggleFullscreen={toggleFullscreen}
                   isFullscreen={isFullscreen}
                   onDownload={handleDownload}
+                  isDownloading={isDownloading}
                   forceMobile={false}
                   isMobile={isMobile}
                   isSmall={isSmall}
