@@ -1,20 +1,16 @@
 import { Ratelimit } from "@upstash/ratelimit";
 import { redis } from "./redis";
 
-// Rate limiter for AI Upload (5 requests per 15 minutes)
-export const aiUploadRatelimit = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(5, "900 s"),
-});
+type Window = Parameters<typeof Ratelimit.slidingWindow>[1];
 
-// Rate limiter for Paper Requests (5 requests per 15 minutes)
-export const paperRequestRatelimit = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(5, "900 s"),
-});
+function allow(requests: number, window: Window) {
+  return redis
+    ? new Ratelimit({ redis, limiter: Ratelimit.slidingWindow(requests, window) })
+    : null;
+}
 
-// Rate limiter for Subscriptions (3 requests per hour)
-export const subscribeRatelimit = new Ratelimit({
-  redis: redis,
-  limiter: Ratelimit.slidingWindow(3, "1 h"),
-});
+export const aiUploadRatelimit = allow(5, "900 s");
+
+export const paperRequestRatelimit = allow(5, "900 s");
+
+export const subscribeRatelimit = allow(3, "1 h");

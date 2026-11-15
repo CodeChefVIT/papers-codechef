@@ -11,6 +11,13 @@ export const config = {
 };
 
 export default async function middleware(request: NextRequest) {
+  if (!aiUploadRatelimit || !paperRequestRatelimit || !subscribeRatelimit) {
+    if (process.env.NODE_ENV === "production") {
+      return failure("rate limiting is not configured", 503);
+    }
+    return NextResponse.next();
+  }
+
   const ip = request.ip ?? "127.0.0.1";
   const { pathname } = request.nextUrl;
 
