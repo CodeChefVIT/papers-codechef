@@ -1,6 +1,6 @@
 import { PaperAdmin } from "@/db/papers";
 import { createPDFfromImages, compressPDF } from "@/lib/storage/pdf";
-import { uploadPDF, uploadThumbnail } from "@/lib/storage/gcp";
+import { uploadPDF } from "@/lib/storage/gcp";
 import { connectToDatabase } from "@/lib/database/mongoose";
 
 const MAX_COMPRESSED_PDF_SIZE = 5 * 1024 * 1024; // 5MB compressed
@@ -9,18 +9,16 @@ const COMPRESS_THRESHOLD = 5 * 1024 * 1024; // 5MB
 type UploadPaperInput = {
   files: File[];
   isPdf: boolean;
-  thumbnail: File | null;
   campus: string | null;
 };
 
 type UploadPaperResult =
-  | { success: true; file_url: string; thumbnail_url: string | null }
+  | { success: true; file_url: string }
   | { success: false; message: string; status: number };
 
 export async function uploadPaper({
   files,
   isPdf,
-  thumbnail,
   campus,
 }: UploadPaperInput): Promise<UploadPaperResult> {
   await connectToDatabase();
@@ -63,15 +61,9 @@ export async function uploadPaper({
   const buffer = Buffer.from(pdfBytes);
   const file_url = await uploadPDF("unapproved", buffer);
 
-  let thumbnail_url: string | null = null;
-  if (thumbnail) {
-    const thumbBuffer = Buffer.from(await thumbnail.arrayBuffer());
-    thumbnail_url = await uploadThumbnail(thumbBuffer, file_url);
-  }
-
   const paper = new PaperAdmin({
     file_url,
-    thumbnail_url,
+    thumbnail_url: null,
     campus,
     subject: null,
     slot: null,
@@ -82,5 +74,5 @@ export async function uploadPaper({
   });
   await paper.save();
 
-  return { success: true, file_url, thumbnail_url };
+  return { success: true, file_url };
 }

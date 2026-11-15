@@ -44,13 +44,3 @@ export async function uploadPDF(folder: string, buffer: Buffer) {
   await bucket.file(pdfFilename).save(buffer, { resumable: false, contentType: "application/pdf" });
   return `https://storage.googleapis.com/${bucketName}/${pdfFilename}`;
 }
-
-export async function uploadThumbnail(buffer: Buffer, pdfFilename: string) {
-  if (!bucket) {
-    throw new Error("Google Cloud Storage is not configured");
-  }
-  const bucketName = process.env.GOOGLE_CLOUD_BUCKET ?? "";
-  const thumbFilename = pdfFilename.replace(".pdf", ".png");
-  await bucket.file(thumbFilename).save(buffer, { resumable: false, contentType: "image/png" });
-  return `https://storage.googleapis.com/${bucketName}/${thumbFilename}`;
-}
