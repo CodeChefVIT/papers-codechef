@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 import SearchBar from "@/components/Searchbar/searchbar";
 import { type IUpcomingPaper } from "@/interface";
-import { type StoredSubjects } from "@/interface";
 import { useState, useEffect } from "react";
 import { Pin, PinOff, Plus, GripVertical } from "lucide-react";
 import {
@@ -31,6 +30,7 @@ import {
 import { type ApiResponse } from '@/interface'
 
 import { CSS } from "@dnd-kit/utilities";
+import { readPinnedSubjects } from "@/lib/utils/pinned-subjects";
 
 interface userPaperResponse {
   subject: string;
@@ -102,9 +102,7 @@ const PinnedModal = ({
   const fetchPapers = async () => {
     try {
       setIsLoading(true);
-      const storedSubjects = JSON.parse(
-        localStorage.getItem("userSubjects") ?? "[]",
-      ) as StoredSubjects;
+      const storedSubjects = readPinnedSubjects();
       const response = await axios.post<ApiResponse<userPaperResponse[]>>(
         "/api/user-papers",
         storedSubjects,
@@ -143,9 +141,7 @@ const PinnedModal = ({
   };
 
   const unpinSubject = (subjectToRemove: string) => {
-    const updatedSubjects = (
-      JSON.parse(localStorage.getItem("userSubjects") ?? "[]") as string[]
-    ).filter((subj) => subj !== subjectToRemove);
+    const updatedSubjects = readPinnedSubjects().filter((subj) => subj !== subjectToRemove);
     localStorage.setItem("userSubjects", JSON.stringify(updatedSubjects));
     setDisplayPapers((prev) =>
       prev.filter((paper) => paper.subject !== subjectToRemove),

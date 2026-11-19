@@ -6,9 +6,9 @@ import {
 import { useRouter } from "next/navigation";
 import { Pin } from "lucide-react";
 import React, { useEffect, useState } from "react";
-import { type StoredSubjects } from "@/interface";
 import { useCourses } from "@/context/courseContext";
 import { Capsule } from "@/components/ui/capsule";
+import { readPinnedSubjects } from "@/lib/utils/pinned-subjects";
 
 interface PaperCardProps {
   subject: string;
@@ -26,9 +26,7 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
     const current = !pinned;
     setPinned(current);
 
-    const saved = JSON.parse(
-      localStorage.getItem("userSubjects") ?? "[]",
-    ) as string[];
+    const saved = readPinnedSubjects();
     const updated = current
       ? [...new Set([...saved, subject])]
       : saved.filter((s) => s !== subject);
@@ -39,9 +37,7 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
   };
 
   useEffect(() => {
-    const currentPinnedSubjects = JSON.parse(
-      localStorage.getItem("userSubjects") ?? "[]",
-    ) as StoredSubjects;
+    const currentPinnedSubjects = readPinnedSubjects();
 
     setPinned(
       Array.isArray(currentPinnedSubjects) &&

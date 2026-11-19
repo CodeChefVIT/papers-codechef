@@ -13,10 +13,10 @@ import {
 } from "@/components/ui/carousel";
 import Autoplay from "embla-carousel-autoplay";
 import { chunkArray } from "@/lib/utils/array";
-import { type StoredSubjects } from "@/interface";
 import SkeletonPaperCard from "./SkeletonPaperCard";
 import PinnedModal from "./ui/PinnedModal";
 import { type ApiResponse } from "@/interface"
+import { readPinnedSubjects } from "@/lib/utils/pinned-subjects";
 
 interface userPaperResponse {
   subject: string;
@@ -63,9 +63,7 @@ function PinnedPapersCarousel() {
     try {
       setIsLoading(true);
 
-      const storedSubjects = JSON.parse(
-        localStorage.getItem("userSubjects") ?? "[]",
-      ) as StoredSubjects;
+      const storedSubjects = readPinnedSubjects();
 
       const response = await axios.post<ApiResponse<userPaperResponse[]>>(
         "/api/user-papers",
@@ -116,9 +114,7 @@ function PinnedPapersCarousel() {
     const handleSubjectsChange = () => {
       void (async () => {
         try {
-          const storedSubjects = JSON.parse(
-            localStorage.getItem("userSubjects") ?? "[]",
-          ) as StoredSubjects;
+          const storedSubjects = readPinnedSubjects();
 
           const response = await axios.post<ApiResponse<userPaperResponse[]>>("/api/user-papers", storedSubjects);
 
