@@ -61,7 +61,15 @@ export async function getCourseCounts(){
 
 export async function createPaperRequest({ subject, exam, slot, year} : CreatePaperInputType){
   await connectToDatabase();
-  return await PaperRequest.create({ subject, exam, slot, year });
+  const result = await PaperRequest.findOneAndUpdate(
+    { subject, exam, slot, year },
+    { $setOnInsert: { subject, exam, slot, year } },
+    { upsert: true, new: true, runValidators: true, includeResultMetadata: true },
+  );
+  return {
+    request: result.value,
+    alreadyRequested: result.lastErrorObject?.updatedExisting === true,
+  };
 }
 
 export async function getSelectedPapers() {
